@@ -20,8 +20,15 @@ Bu depo yalnızca plan/analiz belgelerini tutar.
 
 ## Faz durumu (2026-10-18)
 
-- **Faz 0** ✔ tamam: repo klonu, tam masaüstü derleme (11.1 MB arm64), test 345/351 (6 adet `lagi_acs` uid-0 artefaktı), sınıflandırma haritası
-- **Faz 1** ▶ sürüyor: **P1.1–P1.4 ✔** (çekirdek statik lib + string/geo + compat ABI'leri + runtime/koordinat ABI'leri; 27+ TU wx'siz) — sırada P1.5 (FontMeasure), P1.6 (CLI duman testi)
+| Faz / Paket | Durum | Kod commit | Not |
+|---|---|---|---|
+| Faz 0 (keşif) | ✔ | — | 344 dosya sınıflandırma haritası; masaüstü build+test baseline (345/351) |
+| Faz 1 / P1.1 ✓ | ✔ | [`c2aef9bed`](https://github.com/velnoxy/Velsub/commit/c2aef9bed) | `aegisub-core` statik lib (`-DAGI_CORE`) |
+| Faz 1 / P1.2 ✓ | ✔ | [`c77d23cb1`](https://github.com/velnoxy/Velsub/commit/c77d23cb1) | `ass_style` çekirdeğe katıldı; `GetEncodings` UI'a taşındı |
+| Faz 1 / P1.3 ✓ | ✔ | [`5f129ca99`](https://github.com/velnoxy/Velsub/commit/5f129ca99) | compat ABI (SingleChoice/Confirm/FileDialog/Clipboard) + 5 TU |
+| Faz 1 / P1.4 ✓ | ✔ | [`9f90c87e`](https://github.com/velnoxy/Velsub/commit/9f90c87e) | runtime ABI (runner/main-thread/Timer) + CoordTranslator; mkv/ffms/libass yolları çekirdekte |
+| Faz 1 / P1.5 ✓ | ✔ | [`4501d4d9`](https://github.com/velnoxy/Velsub/commit/4501d4d9) | font ölçüm ABI (headless; masaüstü wx korundu) |
+| Faz 1 / P1.6 | ▶ sırada | — | CLI duman testi (ASS aç→düzenle→kaydet) + Faz 1 anti-slop denetimi |
 
 ## Atıf / lisans
 
