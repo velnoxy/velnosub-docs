@@ -1,13 +1,16 @@
-# Velsub — Aegisub Mobil Port Planı (Android öncelikli, iOS sonra)
+# velnosub — Aegisub Mobil Port Planı (Android öncelikli, iOS sonra)
+
+> **2026-10-18 durum notu:** Kod deposu bağımsız repo
+> [`velnoxy/velnosub`](https://github.com/velnoxy/velnosub) (fork ilişkisi bırakıldı; eski fork `Velsub-fork` arşiv olarak durur), belge deposu [`velnoxy/velnosub-docs`](https://github.com/velnoxy/velnosub-docs). Adlandırma revizyonu `velsub → velnosub` commit [`997c5819a`](https://github.com/velnoxy/velnosub/commit/997c5819a). Arayüz yığını kararı Qt 6'dan Rust (egui/eframe)'a döndü; gerekçe ve yeni Faz 4 paketleri §3 ve Faz 4'te.
 
 ## 0. Proje bilgisi
 
-- **Uygulama adı:** Velsub (Aegisub'un mobil portu / türevi)
+- **Uygulama adı:** velnosub (Aegisub'un mobil portu / türevi)
 - **Çalışma dizini:** Bu dosyanın bulunduğu klasör
   - Tüm çalışma (klon, kaynak, build çıktıları, dokümanlar) bu klasör altında yapılır
-  - Aegisub deposu bu klasörün içine klonlanır (ör. `aegisub-upstream`), Velsub'a özgü kod ayrı dizinde tutulur (ör. `velsub-app`)
+  - Aegisub deposu bu klasörün içine klonlanır (ör. `aegisub-upstream`), velnosub'a özgü kod ayrı dizinde tutulur (ör. `velnosub-app`)
   - Not: Android'in paylaşılan depolama alanında (ör. Download) scoped storage kısıtları ve çalıştırma/symlink izni olmaması derlemeyi etkileyebilir; derleme Termux/proot gibi bir ortamdan yapılıyorsa kaynak ve build dizinini uygulamanın kendi dahili dizinine kopyalamak gerekebilir
-- Kullanıcıya görünen ad, paket adı, ikon, ayar dizinleri, log ve hata mesajlarında "Aegisub" yerine **Velsub** kullanılır; lisans bildirimleri ve orijinal yazar atıfları (GPL/BSD gereği) korunur ve "Aegisub tabanlıdır" notu Hakkında ekranında yer alır
+- Kullanıcıya görünen ad, paket adı, ikon, ayar dizinleri, log ve hata mesajlarında "Aegisub" yerine **velnosub** kullanılır; lisans bildirimleri ve orijinal yazar atıfları (GPL/BSD gereği) korunur ve "Aegisub tabanlıdır" notu Hakkında ekranında yer alır
 
 Kaynak: https://github.com/arch1t3cht/Aegisub (branch: `feature`)
 Taban: TypesettingTools/Aegisub → orijinal Aegisub
@@ -48,9 +51,11 @@ wxWidgets mobilde resmi olarak desteklenmiyor. Bu yüzden:
 1. **`aegisub-core` (C++, platformdan bağımsız)**
    - `libaegisub` + `src/` içinden GUI'ye bağlı olmayan her şey (subtitle model, undo, komut sistemi, video/ses sağlayıcı soyutlamaları, auto4 çekirdeği)
    - wx tiplerini (`wxString`, `wxRect`, `wxColour`, event sistemi vb.) soyutlama katmanıyla değiştir
-2. **`aegisub-ui` (Qt 6 / QML, C++)**
+2. **`velnosub-ui` (Rust, egui/eframe)** *(2026-10-18 revizyonu: Qt yerine Rust)*
+   - C++ çekirdek (`libvelnosub-core.so`) üstünde ince bir `extern "C"` ABI katmanı; Rust (egui/eframe) bu ABI'ye bağlanır, `cargo-ndk` + `cargo-apk`/`xbuild` ile gradle'sız APK
    - Tek kod tabanı ile Android + iOS (+ masaüstü test)
-   - Alternatif: Kotlin + Jetpack Compose + JNI. Qt seçilirse C++ paylaşımı kolay olur; Compose seçilirse JNI köprüsü şart
+   - Karar gerekçesi: hedef konak (Termux+PRoot, aarch64) Qt 6 Android kaynak derlemesini praktikte taşımıyor ve gradle/aapt2 zinciri kapalı; egui/eframe bu konakta çalışan en kısa bootstrap yoludur. Eski Qt 6 kararı git geçmişinde durur
+   - Alternatif (seçilmedi): Kotlin + Jetpack Compose + JNI (JNI köprüsü şart)
 3. **Platform adaptörleri**
    - Ses çıkışı: Oboe (AAudio/OpenSL ES)
    - Video: FFmpeg (ffms2 veya doğrudan libav*) + isteğe bağlı MediaCodec hızlandırma
@@ -83,12 +88,18 @@ wxWidgets mobilde resmi olarak desteklenmiyor. Bu yüzden:
 - Spektrum/dalga formu: mevcut hesaplama kodunu yeniden kullan, çizimi UI katmanına bırak
 - Keyframe üretimi: dahili algoritma (VapourSynth/Avisynth masaüstü-özel, mobilde devre dışı)
 
-### Faz 4 — Mobil UI
-- Ana ekranlar: altyazı grid'i, edit box, video paneli, ses paneli, stil yöneticisi, dialog'lar
-- Dokunmatik etkileşim: pinch-zoom/pan video, sürükle ile typesetting araçları, ses üzerinde sürükleyerek zamanlama
-- Hotkey sistemi: harici klavye için tam destek (mevcut `hotkey` altyapısı), ekran üstü kısayol çubuğu
-- Tablet/DeX düzeni: çok panelli; telefon düzeni: sekmeli
-- Komut paleti (Aegisub komutlarına arama ile erişim) mobilde menü yerine
+### Faz 4 — Mobil UI (Rust/egui; 2026-10-18 revizyonu)
+Paketler (her biri kendi commit + koşum kanıtıyla kapanır):
+
+- **P4.0** — Rust araç zinciri + Android bootstrap: rustup + cargo-ndk, minimal egui/eframe uygulaması aarch64'te derlenir; `cargo-apk`/`xbuild` paketleme cihazda açılır
+- **P4.1** — C ABI köprüsü: `aegisub-core` yüzeyine `extern "C"` şeriti (aç/düzenle/kaydet/render çağrıları) + Rust crate bağlanması
+- **P4.2** — Altyazı grid'i + edit box (sanallaştırılmış liste, hücre düzenleme, çekirdek undo bağlantısı)
+- **P4.3** — Video paneli: Faz 3 video sağlayıcısından gelen kare egui texture'ı; libass önizleme katmanı (P2.3 render yolunu çoğaltmadan)
+- **P4.4** — Ses paneli: dalga formu/spektrum canvas çerçevesi; oynatma Oboe (arm64) / AAudio (emülatör)
+- **P4.5** — Stil yöneticisi + dialog'lar; Faz 5 dinamik form eşlemesiyle aynı widget dilimi
+- **P4.6** — Dokunma jestleri (pinch-zoom/pan, sürükleme araçları), harici klavye hotkey şeridi, tablet/telefon düzenleri, komut paleti
+
+Eski Qt 6 metni git geçmişinde durur; Faz 4 çıktısı cihazda duman edilmeden kapanmaz.
 
 ### Faz 5 — Automation (scriptler dahil, kritik)
 Mevcut yapı: `src/auto4_lua*.cpp` Lua motorunu barındırır, `automation/include` ve `automation/autoload` içinde kütüphane ve scriptler bulunur.

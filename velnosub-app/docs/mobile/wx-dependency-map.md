@@ -1,6 +1,6 @@
-# Faz 0 — src/ wx Bağımlılık Haritası (Velsub)
+# Faz 0 — src/ wx Bağımlılık Haritası (velnosub)
 
-**Proje:** Velsub — Aegisub mobil port planı
+**Proje:** velnosub — Aegisub mobil port planı
 **Anlık görüntü:** `arch1t3cht/Aegisub`, `feature` dalı, commit `9bfd500` ("Fix placeholder comboboxes on wxGTK")
 **Tarih:** 2026-10-17
 **Yöntem:** statik tarama — `grep` bazlı wx include/token envanteri + hedefli kod okuması. Üretici: `/root/velsub/analiz/wxmap.py` (yeniden çalıştırılabilir; sonuçlar iki ürünle çapraz kontrol edildi).

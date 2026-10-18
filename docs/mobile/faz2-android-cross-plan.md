@@ -27,17 +27,17 @@ Kurulum dizini: `/root/velsub/ndk-deps/<abi>/{include,lib,pkgconfig}`.
 
 | İş | Commit | Not |
 |---|---|---|
-| `tools/cross/velsub-cli.cpp` | [`48af0fb22`](https://github.com/velnoxy/Velsub/commit/48af0fb22) | gtest'siz: GetReader→ReadFile→Commit(std)→WriteFile→tur dokunuşu; cihazda `VELSUB_CONFIG_JSON` ile gerçek default_config.json ister; `-DAGI_CORE` ile derlenir |
-| Cross gating | [`0b1fe29f5`](https://github.com/velnoxy/Velsub/commit/0b1fe29f5) | root meson: wx/vendor-subproject ve LuaJIT+luabins GUI-only; fontconfig GUI-only |
-| OpenGL gating | [`86ade834c`](https://github.com/velnoxy/Velsub/commit/86ade834c) | GUI-only (`dep_gl`); masaüstünde değişiklik yok |
-| Çekirdek libass wrap fallback | [`6884ba5ae`](https://github.com/velnoxy/Velsub/commit/6884ba5ae) | `dependency('libass', fallback: ['libass','libass_dep'])` — cross'ta wrap alt-proje (freetype+hb+fribidi zinciri zaten provide'lı) |
-| Lua TU'ları libaegisub'da gate | [`a29eabf32`](https://github.com/velnoxy/Velsub/commit/a29eabf32) | 7 lua birimi yalnız GUI kol; Faz 5'te geri döner |
-| PIC + boost.pc | [`b4342588e`](https://github.com/velnoxy/Velsub/commit/b4342588e) | ICU/Boost statik arşivleri `-fPIC`; b2 .pc üretmediği için boost.pc betikten üretilir |
-| Boost modülleri + cxxstd | [`ea0eff8d9`](https://github.com/velnoxy/Velsub/commit/ea0eff8d9)…[`5bb97d636`](https://github.com/velnoxy/Velsub/commit/5bb97d636) | b2'ye `--with-system` ve **`cxxstd=17`** (C++03 modunda static constexpr üyeler dış sembole düşüyor — core ile dil modu uyumsuzdu); boost.pc `Libs` hem system'i hem bütün modülleri listeler; cross-file `boost_includedir/boost_librarydir` ile sistem-boost gölgesi kesildi |
-| Boost link düzeni | [`edb3e2d75`](https://github.com/velnoxy/Velsub/commit/edb3e2d75) | cross'ta boost `find_library` zinciriyle (system öncelikli, 7 arşiv) explicit link; host kolunda `boost_dep` |
-| Mobil çekirdek TU seti | [`edb3e2d75`](https://github.com/velnoxy/Velsub/commit/edb3e2d75) | core'un referans verdiği wx'siz tanım TU'ları mobil kolda core'a katıldı: `selection_controller.cpp`, `text_selection_controller.cpp` (AGI_CORE kapıları), `video_provider_cache/dummy/yuv4mpeg`, `core/options_globals.cpp` (config::opt/path) |
-| utils.h AGI_CORE ayrımı | [`edb3e2d75`](https://github.com/velnoxy/Velsub/commit/edb3e2d75) | wx yüzeyi (PrettySize / seçim / IO / IME) korumada; CleanCache + SmallestPowerOf2 mobil çekirdeğe açık |
-| CLI host saniteyesi | [`6ccd0a5ef`](https://github.com/velnoxy/Velsub/commit/6ccd0a5ef) | `agi::dispatch::Init` (inline thunk) + `agi::log::LogSink` CLI'da kurulur; config::opt/path tek tanım `.so`'ya taşındı; `file_mapping.h` `<memory>` |
+| `tools/cross/velsub-cli.cpp` | [`48af0fb22`](https://github.com/velnoxy/velnosubs/commit/48af0fb22) | gtest'siz: GetReader→ReadFile→Commit(std)→WriteFile→tur dokunuşu; cihazda `VELSUB_CONFIG_JSON` ile gerçek default_config.json ister; `-DAGI_CORE` ile derlenir |
+| Cross gating | [`0b1fe29f5`](https://github.com/velnoxy/velnosubs/commit/0b1fe29f5) | root meson: wx/vendor-subproject ve LuaJIT+luabins GUI-only; fontconfig GUI-only |
+| OpenGL gating | [`86ade834c`](https://github.com/velnoxy/velnosubs/commit/86ade834c) | GUI-only (`dep_gl`); masaüstünde değişiklik yok |
+| Çekirdek libass wrap fallback | [`6884ba5ae`](https://github.com/velnoxy/velnosubs/commit/6884ba5ae) | `dependency('libass', fallback: ['libass','libass_dep'])` — cross'ta wrap alt-proje (freetype+hb+fribidi zinciri zaten provide'lı) |
+| Lua TU'ları libaegisub'da gate | [`a29eabf32`](https://github.com/velnoxy/velnosubs/commit/a29eabf32) | 7 lua birimi yalnız GUI kol; Faz 5'te geri döner |
+| PIC + boost.pc | [`b4342588e`](https://github.com/velnoxy/velnosubs/commit/b4342588e) | ICU/Boost statik arşivleri `-fPIC`; b2 .pc üretmediği için boost.pc betikten üretilir |
+| Boost modülleri + cxxstd | [`ea0eff8d9`](https://github.com/velnoxy/velnosubs/commit/ea0eff8d9)…[`5bb97d636`](https://github.com/velnoxy/velnosubs/commit/5bb97d636) | b2'ye `--with-system` ve **`cxxstd=17`** (C++03 modunda static constexpr üyeler dış sembole düşüyor — core ile dil modu uyumsuzdu); boost.pc `Libs` hem system'i hem bütün modülleri listeler; cross-file `boost_includedir/boost_librarydir` ile sistem-boost gölgesi kesildi |
+| Boost link düzeni | [`edb3e2d75`](https://github.com/velnoxy/velnosubs/commit/edb3e2d75) | cross'ta boost `find_library` zinciriyle (system öncelikli, 7 arşiv) explicit link; host kolunda `boost_dep` |
+| Mobil çekirdek TU seti | [`edb3e2d75`](https://github.com/velnoxy/velnosubs/commit/edb3e2d75) | core'un referans verdiği wx'siz tanım TU'ları mobil kolda core'a katıldı: `selection_controller.cpp`, `text_selection_controller.cpp` (AGI_CORE kapıları), `video_provider_cache/dummy/yuv4mpeg`, `core/options_globals.cpp` (config::opt/path) |
+| utils.h AGI_CORE ayrımı | [`edb3e2d75`](https://github.com/velnoxy/velnosubs/commit/edb3e2d75) | wx yüzeyi (PrettySize / seçim / IO / IME) korumada; CleanCache + SmallestPowerOf2 mobil çekirdeğe açık |
+| CLI host saniteyesi | [`6ccd0a5ef`](https://github.com/velnoxy/velnosubs/commit/6ccd0a5ef) | `agi::dispatch::Init` (inline thunk) + `agi::log::LogSink` CLI'da kurulur; config::opt/path tek tanım `.so`'ya taşındı; `file_mapping.h` `<memory>` |
 
 **Host CLI duman koşumu (dokümana kanıt):** `ninja -C build-host-check tools/cross/velsub-cli` →
 `VELSUB_CONFIG_JSON=src/libresrc/default_config.json` ile `docs/specs/ass-format-tests.ass`
@@ -84,3 +84,10 @@ x86_64 için `build-android-x86_64` + `android-x86_64.txt` (emülatör hedefi).
 - [ ] libass kare render künyesi (P2.3): `velsub-ass-render` (ass_add_font + ass_render_frame)
 - [ ] x86_64 ABI derlemesi (emülatör çıktısı)
 - [ ] masaüstü doğrulaması: utils.h/selection kapıları diffuse edilmişken incremental build + core smoke testi
+
+## Künye eki (2026-10-18)
+
+- Adlandırma revizyonu: `velsub → velnosub`, commit [`997c5819a`](https://github.com/velnoxy/velnosub/commit/997c5819a). Kod deposu artık bağımsız repo [`velnoxy/velnosub`](https://github.com/velnoxy/velnosub); eski fork `Velsub-fork` adıyla arşivde durur. Faz 2 künye ve koşum tabloları o tarihli snapshot olarak `velsub-*` adlarını muhafaza eder: bu satırlar o commit'lerin kaydıdır, sonradan bozunmamıştır.
+- P2.3: `velnosub-ass-render` kodu commit [`f1deb8ada`](https://github.com/velnoxy/velnosub/commit/f1deb8ada). Kapsam: libass `ass_add_font` + `ass_render_frame`, PPM (P6) çıktı, `ASS_FONTPROVIDER_NONE` (fontconfig'siz; cihazla aynı yol). Host koşum kanıtı ayrı satırda işlenecektir.
+- Arayüz yığını kararı: Qt 6 yerine Rust (egui/eframe). Gerekçe ve Faz 4 paketleri master plan §3/Faz 4'te.
+- Push durumu: GitHub OAuth token'ına `workflow` scope onayı bekler; `velnosub` repona push bir onay ile tek turda açılacaktır. Komiteler yerelde mantıklı dilimlerle yazıldı.
