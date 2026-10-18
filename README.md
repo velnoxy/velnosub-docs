@@ -21,7 +21,7 @@ Bu depo yalnızca plan/analiz belgelerini tutar.
 ## Faz durumu (2026-10-18)
 
 - **Faz 0** ✔ tamam: repo klonu, tam masaüstü derleme (11.1 MB arm64), test 345/351 (6 adet `lagi_acs` uid-0 artefaktı), sınıflandırma haritası
-- **Faz 1** ▶ sürüyor: **P1.1 ✔** (`aegisub-core` statik lib, `-DAGI_CORE`, masaüstü değişmedi), **P1.2 ✔** (`ass_style` çekirdekte; UI listesi UI'a taşındı) — sırada P1.3 (KararSeçici/Onay/DosyaDiyalog/Pano ABI'leri), P1.4 (event/timer/thread), P1.5 (FontMeasure), P1.6 (CLI duman testi)
+- **Faz 1** ▶ sürüyor: **P1.1 ✔** (`aegisub-core` statik lib, `-DAGI_CORE`, masaüstü değişmedi), **P1.2 ✔** (`ass_style` çekirdekte; UI listesi UI'a taşındı), **P1.3 ✔** (compat ABI + 5 TU bağlandı: charset_detect / subtitle_format / provider factories / search_replace) — sırada P1.4 (event/timer/thread + ProgressSink), P1.5 (FontMeasure), P1.6 (CLI duman testi)
 
 ## Atıf / lisans
 
