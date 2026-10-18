@@ -1,0 +1,146 @@
+# Velsub — Aegisub Mobil Port Planı (Android öncelikli, iOS sonra)
+
+## 0. Proje bilgisi
+
+- **Uygulama adı:** Velsub (Aegisub'un mobil portu / türevi)
+- **Çalışma dizini:** Bu dosyanın bulunduğu klasör
+  - Tüm çalışma (klon, kaynak, build çıktıları, dokümanlar) bu klasör altında yapılır
+  - Aegisub deposu bu klasörün içine klonlanır (ör. `aegisub-upstream`), Velsub'a özgü kod ayrı dizinde tutulur (ör. `velsub-app`)
+  - Not: Android'in paylaşılan depolama alanında (ör. Download) scoped storage kısıtları ve çalıştırma/symlink izni olmaması derlemeyi etkileyebilir; derleme Termux/proot gibi bir ortamdan yapılıyorsa kaynak ve build dizinini uygulamanın kendi dahili dizinine kopyalamak gerekebilir
+- Kullanıcıya görünen ad, paket adı, ikon, ayar dizinleri, log ve hata mesajlarında "Aegisub" yerine **Velsub** kullanılır; lisans bildirimleri ve orijinal yazar atıfları (GPL/BSD gereği) korunur ve "Aegisub tabanlıdır" notu Hakkında ekranında yer alır
+
+Kaynak: https://github.com/arch1t3cht/Aegisub (branch: `feature`)
+Taban: TypesettingTools/Aegisub → orijinal Aegisub
+Dil dağılımı: C/C++ (~94%), Lua (~3%), MoonScript, Meson
+
+## 1. Hedef
+
+Aegisub'un **tam** işlevselliğini Android'de (sonra iOS) çalıştırmak:
+
+- ASS/SSA/SRT vb. altyazı düzenleme (grid, edit box, stil yöneticisi, find/replace, timing araçları)
+- Video önizleme + libass render (mevcut libass entegrasyonu)
+- Ses dalga formu/spektrum, ses oynatma, ses ile timing
+- Görsel typesetting araçları (konum, ölçek, döndürme, vektör klip, drag araçları)
+- **Automation: Lua ve MoonScript scriptleri, makrolar, export filtreleri, karaoke templater, DependencyControl uyumu**
+- Hotkey sistemi, ayarlar, çok dilli arayüz (`po/`)
+
+Kabul kriteri: mevcut masaüstü Aegisub'da çalışan tipik bir typesetting scripti (ör. kara-templater, ILL/Yutils tabanlı scriptler) mobilde değişiklik olmadan çalışmalı.
+
+## 2. Depo yapısı (okunacak yerler)
+
+| Dizin | İçerik | Port notu |
+|---|---|---|
+| `libaegisub/` | Çekirdek kütüphane: ASS ayrıştırma, ayarlar, hotkey, zaman, charset, JSON, log | wx'e bağımlı olmamalı → doğrudan taşınır |
+| `src/` | Ana uygulama, wxWidgets GUI, video/ses sağlayıcıları, komutlar, `auto4_lua*` | **Asıl iş burada.** GUI ve wx bağımlılıkları ayrıştırılacak |
+| `automation/` | Dahili scriptler (`autoload/`), `include/` (Lua kütüphaneleri, moonscript.lua, DependencyControl vb.) | Neredeyse olduğu gibi kullanılır |
+| `vendor/luabins/` | Lua veri serileştirme | NDK ile derlenir |
+| `subprojects/` | Meson wrap bağımlılıkları | NDK için cross-build gerekecek |
+| `packages/` | Paketleme betikleri | Android için yeni paket hedefi eklenecek |
+| `po/` | Çeviriler | Qt/Android tarafında yeniden kullan (gettext → Qt Linguist veya gettext) |
+| `tests/` | Testler | Çekirdek için CI'da çalıştır |
+
+## 3. Mimari karar
+
+wxWidgets mobilde resmi olarak desteklenmiyor. Bu yüzden:
+
+**Katmanlı yaklaşım:**
+
+1. **`aegisub-core` (C++, platformdan bağımsız)**
+   - `libaegisub` + `src/` içinden GUI'ye bağlı olmayan her şey (subtitle model, undo, komut sistemi, video/ses sağlayıcı soyutlamaları, auto4 çekirdeği)
+   - wx tiplerini (`wxString`, `wxRect`, `wxColour`, event sistemi vb.) soyutlama katmanıyla değiştir
+2. **`aegisub-ui` (Qt 6 / QML, C++)**
+   - Tek kod tabanı ile Android + iOS (+ masaüstü test)
+   - Alternatif: Kotlin + Jetpack Compose + JNI. Qt seçilirse C++ paylaşımı kolay olur; Compose seçilirse JNI köprüsü şart
+3. **Platform adaptörleri**
+   - Ses çıkışı: Oboe (AAudio/OpenSL ES)
+   - Video: FFmpeg (ffms2 veya doğrudan libav*) + isteğe bağlı MediaCodec hızlandırma
+   - Dosya erişimi: Storage Access Framework (SAF), `content://` URI'leri için dosya tanımlayıcı katmanı
+   - Font: Android sistem fontları + kullanıcı font klasörü → libass/fontconfig yapılandırması
+
+Önerilen strateji: **önce çekirdeği headless derle ve test et, sonra UI.**
+
+## 4. Aşamalar
+
+### Faz 0 — Keşif (1–2 gün eşdeğeri)
+- Depoyu klonla, masaüstünde Meson ile derle (`meson setup build --buildtype=release`)
+- `src/` içinde wx bağımlılık haritası çıkar: hangi dosyalar `#include <wx/...>` kullanıyor, hangileri GUI'den bağımsız
+- Çıktı: `docs/mobile/wx-dependency-map.md`
+
+### Faz 1 — Çekirdeği ayır
+- wx'siz çekirdek hedefi (`aegisub-core`) oluştur
+- wx tiplerini ince bir soyutlama ile değiştir (string, rect, color, timer, event, config)
+- Mevcut masaüstü uygulaması bu çekirdek üzerinde hâlâ derlenmeli (regresyon yok)
+- Birim testleri çekirdek üzerinde geçmeli
+
+### Faz 2 — Android cross-build
+- NDK (r26+), arm64-v8a ve x86_64 (emülatör)
+- Meson cross-file veya CMake wrapper; bağımlılıklar: boost, ICU, libass (freetype, harfbuzz, fribidi), FFmpeg, fftw3 (veya kissfft ile değiştirme seçeneği), hunspell, zlib, LuaJIT (Android) / Lua 5.1
+- Çıktı: `libaegisub-core.so` + basit bir CLI test (ASS aç → kaydet → libass ile kare render)
+
+### Faz 3 — Medya katmanı
+- Video sağlayıcı: FFmpeg tabanlı, kare-doğru seek (BestSource mantığı veya ffms2 indeksleme)
+- Ses sağlayıcı: FFmpeg decode → PCM önbellek (disk tabanlı, büyük dosyalar için) → Oboe oynatma
+- Spektrum/dalga formu: mevcut hesaplama kodunu yeniden kullan, çizimi UI katmanına bırak
+- Keyframe üretimi: dahili algoritma (VapourSynth/Avisynth masaüstü-özel, mobilde devre dışı)
+
+### Faz 4 — Mobil UI
+- Ana ekranlar: altyazı grid'i, edit box, video paneli, ses paneli, stil yöneticisi, dialog'lar
+- Dokunmatik etkileşim: pinch-zoom/pan video, sürükle ile typesetting araçları, ses üzerinde sürükleyerek zamanlama
+- Hotkey sistemi: harici klavye için tam destek (mevcut `hotkey` altyapısı), ekran üstü kısayol çubuğu
+- Tablet/DeX düzeni: çok panelli; telefon düzeni: sekmeli
+- Komut paleti (Aegisub komutlarına arama ile erişim) mobilde menü yerine
+
+### Faz 5 — Automation (scriptler dahil, kritik)
+Mevcut yapı: `src/auto4_lua*.cpp` Lua motorunu barındırır, `automation/include` ve `automation/autoload` içinde kütüphane ve scriptler bulunur.
+
+Yapılacaklar:
+1. **Lua motoru:** Aegisub Lua 5.1 / LuaJIT API'sine göre yazılmış scriptleri çalıştırır. Android arm64'te LuaJIT kullan. iOS'ta JIT yasak → LuaJIT interpreter modu veya PUC Lua 5.1; FFI kullanan scriptler iOS'ta sınırlı olacak (belgelendir).
+2. **Aegisub Lua API'sinin tamamı** korunmalı: `aegisub.*` (log, progress, dialog, decode_path, cancel, text_extents, frame_from_ms, ms_from_frame, project_properties, video_size, vm API, gettext, lua_api eklemeleri: selection/cursor kontrolü vb. — bu fork'ta `lua_api` branch'i)
+3. **`aegisub.dialog.display` / `aegisub.dialog.open|save`:** Script diyaloglarını (label, edit, intedit, floatedit, textbox, dropdown, checkbox, color, coloralpha, alpha, slider vb.) Qt/QML'de dinamik form olarak yeniden uygula. Bu, wx'e en bağımlı kısımdır.
+4. **MoonScript:** `automation/include/moonscript.lua` ile gömülü gelir; doğrudan çalışmalı
+5. **Dahili scriptler:** `automation/autoload/` (ör. karaoke templater, kara-templater, cleantags, macros) birebir paketlenir
+6. **DependencyControl uyumu:** `automation/include/l0/` ve ilgili yapı, kullanıcı scriptleri için yol çözümleme (`aegisub.decode_path` ile `?user`, `?data`, `?script`, `?temp`, `?audio`, `?video`, `?local`) mobil dizinlere eşlenmeli
+7. **Kullanıcı script yönetimi:** SAF ile klasörden script ekleme, Automation Manager ekranı (yükle/yeniden yükle/hata logu)
+8. **Harici bağımlılıklar:** Birçok script `require("ffi")` veya Windows DLL'i (`requireffi`, `ILL`, `Yutils`, `clipper`, `lfs`, `re` vb.) kullanır. Android için bunların .so karşılıklarını derle/paketle ve bir uyumluluk tablosu üret (çalışan / kısmi / çalışmayan).
+9. **Çalıştırma güvenliği:** Scriptler kullanıcı yetkisinde çalışır; ağ erişimi (`io`, `os.execute`, `io.popen`) mobilde kısıtlanabilir → `os.execute`/`io.popen` Android'de işlev dışı bırakılmalı veya sandbox'lanmalı, bu belgelenmeli
+
+### Faz 6 — iOS
+- Qt for iOS, Metal tabanlı render
+- Lua: JIT'siz mod
+- Bağımlılıklar statik link
+- Dosya erişimi: UIDocumentPicker, security-scoped bookmarks
+
+### Faz 7 — Paketleme ve test
+- Android: AAB/APK, ABI split, imzalama
+- CI: GitHub Actions ile NDK build + çekirdek testleri + emülatörde smoke test
+- Regresyon: referans `.ass` dosyaları + referans scriptler (çıktı karşılaştırma)
+- Performans bütçesi: 1080p video seek < 150 ms, 5000 satırlık dosya grid kaydırma 60 fps
+
+## 5. Bilinen riskler
+
+| Risk | Etki | Önlem |
+|---|---|---|
+| wx bağımlılığı çekirdeğe sızmış | Faz 1 uzar | Bağımlılık haritasıyla önceliklendir, soyutlama katmanı |
+| Script diyaloglarının dinamik doğası | UI karmaşıklığı | Veri güdümlü form üreteci |
+| FFI/native script kütüphaneleri | Bazı scriptler çalışmaz | Uyumluluk tablosu, popüler kütüphanelerin Android derlemeleri |
+| Büyük ses dosyaları | Bellek/depolama | Disk önbellekli PCM |
+| Doğru kare seek | Typesetting için kritik | İndeksleme + BestSource benzeri doğruluk modu |
+| Lisans | Dağıtım | Kod GPL uyumlu BSD tarzı; fftw nedeniyle birleşik çıktı GPLv2 → kaynak açma yükümlülüğü |
+| Mağaza politikaları | Kullanıcı scripti çalıştırma (özellikle iOS) | Politikaları araştır, gerekirse script desteğini sınırla |
+
+## 6. Teslim edilecekler
+
+1. `aegisub-core` çekirdek kütüphanesi (wx'siz) + masaüstü regresyon testleri
+2. Android NDK build sistemi ve CI
+3. Mobil UI (Qt/QML) — telefon ve tablet düzenleri
+4. Tam Lua/MoonScript automation desteği + script uyumluluk raporu
+5. Dokümantasyon: mimari, derleme, script yazarları için mobil notları
+6. Çalışan APK/AAB
+
+## 7. Çalışma kuralları (AI ajan için)
+
+- Her aşama bitmeden bir sonrakine geçme; her fazın sonunda çalışan, test edilmiş bir çıktı olsun
+- Masaüstü derlemesini bozma
+- Büyük değişikliklerden önce plan yaz, belirsiz kararları (Qt vs Compose, LuaJIT vs PUC) gerekçeleriyle belgeleyip sor
+- Çıktılar: kod + `docs/mobile/` altında kısa not dosyaları
+- Bilinmeyeni uydurma; emin olmadığın yerde depodaki koda bak
