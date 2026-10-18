@@ -1,42 +1,71 @@
-# Velsub — Planlama Belgeleri
+# Velsub
 
-**Velsub**, Aegisub'ın mobil (Android/iOS) ve Qt 6 tabanlı yeniden mühendislik portudur.
-Kod tabani: [arch1t3cht/Aegisub](https://github.com/arch1t3cht/Aegisub) (`feature` dalı, `9bfd500`).
-Bu depo yalnızca plan/analiz belgelerini tutar.
+**Velsub**, [Aegisub](https://github.com/arch1t3cht/Aegisub)'ın mobil (Android/iOS) ve
+ilerleyen fazlarda Qt 6 ön yüzlü yeniden mühendislik portudur. Kod tabanı:
+[arch1t3cht/Aegisub](https://github.com/arch1t3cht/Aegisub) (`feature` dalı, `9bfd500`).
+
+Port stratejisi "core-first" (çekirdek öncelikli): önce wx'siz ASS çekirdeği ayrıştırılır
+ve kendi kendine yeten bir ikili hale gelir; mobil kollar bu çekirdeğin üstüne kurulur.
+Lua/MoonScript otomasyonu (`aegisub.*`, DependencyControl, autoload) bölünmeden korunur:
+LuaJIT'in aarch64 JIT/FFI mimarisi Faz 5'e kadar saklanır, çekirdekten hiçbir şey çıkmaz.
 
 ## Depo haritası
 
 | Depo | İçerik |
 |---|---|
-| [velnoxy/Velsub](https://github.com/velnoxy/Velsub) | Kod — Aegisub fork'u; Faz 1 commit'leri burada (`feature` dalı) |
-| **velnoxy/Velsub-docs** (bu depo) | Master plan, bağımlılık haritası, faz çalışma planı |
+| [velnoxy/Velsub](https://github.com/velnoxy/Velsub) | Kod: Aegisub fork'u, `feature` dalı; hedefler `libvelsub-core.so` + `velsub-cli` (GUI Faz 3'te) |
+| **velnoxy/Velsub-docs** (bu depo) | Plan/analiz belgeleri; künyeler ve doğrulama kanıtları |
 
-## Belge rehberi
-
-- [`aegisub-mobile-port.md`](aegisub-mobile-port.md) — master plan: kurallar, fazlar (Faz 0–7)
-- [`velsub-app/docs/mobile/wx-dependency-map.md`](velsub-app/docs/mobile/wx-dependency-map.md) — Faz 0 ürünü: 344 src dosyasının wx bağımlılık sınıflandırması, derleme/test raporu
-- [`velsub-app/docs/mobile/faz1-core-split-plan.md`](velsub-app/docs/mobile/faz1-core-split-plan.md) — Faz 1 iş paketleri (P1.1–P1.6), P1.1 künyesi, ABI kararları
-- [`docs/mobile/faz2-device-test.md`](docs/mobile/faz2-device-test.md) — Faz 2 cihaz duman testi rehberi (paket listesi + koşum)
-- [`docs/mobile/faz2-android-cross-plan.md`](docs/mobile/faz2-android-cross-plan.md) — Faz 2 cross-build planı, künyeler ve aşılanan kapılar
-- [`aegisub-upstream-YERINDEN-TASINDI.md`](aegisub-upstream-YERINDEN-TASINDI.md) — kaynak deposunun sdcard'dan iç dizine taşınma gerekçesi
-
-## Faz durumu (2026-10-18)
+## Durum (2026-10-18)
 
 | Faz / Paket | Durum | Kod commit | Not |
 |---|---|---|---|
-| Faz 0 (keşif) | ✔ | — | 344 dosya sınıflandırma haritası; masaüstü build+test baseline (345/351) |
-| Faz 1 / P1.1 ✓ | ✔ | [`c2aef9bed`](https://github.com/velnoxy/Velsub/commit/c2aef9bed) | `aegisub-core` statik lib (`-DAGI_CORE`) |
-| Faz 1 / P1.2 ✓ | ✔ | [`c77d23cb1`](https://github.com/velnoxy/Velsub/commit/c77d23cb1) | `ass_style` çekirdeğe katıldı; `GetEncodings` UI'a taşındı |
-| Faz 1 / P1.3 ✓ | ✔ | [`5f129ca99`](https://github.com/velnoxy/Velsub/commit/5f129ca99) | compat ABI (SingleChoice/Confirm/FileDialog/Clipboard) + 5 TU |
-| Faz 1 / P1.4 ✓ | ✔ | [`9f90c87e`](https://github.com/velnoxy/Velsub/commit/9f90c87e) | runtime ABI (runner/main-thread/Timer) + CoordTranslator; mkv/ffms/libass yolları çekirdekte |
-| Faz 1 / P1.5 ✓ | ✔ | [`4501d4d9`](https://github.com/velnoxy/Velsub/commit/4501d4d9) | font ölçüm ABI (headless; masaüstü wx korundu) |
-| Faz 1 / P1.6 ✓ | ✔ | [`d718cf2a7`](https://github.com/velnoxy/Velsub/commit/d718cf2a7) | `velsub core smoke`: ASS aç → düzenle → kaydet turu (wx'siz çekirdek ikilisi) |
-| **Faz 1** | ✔ tamam + denetim | — | audit-001 bulguları 1–3 uygulandı ([`b8a318177`](https://github.com/velnoxy/Velsub/commit/b8a318177)); 4–6 bilgi olarak kaldı |
+| Faz 0 (keşif) | ✔ | | 344 src dosyasının wx bağımlılık sınıflandırma haritası; masaüstü build+test baseline 345/351 |
+| Faz 1 / P1.1 | ✔ | [`c2aef9bed`](https://github.com/velnoxy/Velsub/commit/c2aef9bed) | wx'siz `aegisub-core` statik lib (`-DAGI_CORE`) |
+| Faz 1 / P1.2 | ✔ | [`c77d23cb1`](https://github.com/velnoxy/Velsub/commit/c77d23cb1) | `ass_style` çekirdeğe katıldı; `GetEncodings` UI'a taşındı |
+| Faz 1 / P1.3 | ✔ | [`5f129ca99`](https://github.com/velnoxy/Velsub/commit/5f129ca99) | compat ABI (SingleChoice/Confirm/FileDialog/Clipboard) + 5 TU |
+| Faz 1 / P1.4 | ✔ | [`9f90c87e5`](https://github.com/velnoxy/Velsub/commit/9f90c87e5) | runtime ABI (runner/main-thread/Timer) + CoordTranslator; mkv/ffms/libass yolları çekirdekte |
+| Faz 1 / P1.5 | ✔ | [`4501d4d95`](https://github.com/velnoxy/Velsub/commit/4501d4d95) | font ölçüm ABI (headless; masaüstü wx korundu) |
+| Faz 1 / P1.6 | ✔ | [`d718cf2a7`](https://github.com/velnoxy/Velsub/commit/d718cf2a7) | `velsub core smoke`: ASS aç → düzenle → kaydet turu (wx'siz çekirdek ikilisi) |
+| Faz 1 (denetim) | ✔ | [`b8a318177`](https://github.com/velnoxy/Velsub/commit/b8a318177) | audit-001 bulguları 1-3 uygulandı; 4-6 bilgi olarak kaldı |
 | Faz 2 / P2.1 (bootstrap) | ✔ | [`29ae8cb2e`](https://github.com/velnoxy/Velsub/commit/29ae8cb2e) | `-Dvelsub_mobile` + `libvelsub-core.so` hedefi; arm64/x86_64 cross dosyaları; `tools/cross/build-deps.sh` (ICU 75 + Boost 1.84) |
-| Faz 2 / P2.2 (CLI + cross zincir) | ✔ link + host smoke | [`48af0fb22`](https://github.com/velnoxy/Velsub/commit/48af0fb22)...[`6ccd0a5ef`](https://github.com/velnoxy/Velsub/commit/6ccd0a5ef) | `velsub-cli` (gtest'siz ASS aç→düzenle→kaydet; host'ta 41 satır tur geçti); GUI/wx/LuaJIT/GL/fontconfig kapıları mobil kolda kapalı ([`0b1fe29f5`](https://github.com/velnoxy/Velsub/commit/0b1fe29f5), [`86ade834c`](https://github.com/velnoxy/Velsub/commit/86ade834c)); libass wrap fallback ([`6884ba5ae`](https://github.com/velnoxy/Velsub/commit/6884ba5ae)); statik arşiv PIC + boost.pc ([`b4342588e`](https://github.com/velnoxy/Velsub/commit/b4342588e)); boost `cxxstd=17` + system + explicit find_library ([`ea0eff8d9`](https://github.com/velnoxy/Velsub/commit/ea0eff8d9)…[`edb3e2d75`](https://github.com/velnoxy/Velsub/commit/edb3e2d75)); CLI singleton'ları ([`6ccd0a5ef`](https://github.com/velnoxy/Velsub/commit/6ccd0a5ef)) |
+| Faz 2 / P2.2 (CLI + cross zincir) | ✔ link + host smoke | [`48af0fb22`](https://github.com/velnoxy/Velsub/commit/48af0fb22)...[`6ccd0a5ef`](https://github.com/velnoxy/Velsub/commit/6ccd0a5ef) | `velsub-cli` (ASS aç → düzenle → kaydet); mobil kolda GUI/wx/LuaJIT/GL/fontconfig kapısı kapalı; libass wrap fallback; PIC'li statik arşivler ve boost.pc ([`b4342588e`](https://github.com/velnoxy/Velsub/commit/b4342588e)); boost `cxxstd=17` + system + find_library zinciri ([`ea0eff8d9`](https://github.com/velnoxy/Velsub/commit/ea0eff8d9)...[`edb3e2d75`](https://github.com/velnoxy/Velsub/commit/edb3e2d75)); CLI singleton'ları ([`6ccd0a5ef`](https://github.com/velnoxy/Velsub/commit/6ccd0a5ef)) |
 
-**Faz 2 araç zinciri durumu:** SnowNF r29 aarch64-host NDK + ICU 75 cross (arm64-v8a, PIC'li statik veri + `.pc`) + Boost 1.84 arm64 statik (7 modül: system/atomic/chrono/filesystem/locale/regex/thread; GIL clang-22 yaması dahil). **`libvelsub-core.so` (42.8 MB AArch64) ve `velsub-cli` (555 KB PIE) üretiliyor**; NEEDED: `libc++_shared.so` + bionic + wrap-zinciri. Devre adımları: cihaz duman testi (bkz. [`docs/mobile/faz2-device-test.md`](docs/mobile/faz2-device-test.md)), P2.3 libass kare render, x86_64 ABI.
+## Koşum kanıtları
+
+- **Android arm64-v8a** (`build-android-arm64/`): `libvelsub-core.so` (42.8 MB, ELF64
+  AArch64 DYN) ve `tools/cross/velsub-cli` (555 KB, AArch64 PIE). NEEDED listesi:
+  `libc++_shared.so` (NDK), bionic (`libm/libdl/libz/libc`) ve wrap-zinciri
+  (`libfreetype/libfribidi/libharfbuzz/libuchardet`).
+- **Host CLI duman koşumu:** [`docs/specs/ass-format-tests.ass`](https://github.com/velnoxy/Velsub/blob/feature/docs/specs/ass-format-tests.ass)
+  girişiyle 41 satır, 2 stil; aç → düzenle → kaydet → tur-okuma geçti.
+- **Masaüstü:** `--reconfigure` yeşil; incremental build yeşil; `velsub core smoke` geçti;
+  345/351 test baseline muhafaza.
+
+Araç zinciri: SnowNF r29 aarch64-host NDK (API 29), ICU 75 arm64-v8a PIC'li statik
+kurulum (`.pc` dahil), Boost 1.84 arm64 statik (7 modül: system/atomic/chrono/filesystem/
+locale/regex/thread; GIL clang-22 yaması dahil). Aşılan kapıların künyeli tam listesi:
+[`docs/mobile/faz2-android-cross-plan.md`](docs/mobile/faz2-android-cross-plan.md).
+
+## Belge rehberi
+
+- [`aegisub-mobile-port.md`](aegisub-mobile-port.md): master plan; kurallar ve fazlar (Faz 0'dan Faz 7'ye)
+- [`velsub-app/docs/mobile/wx-dependency-map.md`](velsub-app/docs/mobile/wx-dependency-map.md): Faz 0 ürünü: 344 src dosyasının wx bağımlılık sınıflandırması
+- [`velsub-app/docs/mobile/faz1-core-split-plan.md`](velsub-app/docs/mobile/faz1-core-split-plan.md): Faz 1 iş paketleri (P1.1-P1.6), künyeler, ABI kararları
+- [`docs/mobile/faz2-android-cross-plan.md`](docs/mobile/faz2-android-cross-plan.md): Faz 2 cross-build planı, künyeler, aşılan 12 kapı
+- [`docs/mobile/faz2-device-test.md`](docs/mobile/faz2-device-test.md): Faz 2 cihaz duman testi rehberi (paket listesi + koşum)
+- [`anti-slop/audit-001-2026-10-18.md`](anti-slop/audit-001-2026-10-18.md): Faz 1 anti-slop denetimi (bulgular 1-3 uygulandı)
+- [`aegisub-upstream-YERINDEN-TASINDI.md`](aegisub-upstream-YERINDEN-TASINDI.md): kaynak deposunun taşınma gerekçesi
+
+## Yol haritası
+
+Faz 2'nin kalanı: `velsub-cli` cihaz duman testi (arm64-v8a), **P2.3** `velsub-ass-render`
+(libass `ass_add_font` + `ass_render_frame` kare render), x86_64 ABI (emülatör çıktısı).
+Sonra: Faz 3 GUI (Qt 6), Faz 4 uygulama iskeleti, Faz 5 Lua/otomasyon (LuaJIT aarch64),
+Faz 6 doğrulama paketi, Faz 7 kapanış.
 
 ## Atıf / lisans
 
-Aegisub tabanlıdır; Aegisub GPLv3, libaegisub/libass/ffms2 BSD/MIT — atıflar Velsub'ta korunur. Şeffaflık için fork ilişkisi açıktır: `velnoxy/Velsub` GitHub fork rozetiyle görünür.
+Aegisub tabanlıdır; Aegisub GPLv3, libaegisub/libass/ffms2 BSD/MIT, atıflar Velsub'ta
+korunur. Şeffaflık için fork ilişkisi açıktır: `velnoxy/Velsub` GitHub fork rozetiyle
+görünür.
