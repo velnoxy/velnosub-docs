@@ -17,6 +17,7 @@ Bu depo yalnızca plan/analiz belgelerini tutar.
 - [`velsub-app/docs/mobile/wx-dependency-map.md`](velsub-app/docs/mobile/wx-dependency-map.md) — Faz 0 ürünü: 344 src dosyasının wx bağımlılık sınıflandırması, derleme/test raporu
 - [`velsub-app/docs/mobile/faz1-core-split-plan.md`](velsub-app/docs/mobile/faz1-core-split-plan.md) — Faz 1 iş paketleri (P1.1–P1.6), P1.1 künyesi, ABI kararları
 - [`docs/mobile/faz2-device-test.md`](docs/mobile/faz2-device-test.md) — Faz 2 cihaz duman testi rehberi (paket listesi + koşum)
+- [`docs/mobile/faz2-android-cross-plan.md`](docs/mobile/faz2-android-cross-plan.md) — Faz 2 cross-build planı, künyeler ve aşılanan kapılar
 - [`aegisub-upstream-YERINDEN-TASINDI.md`](aegisub-upstream-YERINDEN-TASINDI.md) — kaynak deposunun sdcard'dan iç dizine taşınma gerekçesi
 
 ## Faz durumu (2026-10-18)
