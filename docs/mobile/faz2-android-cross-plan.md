@@ -16,7 +16,14 @@ Faz 2 hedefi (master plan §4): NDK r26+ ile arm64-v8a + x86_64 (emülatör)
 
 Kurulum dizini: `/root/velsub/ndk-deps/<abi>/{include,lib,pkgconfig}`.
 
-## P2.2 — CLI + cross zincir (🚧, `48af0fb22`…`b4342588e`)
+## P2.2 — CLI + cross zincir (✔ tam link, `edb3e2d75`)
+
+Çıktılar (`build-android-arm64/`):
+- `libvelsub-core.so` — 42.8 MB, ELF64 **AArch64** DYN; NEEDED: wrap-zinciri
+  `.so`'lar (freetype/fribidi/harfbuzz/uchardet) + bionic (m/dl/z/c) +
+  `libc++_shared.so`
+- `tools/cross/velsub-cli` — 555 KB, AArch64 PIE; NEEDED: `libvelsub-core.so`,
+  `libc++_shared.so`, libdl, libc
 
 | İş | Commit | Not |
 |---|---|---|
@@ -26,16 +33,31 @@ Kurulum dizini: `/root/velsub/ndk-deps/<abi>/{include,lib,pkgconfig}`.
 | Çekirdek libass wrap fallback | [`6884ba5ae`](https://github.com/velnoxy/Velsub/commit/6884ba5ae) | `dependency('libass', fallback: ['libass','libass_dep'])` — cross'ta wrap alt-proje (freetype+hb+fribidi zinciri zaten provide'lı) |
 | Lua TU'ları libaegisub'da gate | [`a29eabf32`](https://github.com/velnoxy/Velsub/commit/a29eabf32) | 7 lua birimi yalnız GUI kol; Faz 5'te geri döner |
 | PIC + boost.pc | [`b4342588e`](https://github.com/velnoxy/Velsub/commit/b4342588e) | ICU/Boost statik arşivleri `-fPIC`; b2 .pc üretmediği için boost.pc betikten üretilir |
+| Boost modülleri + cxxstd | [`ea0eff8d9`](https://github.com/velnoxy/Velsub/commit/ea0eff8d9)…[`5bb97d636`](https://github.com/velnoxy/Velsub/commit/5bb97d636) | b2'ye `--with-system` ve **`cxxstd=17`** (C++03 modunda static constexpr üyeler dış sembole düşüyor — core ile dil modu uyumsuzdu); boost.pc `Libs` hem system'i hem bütün modülleri listeler; cross-file `boost_includedir/boost_librarydir` ile sistem-boost gölgesi kesildi |
+| Boost link düzeni | [`edb3e2d75`](https://github.com/velnoxy/Velsub/commit/edb3e2d75) | cross'ta boost `find_library` zinciriyle (system öncelikli, 7 arşiv) explicit link; host kolunda `boost_dep` |
+| Mobil çekirdek TU seti | [`edb3e2d75`](https://github.com/velnoxy/Velsub/commit/edb3e2d75) | core'un referans verdiği wx'siz tanım TU'ları mobil kolda core'a katıldı: `selection_controller.cpp`, `text_selection_controller.cpp` (AGI_CORE kapıları), `video_provider_cache/dummy/yuv4mpeg`, `core/options_globals.cpp` (config::opt/path) |
+| utils.h AGI_CORE ayrımı | [`edb3e2d75`](https://github.com/velnoxy/Velsub/commit/edb3e2d75) | wx yüzeyi (PrettySize / seçim / IO / IME) korumada; CleanCache + SmallestPowerOf2 mobil çekirdeğe açık |
+| CLI host saniteyesi | [`6ccd0a5ef`](https://github.com/velnoxy/Velsub/commit/6ccd0a5ef) | `agi::dispatch::Init` (inline thunk) + `agi::log::LogSink` CLI'da kurulur; config::opt/path tek tanım `.so`'ya taşındı; `file_mapping.h` `<memory>` |
 
-## Fondör (bir zamanlar takılıp aşılan beş kapı)
+**Host CLI duman koşumu (dokümana kanıt):** `ninja -C build-host-check tools/cross/velsub-cli` →
+`VELSUB_CONFIG_JSON=src/libresrc/default_config.json` ile `docs/specs/ass-format-tests.ass`
+→ *41 satır, 2 stil; aç → düzenle → kaydet → tur tamamlama* → 345/351 test baseline'ıyla
+aynı ABI; CLI çıktısında sahne işaretçileri (`[0]…[3]`) cihaz testinde de aynı bekleniyor.
+
+## Fondör (takılıp aşılan kapılar)
 
 1. **PATH glob expand**: `PATH=...*/bin:$PATH` atamada glob açılmaz, `$(echo ...)` gerekir
 2. **fontconfig root şartı** — GUI listeyicisi için; core kullanmaz → gate
 3. **libass sistem font provider** — Android'de yok → `require-system-font-provider=false` (`ass_add_font` yolu)
-4. **vendor LuaJIT meson'u Android'i 'Unsupported'\u200b** sayar → mobil kol çizgisel atlar (Faz 5'te tekrar)
-5. **meson boost özel-yordam sytem-boost görürse** `-I/usr/include` zehirler → boost.pc koşuluyla pkg-config baskın
+4. **vendor LuaJIT meson'u Android'i 'Unsupported'** sayar → mobil kol çizgisel atlar (Faz 5'te tekrar)
+5. **meson boost özel-yordam sytem-boost görürse** `-I/usr/include` zehirler → boost.pc koşuluyla pkg-config baskın; yine de meson libleri düşürüyor → cross-file `boost_includedir/librarydir` + sonunda **find_library explicit zinciri**
 6. **Boost 1.84 GIL başlığı** clang 22 kurallarında kırılıyor → `::template apply(` → `::apply(` minimal yama (yalnız cross paket kurulumunda)
 7. **proot fork limiti** → uzun derlemelerin -j1 / düşük paralelide koşması
+8. **Boost arşivleri C++03 modunda derlenmişti** — `system_cat_holder::instance` static constexpr üyeleri dil moduna göre dış sembole düşüyor, core C++17 bekliyordu → b2 `cxxstd=17`
+9. **libboost_system kurulmamıştı** — cat_holder tanımları system arşivinde; `--with-system` + `.pc`/`find_library` listesinde başa
+10. **core TU'ları GUI sembolleri referans veriyor** — SelectionController/TextSelectionController/CreateCacheVideoProvider/config::opt path → wx'siz tanım TU'ları (selection/text_selection/video cache/dummy/yuv) mobil core'a katıldı; `config::opt|path` için yeni `core/options_globals.cpp`
+11. **utils.h wx yüzeyi** — video_provider_yuv4mpeg gibi TU'lar CleanCache'e ihtiyaç duyuyor; wx yüzeyi AGI_CORE ile kapanıp wx'siz yardımcılar açık
+12. **CLI'da GUI singleton'ları yok** — `agi::dispatch::Init` (`::service` null → SerialQueue SEGV) ve `agi::log::LogSink` (`log::Log` null yazımı) GUI main.cpp'te kuruluyor; CLI ikisini kendi başlatır (mobil app Faz 4'te aynı kalıbı uygular)
 
 ## Cross kurulum komutları (arm64 örnek)
 
@@ -56,7 +78,9 @@ x86_64 için `build-android-x86_64` + `android-x86_64.txt` (emülatör hedefi).
 
 ## Yapılacaklar (Faz 2 kapanışı öncesi)
 
-- [ ] PIC'li ICU/Boost arşivleriyle `libvelsub-core.so` linki biter → ELF aarch64 Android tehdidi doğrulaması (`file`/`readelf`)
-- [ ] `velsub-cli` cihaz duman testi (bkz. [`docs/mobile/faz2-device-test.md`](faz2-device-test.md))
+- [x] PIC'li ICU/Boost arşivleriyle `libvelsub-core.so` linki biter → ELF aarch64 Android doğrulaması (llvm-readelf) ✔
+- [x] `velsub-cli` HOST duman koşumu (ass-format-tests.ass 41 satır) ✔
+- [ ] `velsub-cli` cihaz duman testi (bkz. [`docs/mobile/faz2-device-test.md`](faz2-device-test.md)) — paket: `.so` + CLI + `libc++_shared.so` (NDK'dan) + wrap-zinciri `.so`'lar (build-android-arm64/subprojects/**)
 - [ ] libass kare render künyesi (P2.3): `velsub-ass-render` (ass_add_font + ass_render_frame)
 - [ ] x86_64 ABI derlemesi (emülatör çıktısı)
+- [ ] masaüstü doğrulaması: utils.h/selection kapıları diffuse edilmişken incremental build + core smoke testi
