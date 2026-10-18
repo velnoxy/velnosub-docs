@@ -24,12 +24,21 @@ VELNOSUB_CONFIG_JSON=/data/local/tmp/default_config.json \
 - `velnosub-cli`, `--edit-first` metnini ilk Dialogue satırına yazar, `Commit`
   ile commitler, kaydeder ve gidiş-dönüş yapan (reload) satır sayısını basar.
 
-## libass kare render (ayrı künye — P2.3)
-- `velnosub-ass-render` ikinci TU: `ass_library_create`, `ass_add_font`
-  (font bloblarını ASS ekindeki fontlardan ya da diskten kaydeder), sonra
-  `ass_renderer_create` + `ass_render_frame`.
-- Sistem font sağlayıcısı yok (libass `require-system-font-provider=false`),
-  fontlar yalnız kayıt yoluyla girer.
+## libass kare render (P2.3)
+- İkinci ikili `velnosub-ass-render` taşındıktan sonra font dosyasını da pushla:
+  örneğin cihazda `DejaVuSans.ttf`.
+- Koşum:
+
+```sh
+LD_LIBRARY_PATH=/data/local/tmp ./velnosub-ass-render in.ass out.ppm \
+  --font /data/local/tmp/DejaVuSans.ttf --t 1 --w 640 --h 360
+```
+
+- Beklenen marker sırası: `[AR0] libass kütüphanesi kuruldu`,
+  `[AR1] ASS yüklendi (olaylar: N)`, `[AR2] kare render edildi (glyph pikseli: N>0)`,
+  `[AR3] PPM yazıldı`. Çıktı `out.ppm` 640x360 boyutundadır; glyph pikselleri siyah
+  arka planın üstünde açık renkte koşar. `--family` varsayılan `Default`; ASS
+  stilinde farklı bir font adı varsa blob'u o adla ass_add_font'a verin.
 
 ## Notlar
 - CLI statik libc++ ile bağlanabilir; `readelf -d` çıktısında NEEDED listesine
