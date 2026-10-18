@@ -28,7 +28,8 @@ Bu depo yalnızca plan/analiz belgelerini tutar.
 | Faz 1 / P1.3 ✓ | ✔ | [`5f129ca99`](https://github.com/velnoxy/Velsub/commit/5f129ca99) | compat ABI (SingleChoice/Confirm/FileDialog/Clipboard) + 5 TU |
 | Faz 1 / P1.4 ✓ | ✔ | [`9f90c87e`](https://github.com/velnoxy/Velsub/commit/9f90c87e) | runtime ABI (runner/main-thread/Timer) + CoordTranslator; mkv/ffms/libass yolları çekirdekte |
 | Faz 1 / P1.5 ✓ | ✔ | [`4501d4d9`](https://github.com/velnoxy/Velsub/commit/4501d4d9) | font ölçüm ABI (headless; masaüstü wx korundu) |
-| Faz 1 / P1.6 | ▶ sırada | — | CLI duman testi (ASS aç→düzenle→kaydet) + Faz 1 anti-slop denetimi |
+| Faz 1 / P1.6 ✓ | ✔ | [`d718cf2a7`](https://github.com/velnoxy/Velsub/commit/d718cf2a7) | `velsub core smoke`: ASS aç → düzenle → kaydet turu (wx'siz çekirdek ikilisi) |
+| **Faz 1** | ✔ tamam | — | anti-slop denetimi beklemede: `anti-slop/audit-001-2026-10-18.md`; sırada Faz 2 |
 
 ## Atıf / lisans
 
