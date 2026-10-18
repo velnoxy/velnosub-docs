@@ -42,7 +42,7 @@ Dönüş ve veri tipleri `std::string` / `std::optional` / `std::vector<std::str
 | # | Paket | İçerik | Kabul |
 |---|---|---|---|
 | P1.1 ✓ | meson hattı | ✔ **bitti (2026-10-18, c2aef9bed):** `src/core/meson.build` + `-DAGI_CORE`; preheader PCH kurulmadı — çekirdek TU'ları iyice azaltıldı (`core/math_util.h` köprüsü, include swap'leri), PCH ileride hız için opsiyonel | core static lib yeşil (260 KB); masaüstü build yeşil (aegisub 11.1 MB); meson test 345/351 (baseline ile aynı, 6 lagı_acs uid-0 artefaktı) |
-| P1.2 | string/geo temizliği | Sınıf B'de wxString/wxPoint içeren dosyaların çekirdek hallerinin std::'ye taşınması | build + grep: core klasöründe `#include <wx/>` = 0 |
+| P1.2 ✓ | string/geo temizliği | ✔ **bitti (2026-10-18, c77d23cb1):** `ass_style.cpp` çekirdeğe katıldı — `GetEncodings(wxArrayString&)` UI listesi tek tüketiciye (`dialog_style_editor.cpp`) taşındı; `<wx/intl.h>` düştü, `utils.h`→`core/math_util.h`. Diğer Sınıf B entansiyonları fazlara ayrıldı: `search_replace_engine`(P1.3 Commit+Confirm), `charset_detect`/`mkv_wrap`(P1.3 SingleChoice), `subtitle_format_ttxt`(P1.3 sonrası XML), `subtitles_provider_libass`(P1.4 Thread) | core 265 KB yeşil; masaüstü yeşil; meson test 345/351 (baseline) |
 | P1.3 | etkileşim ABI'leri | § 1.1'deki 4 arayüz + headless default impl + ilgili 4 dosyanın bağlanması | masaüstünde dialog davranışı değişmeden çalışıyor |
 | P1.4 | event/timer/thread | § 1.2 tablosundaki üç madde | build + smoke: async video provider bildirimi işliyor |
 | P1.5 | font::Measure | masaüstünde wx impl korunarak arayüzle karşılanır | text_extents smoke testi (Lua) |
