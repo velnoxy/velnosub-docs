@@ -1,7 +1,9 @@
 # velnosub
 
-**velnosub**, [Aegisub](https://github.com/arch1t3cht/Aegisub)'ın mobil (Android/iOS) ve
-ilerleyen fazlarda Qt 6 ön yüzlü yeniden mühendislik portudur. Kod tabanı:
+**velnosub**, [Aegisub](https://github.com/arch1t3cht/Aegisub)'ın mobil (Android/iOS)
+yeniden mühendislik portudur. UI yığını Rust/**egui-eframe** olarak seçilmiştir
+(ilk seçenek Qt 6'nın bu konakta ilerletilme zorluğu → karar kaydı master plan
+§3'te). Kod tabanı:
 [arch1t3cht/Aegisub](https://github.com/arch1t3cht/Aegisub) (`feature` dalı, `9bfd500`).
 
 Port stratejisi "core-first" (çekirdek öncelikli): önce wx'siz ASS çekirdeği ayrıştırılır
@@ -13,10 +15,10 @@ LuaJIT'in aarch64 JIT/FFI mimarisi Faz 5'e kadar saklanır, çekirdekten hiçbir
 
 | Depo | İçerik |
 |---|---|
-| [velnoxy/velnosub](https://github.com/velnoxy/velnosub) | Kod (bağımsız depo, `feature` dalı); hedefler `libvelnosub-core.so` + `velnosub-cli` (GUI Faz 3'te); Aegisub atfı korunur |
+| [velnoxy/velnosub](https://github.com/velnoxy/velnosub) | Kod (bağımsız depo, `feature` dalı); hedefler `libvelnosub-core.so` + `velnosub-cli` + `velnosub-ass-render` (medya Faz 3, UI Faz 4); Aegisub atfı korunur |
 | **velnoxy/velnosub-docs** (bu depo) | Plan/analiz belgeleri; künyeler ve doğrulama kanıtları |
 
-## Durum (2026-10-18)
+## Durum (2026-10-19)
 
 | Faz / Paket | Durum | Kod commit | Not |
 |---|---|---|---|
@@ -31,18 +33,33 @@ LuaJIT'in aarch64 JIT/FFI mimarisi Faz 5'e kadar saklanır, çekirdekten hiçbir
 | Faz 2 / P2.1 (bootstrap) | ✔ | [`29ae8cb2e`](https://github.com/velnoxy/velnosub/commit/29ae8cb2e) | `-Dvelnosub_mobile` + `libvelnosub-core.so` hedefi; arm64/x86_64 cross dosyaları; `tools/cross/build-deps.sh` (ICU 75 + Boost 1.84) |
 | Faz 2 / P2.2 (CLI + cross zincir) | ✔ link + host smoke | [`48af0fb22`](https://github.com/velnoxy/velnosub/commit/48af0fb22)...[`6ccd0a5ef`](https://github.com/velnoxy/velnosub/commit/6ccd0a5ef) | `velnosub-cli` (ASS aç → düzenle → kaydet); mobil kolda GUI/wx/LuaJIT/GL/fontconfig kapısı kapalı; libass wrap fallback; PIC'li statik arşivler ve boost.pc ([`b4342588e`](https://github.com/velnoxy/velnosub/commit/b4342588e)); boost `cxxstd=17` + system + find_library zinciri ([`ea0eff8d9`](https://github.com/velnoxy/velnosub/commit/ea0eff8d9)...[`edb3e2d75`](https://github.com/velnoxy/velnosub/commit/edb3e2d75)); CLI singleton'ları ([`6ccd0a5ef`](https://github.com/velnoxy/velnosub/commit/6ccd0a5ef)) |
 | Faz 2 / revizyon (adlandırma) | ✔ | [`997c5819a`](https://github.com/velnoxy/velnosub/commit/997c5819a) | `velsub → velnosub` revizyonu (`-Dvelnosub_mobile`, `libvelnosub-core.so`, `velnosub-cli`, `velnosub core smoke`); kod deposu bağımsız `velnoxy/velnosub` |
-| Faz 2 / P2.3 (kare render) | ✔ kod (koşum aşağıda) | [`f1deb8ada`](https://github.com/velnoxy/velnosub/commit/f1deb8ada) | `velnosub-ass-render`: libass `ass_add_font` + `ass_render_frame`, PPM çıktı, `ASS_FONTPROVIDER_NONE` (fontconfig'siz) |
+| Faz 2 / P2.3 (kare render) | ✔ kod + host koşum | [`f1deb8ada`](https://github.com/velnoxy/velnosub/commit/f1deb8ada) | `velnosub-ass-render`: libass 0.17 `ass_process_data` + `ass_add_font` + `ass_render_frame`, PPM; üç düzeltme: mobil `libresrc` kapısı ([`3b170e897`](https://github.com/velnoxy/velnosub/commit/3b170e897)), boş karede PPM ([`e01a6e7eb`](https://github.com/velnoxy/velnosub/commit/e01a6e7eb)), `--defaultfont` fallback ([`5da6fd29b`](https://github.com/velnoxy/velnosub/commit/5da6fd29b)) |
+| Faz 2 / P2.2 yeniden kanıt (ek IV) | ✔ | [`5da6fd29b`](https://github.com/velnoxy/velnosub/commit/5da6fd29b) | arm64 sıfır-temiz tam koval: `ninja 484/484` (`A64BUILD=0`); üç artefakt readelf doğrulamalı; künye eki III-IV faz2 planında |
+| Test çerçevesi | ✔ | [`d878c06af`](https://github.com/velnoxy/velnosub/commit/d878c06af) | gtest `protocol: 'gtest'` kaybı bulundu ve onarıldı; masaüstü baseline 345/351 birebir yeniden üretildi |
+| Faz 4 / P4.0 (UI bootstrap) | ✔ | [`e4e69a0da`](https://github.com/velnoxy/velnosub/commit/e4e69a0da) | Rust/egui-eframe 0.37, 223 crate, aarch64-PIE artifact 7.431.952 B (NEEDED yalnız libdl/libandroid/libm/libc); cihazda açma denemesi sırada |
+| Faz 2 / x86_64 | ⏳ koşumda | | ICU+Boost merdiveni `-j1` (proot futex/ENOSYS bulgusu: `JOBS` env desteği pushlu) |
 
 ## Koşum kanıtları
 
-- **Android arm64-v8a** (`build-android-arm64/`): `libvelnosub-core.so` (42.8 MB, ELF64
-  AArch64 DYN) ve `tools/cross/velnosub-cli` (555 KB, AArch64 PIE). NEEDED listesi:
-  `libc++_shared.so` (NDK), bionic (`libm/libdl/libz/libc`) ve wrap-zinciri
-  (`libfreetype/libfribidi/libharfbuzz/libuchardet`).
+- **Android arm64-v8a** (`build-android-arm64/`, 484/484 tam koval):
+  `libvelnosub-core.so` (42.813.912 B, ELF64 AArch64 DYN), `tools/cross/velnosub-cli`
+  (599.976 B, PIE) ve `tools/cross/velnosub-ass-render` (230.432 B, PIE). NEEDED
+  listesi: `libvelnosub-core.so` (ikililer), `libc++_shared.so` (NDK), bionic
+  (`libm/libdl/libz/libc`) ve wrap-zinciri
+  (`libfreetype/libpng16/libfribidi/libharfbuzz/libuchardet`).
 - **Host CLI duman koşumu:** [`docs/specs/ass-format-tests.ass`](https://github.com/velnoxy/velnosub/blob/feature/docs/specs/ass-format-tests.ass)
   girişiyle 41 satır, 2 stil; aç → düzenle → kaydet → tur-okuma geçti.
+- **Host kare-render koşumu (P2.3):** libass 0.17.4; `--defaultfont` fallback
+  seçimi logda (`[ass] fontselect: (Arial, 400, 0) -> DejaVuSans.ttf`),
+  `[AR2] glyph pikseli: 9203`, PPM `691.215 bayt` (640×360×3+15 başlık,
+  `[AR3]`). Araştırmayla netleşen davranış: libass 0.17'de `ass_add_font` adı
+  eşleşme anahtarı değildir; embed provider fontu dosyanın gerçek family'sinden
+  indeksler. Künye eki III'te kayıtlıdır.
 - **Masaüstü:** `--reconfigure` yeşil; incremental build yeşil; `velnosub core smoke` geçti;
   345/351 test baseline muhafaza.
+- **Cihaz paketi:** `device-pkg.tar.gz` (22.560.092 B; iki ikili + 6 shared/lib
+  `libc++_shared` dahil + test ASS + DejaVu font); reçete
+  [`docs/mobile/faz2-device-test.md`](docs/mobile/faz2-device-test.md)'de.
 
 Araç zinciri: SnowNF r29 aarch64-host NDK (API 29), ICU 75 arm64-v8a PIC'li statik
 kurulum (`.pc` dahil), Boost 1.84 arm64 statik (7 modül: system/atomic/chrono/filesystem/
@@ -61,11 +78,11 @@ locale/regex/thread; GIL clang-22 yaması dahil). Aşılan kapıların künyeli 
 
 ## Yol haritası
 
-Faz 2'nin kalanı: cihaz duman testleri (arm64-v8a cihazda `velnosub-cli` ve
-`velnosub-ass-render`), x86_64 ABI çıktısı. **P2.3** kodu atıldı
-(`velnosub-ass-render`), host koşumu sıraya alındı. Sonra: Faz 3 medya katmanı
-(FFmpeg video/ses sağlayıcı), Faz 4 mobil UI (Rust/egui kararı künyeli),
-Faz 5 automation (LuaJIT aarch64), Faz 6 iOS, Faz 7 paketleme ve test.
+Faz 2'nin kalanı: x86_64 ABI çıktısı (ICU+Boost merdiveni `-j1` ile koşuyor) ve
+cihaz duman testleri (paket hazır; reçete faz2-device-test'te). Sonra: Faz 3
+medya katmanı (FFmpeg video/ses sağlayıcı), Faz 4 mobil UI (P4.0 Rust/egui
+bootstrap ✔; sırada P4.1 C ABI köprüsü), Faz 5 automation (LuaJIT aarch64),
+Faz 6 iOS, Faz 7 paketleme ve test.
 
 ## Atıf / lisans
 

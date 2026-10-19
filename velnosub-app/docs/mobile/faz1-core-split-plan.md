@@ -4,6 +4,10 @@
 **Amaç:** `wx-dependency-map.md` § 6 çerçevesini uygulanabilir iş paketlerine çevirmek.
 **Karar kaydı:** UI = **Qt 6** (kullanıcı onayı, 2026-10-17/18). Masaüstü test hattı için Ubuntu apt'tan native arm64 Qt6 kullanılacağı planlanıyor; Android hedefi ise Faz 4'te Qt kaynak derlemesi + `QT_HOST_PATH` yöntemiyle hedeflenecek. Faz 2'deki NDK gereksinimi bu karardan bağımsızdır — çekirdek `.so` her hâlükârda NDK ister.
 
+> **Güncelleme (2026-10-19):** Bu karar Faz 4'te **Rust (egui/eframe)** lehine
+> revize edildi (master plan §3); yukarıdaki kayıt karar anının dokümanı olarak
+> durur.
+
 ## 0. Faz 1 hedefleri
 
 1. `aegisub-core` meson hedefi oluşturulur: `libaegisub` + wx bağımlılık haritasındaki Sınıf C dosyalarının tamamı + temizlenmiş Sınıf B dosyaları.

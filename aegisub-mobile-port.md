@@ -3,6 +3,13 @@
 > **2026-10-18 durum notu:** Kod deposu bağımsız repo
 > [`velnoxy/velnosub`](https://github.com/velnoxy/velnosub) (fork ilişkisi bırakıldı; eski fork `Velsub-fork` arşiv olarak durur), belge deposu [`velnoxy/velnosub-docs`](https://github.com/velnoxy/velnosub-docs). Adlandırma revizyonu `velsub → velnosub` commit [`997c5819a`](https://github.com/velnoxy/velnosub/commit/997c5819a). Arayüz yığını kararı Qt 6'dan Rust (egui/eframe)'a döndü; gerekçe ve yeni Faz 4 paketleri §3 ve Faz 4'te.
 
+> **2026-10-19 durum notu:** Faz 2 arm64 kolu sıfır-temiz kovayla kapandı
+> (`ninja 484/484`; künye eki IV). P2.3 `velnosub-ass-render` host koşumu yeşil:
+> glyph 9203, PPM 691.215 bayt, `--defaultfont` fallback; künye eki III. Faz 4
+> P4.0 Rust/egui bootstrap kapandı ([`e4e69a0da`](https://github.com/velnoxy/velnosub/commit/e4e69a0da)).
+> x86_64 ABI merdiveni `-j1` ile koşumda (proot futex/ENOSYS bulgusu). Cihaz
+> paketi ve reçete: docs/mobile/faz2-device-test.md.
+
 ## 0. Proje bilgisi
 
 - **Uygulama adı:** velnosub (Aegisub'un mobil portu / türevi)
