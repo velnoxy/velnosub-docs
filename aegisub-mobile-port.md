@@ -10,7 +10,9 @@
 > Gece ekleri: P4.1 C ABI şeridi host koşumu yeşil (`libvelnosub-abi.so` +
 > Rust `abi-smoke`, `[AB0..AB5]` `CAPI=0`; faz4 planındaki künye) ve P5.0
 > LuaJIT zemini host koşumu yeşil (`velnosub-automation`, LuaJIT
-> 2.1.1791988261, `[AU0..AU3]`; faz5 planındaki künye). x86_64 ABI
+> 2.1.1791988261, `[AU0..AU3]`; faz5 planındaki künye; arm64+x86_64 LuaJIT
+> cross kurulumları + automation ikilileri, reconfigure clearcache tuzağı
+> çözüldü). x86_64 ABI
 > merdiveni `-j1` tamamlandı (ICU+Boost statik öntanı, 11 `.a` + `.pc`);
 > Faz 2 x86_64 masa ✔ (476/476 tam koval; boost b2 ABI-kimlik düzeltmesiyle;
 > künye eki V). Cihaz paketi ve reçete: docs/mobile/faz2-device-test.md.

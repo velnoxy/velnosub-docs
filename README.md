@@ -38,7 +38,7 @@ LuaJIT'in aarch64 JIT/FFI mimarisi Faz 5'e kadar saklanır, çekirdekten hiçbir
 | Test çerçevesi | ✔ | [`d878c06af`](https://github.com/velnoxy/velnosub/commit/d878c06af) | gtest `protocol: 'gtest'` kaybı bulundu ve onarıldı; masaüstü baseline 345/351 birebir yeniden üretildi |
 | Faz 4 / P4.0 (UI bootstrap) | ✔ | [`e4e69a0da`](https://github.com/velnoxy/velnosub/commit/e4e69a0da) | Rust/egui-eframe 0.37, 223 crate, aarch64-PIE artifact 7.431.952 B (NEEDED yalnız libdl/libandroid/libm/libc); cihazda açma denemesi sırada |
 | Faz 4 / P4.1 (C ABI şeridi) | ✔ host koşum | [`564d9739e`](https://github.com/velnoxy/velnosub/commit/564d9739e) | `libvelnosub-abi.so` (`init/open/edit/save/reload` 9 sembol) + `velnosub-ui/abi-smoke`; host şeridi `[AB0..AB5]` `CAPI=0`; künye faz4 planında |
-| Faz 5 / P5.0 (LuaJIT zemini) | ✔ host koşum | [`46cbecd32`](https://github.com/velnoxy/velnosub/commit/46cbecd32) | build-luajit.sh + `velnosub-automation` stub dumanı; host `[AU0..AU3]` (`LuaJIT 2.1.1791988261`); arm64 cross sırada; künye faz5 planında |
+| Faz 5 / P5.0 (LuaJIT zemini) | ✔ host + arm64 + x86_64 | [`46cbecd32`](https://github.com/velnoxy/velnosub/commit/46cbecd32) | host `[AU0..AU3]` koşumu + arm64/x86_64 LuaJIT cross kurulumu; `velnosub-automation` arm64 763.168 B, x86_64 801.264 B; reconfigure clearcache tuzağı çözüldü; künye faz5 planında |
 | Faz 2 / x86_64 | ✔ tam koval | [`1584bf29a`](https://github.com/velnoxy/velnosub/commit/1584bf29a) | b2 boost ABI-kimlik düzeltmesi (AArch64 sızması giderildi) + masa7 476/476: core.so 72.495.784 B (X86-64 DYN), cli 585.976 B, ass-render 223.040 B, abi.so 692.704 B (9 sembol); künye eki V |
 
 ## Koşum kanıtları
