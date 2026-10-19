@@ -117,3 +117,13 @@ Host koşum kanıtı (`build-host-check`, `-Dvelnosub_mobile=true`):
 - `velnosub-cli` smoke: `[0] config` + `[0b] 15030 bayt` + `[3] 41 satır, 2 stil` + `düzenlendi: velnosub host smoke` + `tur tamam: 41 satır` — `HCCLI15=0`.
 - `velnosub-ass-render` (DejaVuSans.ttf, `--defaultfont` aynı yol): `[ass] fontselect: (Arial, 400, 0) -> DejaVuSans.ttf` fallback seçimi; `[AR2] glyph pikseli: 9203`; `[AR3] PPM` 691.215 bayt (640×360×3+15 başlık) — `AR19=0`. Kanıt dosyası: `/root/velsub/status/hc-ar19.ppm`.
 - Kapının masaüstü etkisi: mobil=false iken `subdir('libresrc')` önceki gibi koşar; byte-eş davranış değişmedi (`meson --reconfigure build` RECONF=0, gtest 345/351 aynı, smoke OK).
+
+## Künye eki IV (2026-10-19) — arm64 tam koval + recal clean rebuild
+
+- Masaüstü düzeltmelerinden sonra arm64 ağacı sıfırlandı (`rm -rf build-android-arm64`) ve baştan kuruldu: `meson setup build-android-arm64 -Dvelnosub_mobile=true ... --cross-file tools/cross/android-arm64.txt` → `A64SETUP=0`.
+- `ninja -C build-android-arm64 -j2` → `[484/484] ... A64BUILD=0` (0 hata).
+- Artefaktlar ve readelf (NDK `llvm-readelf`):
+  - `libvelnosub-core.so` 42.813.912 bayt (ELF64 AArch64 DYN; NEEDED: freetype/fribidi/harfbuzz/uchardet + bionic + `libc++_shared.so`).
+  - `tools/cross/velnosub-cli` 599.976 bayt (AArch64 PIE; NEEDED: `libvelnosub-core.so`, `libc++_shared.so`, `libdl`, `libc`).
+  - `tools/cross/velnosub-ass-render` 230.432 bayt (AArch64 PIE; aynı NEEDED şeridi + `-lvelnosub-core.so`).
+- Kod commit: [`5da6fd29b`](https://github.com/velnoxy/velnosub/commit/5da6fd29b) (düzeltme3; koval bu üstünden).
