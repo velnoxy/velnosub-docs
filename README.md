@@ -37,7 +37,9 @@ LuaJIT'in aarch64 JIT/FFI mimarisi Faz 5'e kadar saklanır, çekirdekten hiçbir
 | Faz 2 / P2.2 yeniden kanıt (ek IV) | ✔ | [`5da6fd29b`](https://github.com/velnoxy/velnosub/commit/5da6fd29b) | arm64 sıfır-temiz tam koval: `ninja 484/484` (`A64BUILD=0`); üç artefakt readelf doğrulamalı; künye eki III-IV faz2 planında |
 | Test çerçevesi | ✔ | [`d878c06af`](https://github.com/velnoxy/velnosub/commit/d878c06af) | gtest `protocol: 'gtest'` kaybı bulundu ve onarıldı; masaüstü baseline 345/351 birebir yeniden üretildi |
 | Faz 4 / P4.0 (UI bootstrap) | ✔ | [`e4e69a0da`](https://github.com/velnoxy/velnosub/commit/e4e69a0da) | Rust/egui-eframe 0.37, 223 crate, aarch64-PIE artifact 7.431.952 B (NEEDED yalnız libdl/libandroid/libm/libc); cihazda açma denemesi sırada |
-| Faz 2 / x86_64 | ⏳ koşumda | | ICU+Boost merdiveni `-j1` (proot futex/ENOSYS bulgusu: `JOBS` env desteği pushlu) |
+| Faz 4 / P4.1 (C ABI şeridi) | ✔ host koşum | [`564d9739e`](https://github.com/velnoxy/velnosub/commit/564d9739e) | `libvelnosub-abi.so` (`init/open/edit/save/reload` 9 sembol) + `velnosub-ui/abi-smoke`; host şeridi `[AB0..AB5]` `CAPI=0`; künye faz4 planında |
+| Faz 5 / P5.0 (LuaJIT zemini) | ✔ host koşum | [`46cbecd32`](https://github.com/velnoxy/velnosub/commit/46cbecd32) | build-luajit.sh + `velnosub-automation` stub dumanı; host `[AU0..AU3]` (`LuaJIT 2.1.1791988261`); arm64 cross sırada; künye faz5 planında |
+| Faz 2 / x86_64 | ⏳ masa kurulumda | | ICU(4)+Boost(7) statik öntanı tamam (11 `.a` + `.pc`); x86_64 masa `meson setup` + `ninja -j2` zinciri p50a64-x64 logunda |
 
 ## Koşum kanıtları
 
@@ -73,6 +75,7 @@ locale/regex/thread; GIL clang-22 yaması dahil). Aşılan kapıların künyeli 
 - [`velnosub-app/docs/mobile/faz1-core-split-plan.md`](velnosub-app/docs/mobile/faz1-core-split-plan.md): Faz 1 iş paketleri (P1.1-P1.6), künyeler, ABI kararları
 - [`docs/mobile/faz2-android-cross-plan.md`](docs/mobile/faz2-android-cross-plan.md): Faz 2 cross-build planı, künyeler, aşılan 12 kapı
 - [`docs/mobile/faz2-device-test.md`](docs/mobile/faz2-device-test.md): Faz 2 cihaz duman testi rehberi (paket listesi + koşum)
+- [`docs/mobile/faz5-automation-plan.md`](docs/mobile/faz5-automation-plan.md): Faz 5 LuaJIT/automation dilimleri ve P5.0 künyesi
 - [`anti-slop/audit-001-2026-10-18.md`](anti-slop/audit-001-2026-10-18.md): Faz 1 anti-slop denetimi (bulgular 1-3 uygulandı)
 - [`aegisub-upstream-YERINDEN-TASINDI.md`](aegisub-upstream-YERINDEN-TASINDI.md): kaynak deposunun taşınma gerekçesi
 
