@@ -26,5 +26,16 @@ Notlar:
 
 ## Bekleyen paketler
 
-- P4.1 C ABI köprüsü, P4.2 grid+edit, P4.3 video paneli, P4.4 ses paneli, P4.5 stil/dialog,
+- P4.2 grid+edit, P4.3 video paneli, P4.4 ses paneli, P4.5 stil/dialog,
 P4.6 jestler/hotkey/düzenler: plan metni master plan Faz 4'te.
+
+## P4.1 — C ABI şeridi ✔ (2026-10-19, host koşum)
+
+| Kayıt | Değer |
+|---|---|
+| Kod commit'leri | [`564d9739e`](https://github.com/velnoxy/velnosub/commit/564d9739e) (`libvelnosub-abi` + abi-smoke crate), [`ebe19435d`](https://github.com/velnoxy/velnosub/commit/ebe19435d) (TU `fstream` katılımı), [`0074297d6`](https://github.com/velnoxy/velnosub/commit/0074297d6) (boş-config koruması) |
+| Yüzey | `tools/cross/velnosub-abi.cpp`: `init/open/event_count/style_count/edit_first/save/reload_count/close/last_error` (9 dış sembol; `libvelnosub-abi.so`, `libvelnosub-core.so`'ya bağlanır) |
+| Rust tarafı | `velnosub-ui/abi-smoke` (eframe'siz küçük crate; build.rs `-L`/`-lvelnosub-abi`; release derleme 9.3 sn) |
+| Host koşumu | `[AB0] init` → `[AB1] açıldı (tutamaç: 1)` → `[AB2] satır: 41 stil: 2` → `[AB3] düzenlendi` → `[AB4] kaydedildi` → `[AB5] tur: 41 satır`; `CAPI=0`; `NINJA=0` (`[11/11] Linking target tools/cross/libvelnosub-abi.so`) |
+| Derinleşen bulgular | (1) init'te boş config sessizce geçiliyordu; şimdi `config boş` hatası döner. (2) cargo ikilisi koşumunda `LD_LIBRARY_PATH` ister. (3) ilk derlemede eksik `<fstream>` geldiği gündeme dair düzeltme commiti [`ebe19435d`](https://github.com/velnoxy/velnosub/commit/ebe19435d) |
+| Cihaz yolu | abi-smoke + `libvelnosub-abi.so` + `libvelnosub-core.so` pakette; aynı şerit `/data/local/tmp` reçetesiyle koşur |
