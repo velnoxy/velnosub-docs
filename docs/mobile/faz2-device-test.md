@@ -27,18 +27,40 @@ VELNOSUB_CONFIG_JSON=/data/local/tmp/default_config.json \
 ## libass kare render (P2.3)
 - İkinci ikili `velnosub-ass-render` taşındıktan sonra font dosyasını da pushla:
   örneğin cihazda `DejaVuSans.ttf`.
-- Koşum:
+- Koşum (`lib/` klasörüne paylaşılan kütüphaneler konursa):
 
 ```sh
-LD_LIBRARY_PATH=/data/local/tmp ./velnosub-ass-render in.ass out.ppm \
-  --font /data/local/tmp/DejaVuSans.ttf --t 1 --w 640 --h 360
+cd /data/local/tmp/velnosub
+LD_LIBRARY_PATH=$PWD/lib ./velnosub-ass-render in.ass out.ppm \
+  --font $PWD/DejaVuSans.ttf --defaultfont $PWD/DejaVuSans.ttf --t 1 --w 640 --h 360
 ```
 
 - Beklenen marker sırası: `[AR0] libass kütüphanesi kuruldu`,
   `[AR1] ASS yüklendi (olaylar: N)`, `[AR2] kare render edildi (glyph pikseli: N>0)`,
   `[AR3] PPM yazıldı`. Çıktı `out.ppm` 640x360 boyutundadır; glyph pikselleri siyah
-  arka planın üstünde açık renkte koşar. `--family` varsayılan `Default`; ASS
-  stilinde farklı bir font adı varsa blob'u o adla ass_add_font'a verin.
+  arka planın üstünde açık renkte koşar.
+- Font seçimi notu (libass 0.17 davranışı): `ass_add_font`'ın ad parametresi
+  eşleşme anahtarı DEĞİLDİR; embed provider fontu dosyanın gerçek family'sinden
+  indeksler (DejaVuSans.ttf = "DejaVu Sans"). ASS stili başka bir ad isterse
+  (bizim test dosyası "Arial" ister) `--defaultfont` verilir; libass log satırı
+  `fontselect: (Arial, 400, 0) -> DejaVuSans.ttf` seçimi gösterir. `--family`
+  yalnızca ass_add_font adı olarak geçer; işlevsel eşleşme sağlamaz.
+
+## Hazır cihaz paketi (2026-10-19)
+- `device-pkg.tar.gz` (22.560.092 bayt, host'ta `/root/velsub/device-pkg.tar.gz`):
+  `velnosub-cli` (599.976 B), `velnosub-ass-render` (230.432 B),
+  `lib/libvelnosub-core.so` (42.813.912 B), `lib/libfreetype.so`,
+  `lib/libpng16.so`, `lib/libfribidi.so`, `lib/libharfbuzz.so`,
+  `lib/libuchardet.so`, `lib/libc++_shared.so` (9.290.184 B),
+  `ass-format-tests.ass` (8.890 B), `DejaVuSans.ttf` (759.720 B).
+- Aktarım:
+
+```sh
+tar -xzf device-pkg.tar.gz
+adb push device-pkg /data/local/tmp/velnosub
+adb shell
+# içinde: yukarıdaki CLI ve ass-render koşumları (LD_LIBRARY_PATH=$PWD/lib)
+```
 
 ## Notlar
 - CLI statik libc++ ile bağlanabilir; `readelf -d` çıktısında NEEDED listesine
