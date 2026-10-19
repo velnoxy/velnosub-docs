@@ -46,21 +46,46 @@ LD_LIBRARY_PATH=$PWD/lib ./velnosub-ass-render in.ass out.ppm \
   `fontselect: (Arial, 400, 0) -> DejaVuSans.ttf` seçimi gösterir. `--family`
   yalnızca ass_add_font adı olarak geçer; işlevsel eşleşme sağlamaz.
 
-## Hazır cihaz paketi (2026-10-19)
-- `device-pkg.tar.gz` (22.560.092 bayt, host'ta `/root/velsub/device-pkg.tar.gz`):
-  `velnosub-cli` (599.976 B), `velnosub-ass-render` (230.432 B),
-  `lib/libvelnosub-core.so` (42.813.912 B), `lib/libfreetype.so`,
-  `lib/libpng16.so`, `lib/libfribidi.so`, `lib/libharfbuzz.so`,
-  `lib/libuchardet.so`, `lib/libc++_shared.so` (9.290.184 B),
-  `ass-format-tests.ass` (8.890 B), `DejaVuSans.ttf` (759.720 B).
+## Hazır cihaz paketi (2026-10-19 gece, device-pkg4)
+- `device-pkg4.tar.gz` (host'ta `/root/velsub/device-pkg4.tar.gz`, 23.4 M civar):
+  `bin/velnosub-cli`, `bin/velnosub-ass-render`, **`bin/velnosub-automation`** (P5.0),
+  **`bin/velnosub-abi-smoke`** (P4.1, aarch64-PIE), `lib/libvelnosub-core.so`,
+  **`lib/libvelnosub-abi.so`** (P4.1), `lib/libfreetype.so`, `lib/libpng16.so`,
+  `lib/libfribidi.so`, `lib/libharfbuzz.so`, `lib/libuchardet.so`,
+  `lib/libc++_shared.so`, `ass-format-tests.ass`, **`default_config.json`**,
+  `DejaVuSans.ttf`. (Kök seviyede eski kopya `velnosub-cli/velnosub-ass-render`
+  de duruyor; `bin/` kullanın.)
 - Aktarım:
 
 ```sh
-tar -xzf device-pkg.tar.gz
+tar -xzf device-pkg4.tar.gz
 adb push device-pkg /data/local/tmp/velnosub
 adb shell
 # içinde: yukarıdaki CLI ve ass-render koşumları (LD_LIBRARY_PATH=$PWD/lib)
 ```
+
+## P5.0 cihaz dumanı (velnosub-automation)
+```sh
+cd /data/local/tmp/velnosub
+LD_LIBRARY_PATH=$PWD/lib ./bin/velnosub-automation
+```
+- Beklenen şerit: `[AU0] LuaJIT kuruldu: LuaJIT 2.1.1791988261`,
+  `[AU1] aegisub tablo kayıtlı`, `[AUL] P5.0 zemin dumanı başladı`,
+  `[AUL] arg: 0, toplam: 1499999500000`, `[AU2] script koştu`, `[AU3] tamam`.
+- İsteğe bağlı script koşumu: `./bin/velnosub-automation buyuk_sc.lua` — script
+  içinden `aegisub.log("...")` çağrıları `[AUL] ` önekiyle stdout'a akar.
+
+## P4.1 cihaz dumanı (velnosub-abi-smoke)
+```sh
+cd /data/local/tmp/velnosub
+LD_LIBRARY_PATH=$PWD/lib \
+VELNOSUB_CONFIG_JSON=$PWD/default_config.json \
+./bin/velnosub-abi-smoke in.ass out_abi.ass "--edit-first cihaz abi dumanı"
+```
+- Beklenen şerit: `[AB0] init` → `[AB1] açıldı (tutamaç: 1)` → `[AB2] satır: 41 stil: 2`
+  → `[AB3] düzenlendi` → `[AB4] kaydedildi` → `[AB5] tur: 41 satır`; çıkış kodu 0.
+- `out_abi.ass` içinde ilk Dialogue satırı "cihaz abi dumanı" olmalı.
+- Hata durumunda `[ABE] ...` satırı `velnosub_abi_last_error` metnini taşır.
 
 ## Notlar
 - CLI statik libc++ ile bağlanabilir; `readelf -d` çıktısında NEEDED listesine
