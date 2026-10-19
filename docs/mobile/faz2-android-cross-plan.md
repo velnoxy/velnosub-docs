@@ -91,3 +91,14 @@ x86_64 için `build-android-x86_64` + `android-x86_64.txt` (emülatör hedefi).
 - P2.3: `velnosub-ass-render` kodu commit [`f1deb8ada`](https://github.com/velnoxy/velnosub/commit/f1deb8ada). Kapsam: libass `ass_add_font` + `ass_render_frame`, PPM (P6) çıktı, `ASS_FONTPROVIDER_NONE` (fontconfig'siz; cihazla aynı yol). Host koşum kanıtı ayrı satırda işlenecektir.
 - Arayüz yığını kararı: Qt 6 yerine Rust (egui/eframe). Gerekçe ve Faz 4 paketleri master plan §3/Faz 4'te.
 - Push durumu: GitHub OAuth token'ına `workflow` scope onayı bekler; `velnosub` repona push bir onay ile tek turda açılacaktır. Komiteler yerelde mantıklı dilimlerle yazıldı.
+
+## Künye eki II (2026-10-19) — masüstü refresh-doğrulama + gtest protokol kaydı
+
+- Masaüstü ağaç yeniden kuruldu (eski `build/` dizi güncel segilerle değiştirildi): `meson setup build --buildtype=release` → `SETUP=0`; `ninja -C build` tam derleme `DBUILD=0` (link: `tests/velnosub-core-smoke`, `aegisub`).
+- `velnosub core smoke` OK (gtest `CoreSmoke.LoadEditSaveRoundTrip`, 9 ms).
+- REGRESYON BULGUSU: P1.6'da `tests/meson.build` protokol kwarg'ı düşüşünden sonraki gtest kaydı tek ikili olarak raporlanıyordu; `protocol: 'gtest'` geri eklenerek masüstü baseline ölçülebilir döndü.
+- Ölçüm: `meson test -C build` → binary XML'i `351 tests from 30 test cases ran`, `6 FAILED` (yalnız 6x `lagi_acs` izin-dışılandır: koşumu root'ta çalıştırma kısıtı) = **345/351 baseline birebir yeniden üretildi**.
+
+## Not (2026-10-19, push）
+
+- GitHub push engeli, upstream `.github/workflows` tanımlarının uc dalla silinmesiyle çözüldü (`adcc46399`): standalone repoda fork CI'si koşmazdı. `feature` dalı + tüm künye commit'leri `velnoxy/velnosub`'a iletildi.
