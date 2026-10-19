@@ -102,3 +102,18 @@ x86_64 için `build-android-x86_64` + `android-x86_64.txt` (emülatör hedefi).
 ## Not (2026-10-19, push）
 
 - GitHub push engeli, upstream `.github/workflows` tanımlarının uc dalla silinmesiyle çözüldü (`adcc46399`): standalone repoda fork CI'si koşmazdı. `feature` dalı + tüm künye commit'leri `velnoxy/velnosub`'a iletildi.
+
+## Künye eki III (2026-10-19) — P2.3 host koşumu
+
+Düzeltme commit'leri:
+
+- [`3b170e897`](https://github.com/velnoxy/velnosub/commit/3b170e897) — mobil konfigürasyonda `libresrc` kapısı (mobil kolda wx yok; `libresrc.cpp` wx ister, kapı `not velnosub_mobile`) + `ass_process_data` (libass 0.17 API; `ass_process` kaldırıldı).
+- [`e01a6e7eb`](https://github.com/velnoxy/velnosub/commit/e01a6e7eb) — boş karede de PPM yaz; `[ARW]` notu.
+- [`5da6fd29b`](https://github.com/velnoxy/velnosub/commit/5da6fd29b) — `--defaultfont` fallback yolu: libass 0.17'de `ass_add_font` adı eşleşme anahtarı değildir; embed provider fontu FT metadata'sından indeksler. `ass_set_fonts(... default_font dosya yolu ...)` ile "family bulunamadı" durumunda dosyadan çözüm.
+
+Host koşum kanıtı (`build-host-check`, `-Dvelnosub_mobile=true`):
+
+- `ninja -C build-host-check tools/cross/velnosub-cli tools/cross/velnosub-ass-render` → `HCB15=0` / `HCB19=0`; hedefler meson introspect'te kayıtlı.
+- `velnosub-cli` smoke: `[0] config` + `[0b] 15030 bayt` + `[3] 41 satır, 2 stil` + `düzenlendi: velnosub host smoke` + `tur tamam: 41 satır` — `HCCLI15=0`.
+- `velnosub-ass-render` (DejaVuSans.ttf, `--defaultfont` aynı yol): `[ass] fontselect: (Arial, 400, 0) -> DejaVuSans.ttf` fallback seçimi; `[AR2] glyph pikseli: 9203`; `[AR3] PPM` 691.215 bayt (640×360×3+15 başlık) — `AR19=0`. Kanıt dosyası: `/root/velsub/status/hc-ar19.ppm`.
+- Kapının masaüstü etkisi: mobil=false iken `subdir('libresrc')` önceki gibi koşar; byte-eş davranış değişmedi (`meson --reconfigure build` RECONF=0, gtest 345/351 aynı, smoke OK).
