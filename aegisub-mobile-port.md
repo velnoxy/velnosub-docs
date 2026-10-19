@@ -7,8 +7,13 @@
 > (`ninja 484/484`; künye eki IV). P2.3 `velnosub-ass-render` host koşumu yeşil:
 > glyph 9203, PPM 691.215 bayt, `--defaultfont` fallback; künye eki III. Faz 4
 > P4.0 Rust/egui bootstrap kapandı ([`e4e69a0da`](https://github.com/velnoxy/velnosub/commit/e4e69a0da)).
-> x86_64 ABI merdiveni `-j1` ile koşumda (proot futex/ENOSYS bulgusu). Cihaz
-> paketi ve reçete: docs/mobile/faz2-device-test.md.
+> Gece ekleri: P4.1 C ABI şeridi host koşumu yeşil (`libvelnosub-abi.so` +
+> Rust `abi-smoke`, `[AB0..AB5]` `CAPI=0`; faz4 planındaki künye) ve P5.0
+> LuaJIT zemini host koşumu yeşil (`velnosub-automation`, LuaJIT
+> 2.1.1791988261, `[AU0..AU3]`; faz5 planındaki künye). x86_64 ABI
+> merdiveni `-j1` tamamlandı (ICU+Boost statik öntanı, 11 `.a` + `.pc`);
+> Faz 2 x86_64 masa kurulumu zincirde. Cihaz paketi ve reçete:
+> docs/mobile/faz2-device-test.md.
 
 ## 0. Proje bilgisi
 
