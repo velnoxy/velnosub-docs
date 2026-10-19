@@ -12,8 +12,8 @@
 > LuaJIT zemini host koşumu yeşil (`velnosub-automation`, LuaJIT
 > 2.1.1791988261, `[AU0..AU3]`; faz5 planındaki künye). x86_64 ABI
 > merdiveni `-j1` tamamlandı (ICU+Boost statik öntanı, 11 `.a` + `.pc`);
-> Faz 2 x86_64 masa kurulumu zincirde. Cihaz paketi ve reçete:
-> docs/mobile/faz2-device-test.md.
+> Faz 2 x86_64 masa ✔ (476/476 tam koval; boost b2 ABI-kimlik düzeltmesiyle;
+> künye eki V). Cihaz paketi ve reçete: docs/mobile/faz2-device-test.md.
 
 ## 0. Proje bilgisi
 

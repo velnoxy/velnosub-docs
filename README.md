@@ -39,7 +39,7 @@ LuaJIT'in aarch64 JIT/FFI mimarisi Faz 5'e kadar saklanır, çekirdekten hiçbir
 | Faz 4 / P4.0 (UI bootstrap) | ✔ | [`e4e69a0da`](https://github.com/velnoxy/velnosub/commit/e4e69a0da) | Rust/egui-eframe 0.37, 223 crate, aarch64-PIE artifact 7.431.952 B (NEEDED yalnız libdl/libandroid/libm/libc); cihazda açma denemesi sırada |
 | Faz 4 / P4.1 (C ABI şeridi) | ✔ host koşum | [`564d9739e`](https://github.com/velnoxy/velnosub/commit/564d9739e) | `libvelnosub-abi.so` (`init/open/edit/save/reload` 9 sembol) + `velnosub-ui/abi-smoke`; host şeridi `[AB0..AB5]` `CAPI=0`; künye faz4 planında |
 | Faz 5 / P5.0 (LuaJIT zemini) | ✔ host koşum | [`46cbecd32`](https://github.com/velnoxy/velnosub/commit/46cbecd32) | build-luajit.sh + `velnosub-automation` stub dumanı; host `[AU0..AU3]` (`LuaJIT 2.1.1791988261`); arm64 cross sırada; künye faz5 planında |
-| Faz 2 / x86_64 | ⏳ masa kurulumda | | ICU(4)+Boost(7) statik öntanı tamam (11 `.a` + `.pc`); x86_64 masa `meson setup` + `ninja -j2` zinciri p50a64-x64 logunda |
+| Faz 2 / x86_64 | ✔ tam koval | [`1584bf29a`](https://github.com/velnoxy/velnosub/commit/1584bf29a) | b2 boost ABI-kimlik düzeltmesi (AArch64 sızması giderildi) + masa7 476/476: core.so 72.495.784 B (X86-64 DYN), cli 585.976 B, ass-render 223.040 B, abi.so 692.704 B (9 sembol); künye eki V |
 
 ## Koşum kanıtları
 
@@ -49,6 +49,11 @@ LuaJIT'in aarch64 JIT/FFI mimarisi Faz 5'e kadar saklanır, çekirdekten hiçbir
   listesi: `libvelnosub-core.so` (ikililer), `libc++_shared.so` (NDK), bionic
   (`libm/libdl/libz/libc`) ve wrap-zinciri
   (`libfreetype/libpng16/libfribidi/libharfbuzz/libuchardet`).
+- **Android x86_64** (`build-android-x86_64/`, 476/476 tam koval):
+  `libvelnosub-core.so` (72.495.784 B, ELF64 X86-64 DYN), `tools/cross/velnosub-cli`
+  (585.976 B), `tools/cross/velnosub-ass-render` (223.040 B) ve
+  `tools/cross/libvelnosub-abi.so` (692.704 B; 9 tanımlı `velnosub_abi` sembolü).
+  Künye eki V.
 - **Host CLI duman koşumu:** [`docs/specs/ass-format-tests.ass`](https://github.com/velnoxy/velnosub/blob/feature/docs/specs/ass-format-tests.ass)
   girişiyle 41 satır, 2 stil; aç → düzenle → kaydet → tur-okuma geçti.
 - **Host kare-render koşumu (P2.3):** libass 0.17.4; `--defaultfont` fallback
@@ -81,11 +86,10 @@ locale/regex/thread; GIL clang-22 yaması dahil). Aşılan kapıların künyeli 
 
 ## Yol haritası
 
-Faz 2'nin kalanı: x86_64 ABI çıktısı (ICU+Boost merdiveni `-j1` ile koşuyor) ve
-cihaz duman testleri (paket hazır; reçete faz2-device-test'te). Sonra: Faz 3
-medya katmanı (FFmpeg video/ses sağlayıcı), Faz 4 mobil UI (P4.0 Rust/egui
-bootstrap ✔; sırada P4.1 C ABI köprüsü), Faz 5 automation (LuaJIT aarch64),
-Faz 6 iOS, Faz 7 paketleme ve test.
+Faz 2'nin kalanı: cihaz duman testleri (paket hazır; reçete faz2-device-test'te).
+Sonra: Faz 3 medya katmanı (FFmpeg video/ses sağlayıcı), Faz 4 mobil UI (P4.0
+Rust/egui bootstrap ✔; sırada P4.1 C ABI köprüsü), Faz 5 automation (LuaJIT
+aarch64), Faz 6 iOS, Faz 7 paketleme ve test.
 
 ## Atıf / lisans
 

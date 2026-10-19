@@ -134,3 +134,28 @@ Host koşum kanıtı (`build-host-check`, `-Dvelnosub_mobile=true`):
   - `tools/cross/velnosub-cli` 599.976 bayt (AArch64 PIE; NEEDED: `libvelnosub-core.so`, `libc++_shared.so`, `libdl`, `libc`).
   - `tools/cross/velnosub-ass-render` 230.432 bayt (AArch64 PIE; aynı NEEDED şeridi + `-lvelnosub-core.so`).
 - Kod commit: [`5da6fd29b`](https://github.com/velnoxy/velnosub/commit/5da6fd29b) (düzeltme3; koval bu üstünden).
+
+## Künye eki V (2026-10-19) — x86_64 tam koval + b2 ABI-kimlik düzeltmesi
+
+- masa6'daki zehir: boost özel-yordamı `C++ static library 'boost_system' not found` dedi; NDK
+  readelf `libboost_system.a` içindeki objelerin `Machine: AArch64` olduğunu gösterdi — arm64 b2
+  önbelleği x86_64 kovasına sızmıştı (ICU zarar görmedi; arşivleri X86-64 doğrulandı).
+- Kök-neden: `build-deps.sh` her iki ABI'da da aynı b2 toolset kimliğini kullanıyordu
+  (`toolset=clang-android`); aynı kaynak ağacındaki bin.v2 önbelleği ABI'leri ayıramıyordu.
+- Düzeltme: ABI-bazlı kimlik — `using clang : android_$ABOLU` + `toolset=clang-android_$ABOLU`
+  (aarch64 → `clang-android_aarch64`, x86_64 → `clang-android_x86_64`); b2'ye `-j${JOBS:-1}`
+  parametrik işçi sayısı. Zincir başına da 7 `.a` mimari kapısı eklendi: arşiv yoksa ya da
+  X86-64 değilse `rm -f libboost_*.a` + `VELNOSUB_BOOST_FORCE=1` ile yeniden kurulum (idempotent).
+- masa7 kanıtları: `BOOST_REBUILD_X86` (taze `clang-android_x86_64` hedef dizininden derleme) →
+  `DEPS_RC=0` → `BOOST_MACH=` `Advanced Micro Devices X86-64` → fresh `meson setup` (tam disable
+  kümesi + `android-x86_64.txt`) → `ninja -C build-android-x86_64 -j2` `[476/476]` → `X64_RC=0`
+  → readelf kanıt bloğu → `X64_END` (19-10 23:17).
+- Artefaktlar (NDK readelf/llvm-nm):
+  - `libvelnosub-core.so` 72.495.784 B — ELF64, `Type: DYN`, `Machine: Advanced Micro Devices X86-64`.
+  - `tools/cross/velnosub-cli` 585.976 B, `tools/cross/velnosub-ass-render` 223.040 B.
+  - `tools/cross/libvelnosub-abi.so` 692.704 B — DYN/X86-64; `nm -D --defined-only` ile 9 tanımlı
+    `velnosub_abi` sembolü (arm64 aynısı).
+- Zincir boyunca üç düzeltme push: cross-file boost property'leri (masa4),
+  [`07e226e30`](https://github.com/velnoxy/velnosub/commit/07e226e30) mükerrer `sys_root`
+  silinmesi (masa5), [`1584bf29a`](https://github.com/velnoxy/velnosub/commit/1584bf29a) b2
+  ABI-kimlik + `-j` parametrik (masa7).
