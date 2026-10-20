@@ -33,6 +33,12 @@ Bu dosya planı ve künyeleri tutar.
   tazelenir) + reconfigure + `ninja -j2` → `build-android-arm64/tools/cross/
   velnosub-video-probe` 71.902.704 B (ELF64, `Type: DYN`, `Machine: AArch64`; `-g`
   statik bağlı FFmpeg nedeniyle büyük — cihaz paketine strip'li gider).
+- P3.0 x86_64 ✔ (02:41, `FFMX64_RC=0`): kurulum `ndk-deps/x86_64/lib` →
+  `libavcodec.a` 121.003.582 B, `libavformat.a` 38.135.734 B, `libavutil.a`
+  3.870.036 B, `libswscale.a` 4.942.186 B, `libswresample.a` 584.050 B (+ pc'ler);
+  LLVM readelf `libavcodec.a` REL/X86-64.
+- P3.1 x86_64 ✔ (02:43): `build-android-x86_64/tools/cross/velnosub-video-probe`
+  71.518.992 B (`Type: DYN`, `Machine: Advanced Micro Devices X86-64`).
 - Derinleşen bulgular:
   1. `ffbuild/version.sh` `... | tail -1` boru hattı proot kesintlerinde/mesaj
      yönlendirmelerinde asılı: make tek hedefte 1:33:08 bekledi (0 ek .o).

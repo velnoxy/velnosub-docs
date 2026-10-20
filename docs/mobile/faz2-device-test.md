@@ -46,23 +46,39 @@ LD_LIBRARY_PATH=$PWD/lib ./velnosub-ass-render in.ass out.ppm \
   `fontselect: (Arial, 400, 0) -> DejaVuSans.ttf` seçimi gösterir. `--family`
   yalnızca ass_add_font adı olarak geçer; işlevsel eşleşme sağlamaz.
 
-## Hazır cihaz paketi (2026-10-19 gece, device-pkg4)
-- `device-pkg4.tar.gz` (host'ta `/root/velsub/device-pkg4.tar.gz`, 23.4 M civar):
+## Hazır cihaz paketi (2026-10-20 sabah, device-pkg)
+- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, 30.612.644 B):
   `bin/velnosub-cli`, `bin/velnosub-ass-render`, **`bin/velnosub-automation`** (P5.0),
-  **`bin/velnosub-abi-smoke`** (P4.1, aarch64-PIE), `lib/libvelnosub-core.so`,
+  **`bin/velnosub-abi-smoke`** (P4.1, aarch64-PIE), **`bin/velnosub-video-probe`**
+  (P3.1, strip'li 13.841.040 B), `lib/libvelnosub-core.so`,
   **`lib/libvelnosub-abi.so`** (P4.1), `lib/libfreetype.so`, `lib/libpng16.so`,
   `lib/libfribidi.so`, `lib/libharfbuzz.so`, `lib/libuchardet.so`,
   `lib/libc++_shared.so`, `ass-format-tests.ass`, **`default_config.json`**,
   `DejaVuSans.ttf`. (Kök seviyede eski kopya `velnosub-cli/velnosub-ass-render`
-  de duruyor; `bin/` kullanın.)
+  de duruyor; `bin/` kullanın.) Eski `device-pkg4.tar.gz` (23.479.573 B, 19-10)
+  yedektir.
 - Aktarım:
 
 ```sh
-tar -xzf device-pkg4.tar.gz
+tar -xzf device-pkg.tar.gz
 adb push device-pkg /data/local/tmp/velnosub
 adb shell
 # içinde: yukarıdaki CLI ve ass-render koşumları (LD_LIBRARY_PATH=$PWD/lib)
 ```
+
+## P3.1 cihaz dumanı (velnosub-video-probe)
+- Pakette örnek video yok; küçük bir kare örneği elle pushlayın
+  (`adb push kisa.mp4 /data/local/tmp/velnosub/`). Paketlenmiş kümesi:
+  demuxer `mov/matroska/avi/ogg/flv/wav`; decoder
+  `h264/hevc/vp8/vp9/aac/mp3/flac/opus/vorbis/pcm_s16le/pcm_f32le/srt`.
+- Probe statik FFmpeg bağlı; NEEDED yalnız `libm/libc++_shared/libdl/libc`:
+
+```sh
+cd /data/local/tmp/velnosub
+LD_LIBRARY_PATH=$PWD/lib ./bin/velnosub-video-probe kisa.mp4 --frames 5
+```
+- Beklenen şerit: `[VP0] açıldı: <kapsayıcı adı> süre: X sn`, `[VP1] akış: <codec>
+  WxH fps: F (time_base a/b)`, `[VP2]` PTS satırları; hata satırları `[VPE]`.
 
 ## P5.0 cihaz dumanı (velnosub-automation)
 ```sh
