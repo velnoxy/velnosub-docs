@@ -57,6 +57,18 @@ Notlar:
 | Paket | `refresh-device-pkg.sh` artık Rust ikililerini de kopyalar (`abi-smoke` 342.168 B + `velnosub-ui` eframe ikilisi) — eski bayat ikili tuzağı (ilk cihaz koşumunda yakalandı) kapandı; tar **86.780.115 B** (`libvelnosub-abi.so` Oboe-bağlı 3.831.416 B, 30 sembol) |
 | Sıradaki | Faz 5 dialog formları (aynı widget dilimi), P4.6 jestler/hotkey/düzenler, APK bağlamı |
 
+## P4.5 III — Dialog form omurgası ✔ (2026-10-20, host + cihaz + paket-içi)
+
+| Kayıt | Değer |
+|---|---|
+| Kod commit | [`03cbf985f`](https://github.com/velnoxy/velnosub/commit/03cbf985f) (feature dalı) |
+| ABI yüzeyi | 30 → **39 sembol**: `dialog_open(spec)` (mini DSL: `ctl\|sınıf\|ad\|başlik\|değer[\|ek]` + `buton\|metin` satırları, `#` yorum; sınıf kapısı: label/edit/intedit/floatedit/checkbox/dropdown/textbox/color/coloralpha; tip doğrulaması — intedit tam sayı, floatedit sayı, checkbox 0/1, dropdown değer öğeler arasında, label hariç boş değer reddi; varsayılan düğme tek halinde "Uygula"), `dialog_count`, `dialog_btncount`, `dialog_ctl` (okuma: sinif\|ad\|başlik\|değer[\|sınırlar\|öğeler] — intedit/floatedit `min,max` sınır hücresi yansır), `dialog_button`, `dialog_set` (tipli yazım), `dialog_show` (düğme seçimi kaydı), `dialog_showid`, `dialog_close` |
+| Rust smoke | `[AD0] dialog açıldı (alan 7, düğme 2)` → `[AD1] ctl 0..6` (label 4-hücreli değersiz satır dahil) → `[AD2] 5 alan yazıldı (sayı/sürü/anahtar)` → `[AD3] teyit: beş alan ikinci okumada birebir` → `[AD4] düğme 1 seçildi (İptal, kayıt tutarlı)` → `[AD5] tip reddi: harf sayıya, öğe dışı anahtar reddedildi (-1,-1)` → `[AD6] dialog kol kapandı — şerit tamam` — host RC=0, cihaz (proot) RC=0, **paket-içi** RC=0 |
+| Zarif-teardown kök düzeltmesi | abi-smoke'un tanınmış `RC=134` quirk'ü (hata-erken-çıkışlar `velnosub_abi_close`'u atlar → statik yıkıcıda çöküş) 44 çıkış noktası `cik(h)` kapısından geçtirilerek kökten kapatıldı — her yol kolunu kapatır, temiz RC |
+| egui dinamik form paneli | `Panel::top("dpanel")`: sınıf↔widget eşleme — label→etiket, edit→singleline TextEdit, textbox→multiline, intedit/floatedit→DragValue (sınırlar `alt..=ust`), checkbox→`ui.checkbox` (0/1), dropdown→ComboBox (`selectable_value`, boru tazeleme), color/coloralpha→`color_edit_button_srgba` (ASS dönüşümü); düğme satırı: gönderme akışı (tüm alan değerleri `dialog_set` ile ABI'ye yazılır, sonra `dialog_show` seçim kaydı) + not satırı; `VELNOSUB_DIALOG` env (spec dosyası yolu) |
+| Örnek spec | `testmedia/dialog-ornak.txt` (paket `media/` içine de aynen; ORNEK_SPEC ile birebir); `refresh-device-pkg.sh` medya bloğu eklendi — media/ artık elle kopyalanmıyor |
+| Sıradaki | gerçek `aegisub.dialog.display` pompası (Lua makro ↔ form; P5.2'yle bağlanır), P4.6 jestler/hotkey/düzenler, APK bağlamı |
+
 ## P4.4 — Ses paneli omurgası ✔ (2026-10-20, host + cihaz koşumu)
 
 | Kayıt | Değer |

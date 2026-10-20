@@ -46,12 +46,19 @@
 > egui Stiller paneli DragValue/font kutusu/ana renk/hiza; commits
 > [`5c62ee6bb`](https://github.com/velnoxy/velnosub/commit/5c62ee6bb) +
 > [`c6fd3fcd2`](https://github.com/velnoxy/velnosub/commit/c6fd3fcd2)).
+> P4.5 III dialog form omurgası ✔ (39 sembol: `dialog_open/…/close` mini
+> DSL — `ctl|sınıf|ad|başlik|değer[|ek]` + `buton|metin` satırları, tipli
+> doğrulama; `[AD0..AD6]` host+cihaz+paket-içi birebir; abi-smoke'un
+> RC=134 quirk'ü 44 çıkış noktası `cik(h)` kapısıyla kökten kapandı;
+> egui dinamik form paneli dpanel; commit
+> [`03cbf985f`](https://github.com/velnoxy/velnosub/commit/03cbf985f)).
 > P5.0 bireysel script koşumu cihazda kanıtlandı (`[AUL]` akışı).
 > Rust-bionic zinciri cihaz kanıtı: abi-smoke proot'ta DOĞRUDAN koştu.
 > eframe ikilisi proot'ta libicu/apex bind eksikliğinden durur (APK
 > bağlamına kalır). P3.4 audio-play AAudio→OpenSLES yedeği eklendi;
 > P3.1 reçetesi mkmpeg ile kullanıcı medyasından bağımsız. Paket
-> 86.700.458 B (media/ test varlıkları + Rust ikilileri dahil).
+> 86.872.719 B (media/ test varlıkları + dialog-ornak spec + Rust
+> ikilileri dahil).
 
 ## 0. Proje bilgisi
 
@@ -146,7 +153,7 @@ Paketler (her biri kendi commit + koşum kanıtıyla kapanır):
 - **P4.2** — Altyazı grid'i + edit box (sanallaştırılmış liste, hücre düzenleme, çekirdek undo bağlantısı)
 - **P4.3** — Video paneli: Faz 3 video sağlayıcısından gelen kare egui texture'ı; libass önizleme katmanı (P2.3 render yolunu çoğaltmadan)
 - **P4.4** — Ses paneli: dalga formu/spektrum canvas çerçevesi; oynatma Oboe (arm64) / AAudio (emülatör)
-- **P4.5** — Stil yöneticisi + dialog'lar; Faz 5 dinamik form eşlemesiyle aynı widget dilimi
+- **P4.5** — Stil yöneticisi + dialog'lar; Faz 5 dinamik form eşlemesiyle aynı widget dilimi (dialog formları omurgası ✔ — `dialog_open/…/close` mini DSL + egui dpanel; Lua pompası Faz 5'in P5.2'siyle bağlanır)
 - **P4.6** — Dokunma jestleri (pinch-zoom/pan, sürükleme araçları), harici klavye hotkey şeridi, tablet/telefon düzenleri, komut paleti
 
 Eski Qt 6 metni git geçmişinde durur; Faz 4 çıktısı cihazda duman edilmeden kapanmaz.

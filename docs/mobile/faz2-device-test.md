@@ -46,23 +46,25 @@ LD_LIBRARY_PATH=$PWD/lib ./velnosub-ass-render in.ass out.ppm \
   `fontselect: (Arial, 400, 0) -> DejaVuSans.ttf` seçimi gösterir. `--family`
   yalnızca ass_add_font adı olarak geçer; işlevsel eşleşme sağlamaz.
 
-## Hazır cihaz paketi (2026-10-20, device-pkg — P4.4 yenilemeli)
-- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, **86.780.115 B**;
-  30 dosya):
+## Hazır cihaz paketi (2026-10-20, device-pkg — P4.5 III yenilemeli)
+- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, **86.872.719 B**;
+  31 dosya):
   `bin/velnosub-cli`, `bin/velnosub-ass-render`, **`bin/velnosub-automation`** (P5.0),
-  **`bin/velnosub-abi-smoke`** (P4.1+P4.2+P4.3+P4.4 şeritleri, strip'li 342.168 B),
+  **`bin/velnosub-abi-smoke`** (P4.1–P4.5 III şeritleri, strip'li 358.360 B),
   **`bin/velnosub-video-probe`**
   (P3.1, strip'li 13.841.040 B), **`bin/velnosub-audio-probe`** (P3.3, strip'li
   13.842.600 B), **`bin/velnosub-audio-play`** (P3.4, strip'li 188.600 B;
   Oboe statik içsel), **`bin/velnosub-mkmpeg`** (P3.1 destek, strip'li
   13.841.416 B; sentetik mp4 üreticisi), **`bin/velnosub-ui`** (P4.0 egui
-  eframe ikilisi, strip'li 5.338.624 B; pencere APK bağlamı ister), `lib/libvelnosub-core.so` (P3.2
+  eframe ikilisi, strip'li 5.554.368 B; stil+dialog panelleri dahil; pencere
+  APK bağlamı ister), `lib/libvelnosub-core.so` (P3.2
   sağlayıcılı 117.401.312 B),
-  **`lib/libvelnosub-abi.so`** (P4.1–P4.5, **30 sembol**; Oboe-bağlı 3.831.416 B), `lib/libfreetype.so`, `lib/libpng16.so`,
+  **`lib/libvelnosub-abi.so`** (P4.1–P4.5 III, **39 sembol**; Oboe-bağlı 4.126.624 B), `lib/libfreetype.so`, `lib/libpng16.so`,
   `lib/libfribidi.so`, `lib/libharfbuzz.so`, `lib/libuchardet.so`,
   `lib/libc++_shared.so`, `ass-format-tests.ass`, **`default_config.json`**,
   `DejaVuSans.ttf`, **`media/`** (`kisa.wav` 192.044 B, `kisa.wav.pcm`
-  192.000 B, `kisa.mp4` 96.065 B — paket kendi test varlıklarıyla dolu).
+  192.000 B, `kisa.mp4` 96.065 B, `dialog-ornak.txt` 288 B — paket kendi test
+  varlıklarıyla dolu).
   (Kök seviyede eski kopya `velnosub-cli/velnosub-ass-render`
   de duruyor; `bin/` kullanın.) Eski `device-pkg4.tar.gz` (23.479.573 B, 19-10)
   yedektir.
@@ -80,9 +82,12 @@ adb shell
   `LD_LIBRARY_PATH=$PWD/lib VELNOSUB_CONFIG_JSON=$PWD/default_config.json
   VELNOSUB_AUDIO=$PWD/media/kisa.wav.pcm ./bin/velnosub-abi-smoke
   $PWD/ass-format-tests.ass /tmp/out.ass` — `[AB0..AB5]`, `[AG0..AG5]`,
-  `[AS0..AS5]`, `[AW0..AW5]`; video için `VELNOSUB_VIDEO=$PWD/media/kisa.mp4`
+  `[AS0..AS5]`, `[AW0..AW5]`, `[AD0..AD6]` (dialog şeridi gömülü spec ile); video için
+  `VELNOSUB_VIDEO=$PWD/media/kisa.mp4`
   → `[AV0..AV4]`. Paket kendi medyasıyla dolu, bağımsız koşar. `bin/velnosub-ui`
-  eframe ikilisi pencereyi APK bağlamında açar (proot'ta beklenmedik durur).
+  eframe ikilisi pencereyi APK bağlamında açar (proot'ta beklenmedik durur);
+  UI'da `VELNOSUB_DIALOG=$PWD/media/dialog-ornak.txt` ile dpanel makro formu
+  açılır.
 
 ## 2026-10-20 — proot-içi cihaz dumanı: tüm şeritler yeşil (KEŞİF)
 
@@ -102,6 +107,7 @@ sistem linker64 devreye girer; `LD_LIBRARY_PATH=$PWD/lib` ile lib/
 | P3.1 `mkmpeg`→`video-probe` | `[MK0..MK3]` (48 paket) → `[VP0] QuickTime/MOV 1.95833 sn` `[VP1] mpeg4 320x240 24fps` `[VP2]×3` `[VP3] decode 3` | ✔ |
 | P3.4 `audio-play` | `[OP1] tampon 96000 sample` → `[OPE] ErrorInternal` (AAudio + OpenSLES yemleri) | ⚠ proot kısıtı (aşağıda) |
 | P4.4 `abi-smoke` ses şeridi | `[AW0] ses açıldı (tutamaç: 1, rate 48000, ch 2)` `[AW1] s16 48000Hz 2k 48000 örnek` `[AW2] peak kovaları: 64 (boş olmayan 64, min<=max true)` `[AW3] oynatma durumu: 2 — arka-iplik openStream proot binder'da hızlı hata veriyor` `[AW4] oynatma kesildi` `[AW5] ses kol kapandı` | ✔ RC=0; **play artık bloke etmiyor** (senkron sürümün süresiz gömülmesi giderildi); gerçek çalma APK bağlamına kalır |
+| P4.5 III `abi-smoke` dialog şeridi | `[AD0] dialog açıldı (alan 7, düğme 2)` `[AD1] ctl 0..6` `[AD2] 5 alan yazıldı` `[AD3] teyit: beş alan ikinci okumada birebir` `[AD4] düğme 1 seçildi (İptal, kayıt tutarlı)` `[AD5] tip reddi (-1,-1)` `[AD6] dialog kol kapandı` | ✔ RC=0 (host/cihaz/paket-içi birebir); 39 sembol defteri |
 
 Notlar:
 - **Proot boru tuzağı**: `… \| head/tail` ile koşan ikili ortada takılabiliyor

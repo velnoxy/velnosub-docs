@@ -12,6 +12,9 @@ Bu dosya dilim planını ve künye/koşum kayıtlarını tutar.
 - **P5.1** — çekirdek bağlaması: automation → `libvelnosub-core.so` C yolu
   (P4.1 ABI şeridinin tekrar kullandığı disiplin; Lua `AssFile` görünümü).
 - **P5.2** — `aegisub.*` gerçek yüzeyi (makro altyazı düzenleme çağrıları).
+- **P5.4** — dialog form omurgası: `aegisub.dialog` kontrol sınıfları + dinamik
+  egui eşlemesi ✔ ABI/widget kısmı tamam (künye: faz4-ui-plan P4.5 III) —
+  Lua pompası (`dialog.display`) P5.2 ile bağlanır.
 - **P5.3** — script yükleme düzeni + DependencyControl uyum zeminleri.
 
 ## P5.0 — LuaJIT zemini ✔ (2026-10-19, host koşumu)
