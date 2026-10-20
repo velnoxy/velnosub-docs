@@ -40,11 +40,12 @@
 > `[AW3]` durum 2 verir, gerçek çalma APK bağlamına kalır; egui
 > AudioSection dalga paneli; commit
 > [`7fb1fc3d1`](https://github.com/velnoxy/velnosub/commit/7fb1fc3d1)).
-> P4.5 stiller omurgası ✔ (style_of 13-hanelik alan dizgesi + ad/boyut
-> düzenleme, COMMIT_STYLES; `[AS0..AS5]` host+cihaz+paket-içi birebir —
-> kalıcılık ikinci tutamaçta teyitli; egui Stiller paneli DragValue
-> canlı boyut; commit
-> [`5c62ee6bb`](https://github.com/velnoxy/velnosub/commit/5c62ee6bb)).
+> P4.5 stiller omurgası + tam editör ✔ (style_of 13-hanelik alan dizgesi
+> + ad/boyut/font/renk/hiza yazma ABI'sı, COMMIT_STYLES; `[AS0..AS6]`
+> host+cihaz+paket-içi birebir — kalıcılık ikinci tutamaçta teyitli;
+> egui Stiller paneli DragValue/font kutusu/ana renk/hiza; commits
+> [`5c62ee6bb`](https://github.com/velnoxy/velnosub/commit/5c62ee6bb) +
+> [`c6fd3fcd2`](https://github.com/velnoxy/velnosub/commit/c6fd3fcd2)).
 > P5.0 bireysel script koşumu cihazda kanıtlandı (`[AUL]` akışı).
 > Rust-bionic zinciri cihaz kanıtı: abi-smoke proot'ta DOĞRUDAN koştu.
 > eframe ikilisi proot'ta libicu/apex bind eksikliğinden durur (APK

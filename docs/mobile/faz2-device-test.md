@@ -47,7 +47,7 @@ LD_LIBRARY_PATH=$PWD/lib ./velnosub-ass-render in.ass out.ppm \
   yalnızca ass_add_font adı olarak geçer; işlevsel eşleşme sağlamaz.
 
 ## Hazır cihaz paketi (2026-10-20, device-pkg — P4.4 yenilemeli)
-- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, **86.700.458 B**;
+- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, **86.780.115 B**;
   30 dosya):
   `bin/velnosub-cli`, `bin/velnosub-ass-render`, **`bin/velnosub-automation`** (P5.0),
   **`bin/velnosub-abi-smoke`** (P4.1+P4.2+P4.3+P4.4 şeritleri, strip'li 342.168 B),
@@ -58,7 +58,7 @@ LD_LIBRARY_PATH=$PWD/lib ./velnosub-ass-render in.ass out.ppm \
   13.841.416 B; sentetik mp4 üreticisi), **`bin/velnosub-ui`** (P4.0 egui
   eframe ikilisi, strip'li 5.338.624 B; pencere APK bağlamı ister), `lib/libvelnosub-core.so` (P3.2
   sağlayıcılı 117.401.312 B),
-  **`lib/libvelnosub-abi.so`** (P4.1–P4.4, 26 sembol; Oboe-bağlı 3.592.184 B), `lib/libfreetype.so`, `lib/libpng16.so`,
+  **`lib/libvelnosub-abi.so`** (P4.1–P4.5, **30 sembol**; Oboe-bağlı 3.831.416 B), `lib/libfreetype.so`, `lib/libpng16.so`,
   `lib/libfribidi.so`, `lib/libharfbuzz.so`, `lib/libuchardet.so`,
   `lib/libc++_shared.so`, `ass-format-tests.ass`, **`default_config.json`**,
   `DejaVuSans.ttf`, **`media/`** (`kisa.wav` 192.044 B, `kisa.wav.pcm`
