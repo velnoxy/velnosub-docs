@@ -47,13 +47,14 @@ LD_LIBRARY_PATH=$PWD/lib ./velnosub-ass-render in.ass out.ppm \
   yalnızca ass_add_font adı olarak geçer; işlevsel eşleşme sağlamaz.
 
 ## Hazır cihaz paketi (2026-10-20 sabah, device-pkg)
-- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, 76.325.745 B):
+- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, 83.459.415 B):
   `bin/velnosub-cli`, `bin/velnosub-ass-render`, **`bin/velnosub-automation`** (P5.0),
   **`bin/velnosub-abi-smoke`** (P4.1, aarch64-PIE), **`bin/velnosub-video-probe`**
   (P3.1, strip'li 13.841.040 B), **`bin/velnosub-audio-probe`** (P3.3, strip'li
-  13.842.600 B), **`bin/velnosub-audio-play`** (P3.4, strip'li 188.152 B;
-  Oboe statik içsel), `lib/libvelnosub-core.so` (P3.2 sağlayıcılı
-  117.401.312 B),
+  13.842.600 B), **`bin/velnosub-audio-play`** (P3.4, strip'li 188.600 B;
+  Oboe statik içsel), **`bin/velnosub-mkmpeg`** (P3.1 destek, strip'li
+  13.841.416 B; sentetik mp4 üreticisi), `lib/libvelnosub-core.so` (P3.2
+  sağlayıcılı 117.401.312 B),
   **`lib/libvelnosub-abi.so`** (P4.1), `lib/libfreetype.so`, `lib/libpng16.so`,
   `lib/libfribidi.so`, `lib/libharfbuzz.so`, `lib/libuchardet.so`,
   `lib/libc++_shared.so`, `ass-format-tests.ass`, **`default_config.json`**,
@@ -69,9 +70,51 @@ adb shell
 # içinde: yukarıdaki CLI ve ass-render koşumları (LD_LIBRARY_PATH=$PWD/lib)
 ```
 
+## 2026-10-20 — proot-içi cihaz dumanı: tüm şeritler yeşil (KEŞİF)
+
+Bulgu: paketteki bionic ikilileri adb'siz, Termux proot içinden DOĞRUDAN
+koşmak mümkün — telefonun kendisi aarch64 olduğu için PT_INTERP üzerinden
+sistem linker64 devreye girer; `LD_LIBRARY_PATH=$PWD/lib` ile lib/
+çözümleniyor. Aşağıdaki şeritlerin tümü cihaz çipsetinde koşulmuş sayılır
+(proot; `adb shell` içindeki koşumla birebir aynı kullanıcı-alanı):
+
+| Duman | Şerit | Sonuç |
+| --- | --- | --- |
+| P4.1 `abi-smoke` | `[AB0] init` `[AB1] açıldı` `[AB2] satır: 41 stil: 2` `[AB3] düzenlendi` `[AB4] kaydedildi` `[AB5] tur: 41 satır` | ✔ `CAPI=0` |
+| P5.0 `automation` | `[AU0]` `[AU1]` `[AUL]×2` `[AU2] script koştu` `[AU3] tamam` | ✔ |
+| Faz 2 `cli` | `[0] config okuma` `[0b] 15030 bayt` `[1] config hazır` `[2] okuyucu hazır` `[3] 41 satır` + düzenleme + tur | ✔ |
+| Faz 2 `ass-render` | `[AR0]` `[AR1] oluyanlar: 40` `[AR2] kare` `[AR3] PPM` | ✔ (aşağıda font notu) |
+| P3.3 `audio-probe` | `[AP0] WAV` `[AP1] pcm_s16le 2ch 48000` `[AP2] parça…` | ✔ `.pcm` 192.000 B |
+| P3.1 `mkmpeg`→`video-probe` | `[MK0..MK3]` (48 paket) → `[VP0] QuickTime/MOV 1.95833 sn` `[VP1] mpeg4 320x240 24fps` `[VP2]×3` `[VP3] decode 3` | ✔ |
+| P3.4 `audio-play` | `[OP1] tampon 96000 sample` → `[OPE] ErrorInternal` (AAudio + OpenSLES yemleri) | ⚠ proot kısıtı (aşağıda) |
+
+Notlar:
+- **Proot boru tuzağı**: `… \| head/tail` ile koşan ikili ortada takılabiliyor
+  (FFmpeg `version.sh \| tail -1` tuzağıyla aynı sınıf); çıktıyı `> dosya`
+  yönlendirip sonra okumak güvenli.
+- **Font eşleşmesi**: stil `Arial` isteyince glyph 0 (piksel yok); stil
+  `DejaVu Sans` + `--font DejaVuSans.ttf --family "DejaVu Sans"` iken
+  `[AR2] kare render edildi (glyph pikseli: 14345)` — libass fontselect
+  gerçek family adıyla eşleşir; `ass_add_font` adı anahtar değildir.
+- **P3.4 proot kısıtı**: `[OP1]` tampon yüklemesi çalışır, akış açımı
+  AAudio ve OpenSLES yemlerinde de `ErrorInternal` (proot'ta dlopen/binder
+  medya-sunucu yolu). Kod tarafına AAudio→OpenSLES yedek yolu eklendi
+  (kısıtlı ortam dayanıklılığı); gerçek ses çıkışı APK bağlamında Faz 4
+  koşucusunda ayrı doğrulanacak.
+- **Medya kendin üret**: `bin/velnosub-mkmpeg kisa.mp4 --saniye 2` kendi
+  statik FFmpeg'inin mpeg4 kodlayıcısıyla 96.065 B'lik test mp4'ü verir —
+  P3.1 reçetesi kullanıcı medyasına muhtaç değil artık.
+
 ## P3.1 cihaz dumanı (velnosub-video-probe)
-- Pakette örnek video yok; küçük bir kare örneği elle pushlayın
-  (`adb push kisa.mp4 /data/local/tmp/velnosub/`). Paketlenmiş kümesi:
+- Pakette örnek video YOK; medyayı kendi üret:
+
+```sh
+cd /data/local/tmp/velnosub
+LD_LIBRARY_PATH=$PWD/lib ./bin/velnosub-mkmpeg kisa.mp4 --saniye 2
+LD_LIBRARY_PATH=$PWD/lib ./bin/velnosub-video-probe kisa.mp4 --frames 5
+```
+
+  Paketlenmiş kümesi:
   demuxer `mov/matroska/avi/ogg/flv/wav`; decoder
   `h264/hevc/vp8/vp9/aac/mp3/flac/opus/vorbis/pcm_s16le/pcm_f32le/srt`.
 - Probe statik FFmpeg bağlı; NEEDED yalnız `libm/libc++_shared/libdl/libc`:
@@ -122,7 +165,9 @@ LD_LIBRARY_PATH=$PWD/lib ./bin/velnosub-automation
   `[AU1] aegisub tablo kayıtlı`, `[AUL] P5.0 zemin dumanı başladı`,
   `[AUL] arg: 0, toplam: 1499999500000`, `[AU2] script koştu`, `[AU3] tamam`.
 - İsteğe bağlı script koşumu: `./bin/velnosub-automation buyuk_sc.lua` — script
-  içinden `aegisub.log("...")` çağrıları `[AUL] ` önekiyle stdout'a akar.
+  içinden `aegisub.log("...")` çağrıları `[AUL]` önekiyle stdout'a akar.
+- Proot notu: çıktıyı `> dosya` yönlendir; `| head/tail` boru altında ikili
+  ortada takılabiliyor (yukarıdaki boru tuzağı notası).
 
 ## P4.1 cihaz dumanı (velnosub-abi-smoke)
 ```sh

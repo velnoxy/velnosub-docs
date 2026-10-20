@@ -39,3 +39,4 @@ P4.6 jestler/hotkey/düzenler: plan metni master plan Faz 4'te.
 | Host koşumu | `[AB0] init` → `[AB1] açıldı (tutamaç: 1)` → `[AB2] satır: 41 stil: 2` → `[AB3] düzenlendi` → `[AB4] kaydedildi` → `[AB5] tur: 41 satır`; `CAPI=0`; `NINJA=0` (`[11/11] Linking target tools/cross/libvelnosub-abi.so`) |
 | Derinleşen bulgular | (1) init'te boş config sessizce geçiliyordu; şimdi `config boş` hatası döner. (2) cargo ikilisi koşumunda `LD_LIBRARY_PATH` ister. (3) ilk derlemede eksik `<fstream>` geldiği gündeme dair düzeltme commiti [`ebe19435d`](https://github.com/velnoxy/velnosub/commit/ebe19435d) |
 | Cihaz yolu | abi-smoke + `libvelnosub-abi.so` + `libvelnosub-core.so` pakette; aynı şerit `/data/local/tmp` reçetesiyle koşur |
+| Cihaz koşumu (2026-10-20) | ✔.Termux proot'ta DOĞRUDAN koştu (adb'siz): tam şerit `[AB0..AB5]` + `[AB3] düzenlendi` (`--edit-first` ile), `CAPI=0`; reçete faz2-device-test.md'de |

@@ -115,11 +115,35 @@ Bu dosya planı ve künyeleri tutar.
   hattı); masa kolunda sistem oboe yok → hedef bilinçli atlanır.
 - Kanıt: arm64 2.584.368 B (`DYN`/AArch64), x86_64 2.448.544 B; NEEDED yalnız
   `liblog/libc++_shared/libm/libdl/libc` (oboe statik). Commit'ler: TU +
-  meson kapısı ve hata-arayüzü düzeltmesi — son hâli
-  `git log --oneline -3` (feature dalında `velnosub: P3.4 velnosub-audio-play`
-  başlıklı iki kayıt).
-- Cihaz dumanı: `[OP0..OP3]` şeridi faz2-device-test.md'de; ham PCM
-  metaverisiz olduğu için rate/kanal P3.3 `[AP1]` çıktısıyla eşleşir.
+  meson kapısı, hata-arayüzü düzeltmesi ve yedek yolu — son hâli
+  `git log --oneline -4` (feature dalında `velnosub: P3.4 velnosub-audio-play`
+  başlığıyla açılan üç kayıt).
+- Cihaz dumanı (proot): `[OP1] tampon yüklü` çalışır; akış açımı AAudio ve
+  OpenSLES yemlerinde de `ErrorInternal` (proot dlopen/binder kısıtı).
+  Dayanıklılık için `openWith(oboe::AudioApi)` yardımcısı: önce
+  Unspecified (AAudio), düşerse `setAudioApi(AudioApi::OpenSLES)` yedeği
+  — commit
+  [`7079100c2`](https://github.com/velnoxy/velnosub/commit/7079100c2).
+  Gerçek çıkış doğrulaması APK bağlamına (Faz 4 runner) kaldı.
+
+### P3.1 destek künyesi — velnosub-mkmpeg + tüm duman şeritleri (2026-10-20, 04:3x)
+
+- `tools/cross/velnosub-mkmpeg.cpp`: sentetik mp4 üreticisi — YUV420P
+  merdiven+şerit dolumu, mpeg4 kodlayıcı (cc gop 12, B-kare yok, global
+  başlık paket), mp4 muxer (`avformat_alloc_output_context2`; 24 fps,
+  `st->time_base 1/fps`, `av_packet_rescale_ts`). Marka şeridi
+  `[MK0] konteyner [MK1] mpeg4 WxH fps [MK2] paket [MK3] tamam [MKE] hata`.
+- Bulgular: (1) FFmpeg 6.1 kurulum başlıkları `extern "C"` muhafazasız —
+  C++ TU'larında `extern "C" { #include <…> }` sarımı ŞART (link hatası
+  `_Z…avformat_alloc_output_context2` ile kendini gösterir).
+  (2) `CONFIG_MPEG4_ENCODER` + `CONFIG_MP4_MUXER` statik derlememizde
+  `yes` (config.mak kanıtı) — harici kodlayıcı gerekmez.
+- Kanıt: arm64 TU 71.904.416 B, stripli 13.841.416 B; koşum 96.065 B'lik
+  kisa.mp4 üretti (2 sn, 48 paket). Cihaz/proot zinciri: mkmpeg →
+  video-probe `[VP0..VP3]` yeşil — P3.1 dumanı kullanıcı medyasından
+  bağımsız hâle geldi (faz2-device-test.md tablosu).
+- Commit [`e7dd229bb`](https://github.com/velnoxy/velnosub/commit/e7dd229bb)
+  (TU + kapı + audio-play yedek yolu).
 
 ## Künyeler
 
