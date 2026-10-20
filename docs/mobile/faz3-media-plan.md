@@ -13,8 +13,9 @@ Bu dosya planı ve künyeleri tutar.
   --disable-doc --disable-network --disable-avdevice`, seçili demuxer/decoder seti).
 - **P3.1** — `velnosub-video-probe` CLI ✔ (arm64 ikili çıktı): dosyayı aç, ilk N kareyi decode et,
   marker satırlarıyla (çözünürlük, kare sayısı, ilk kare PTS) duman.
-- **P3.2** — video sağlayıcı TU mobil kolda `video_provider_ffmpeg` (kare-doğru seek:
-  ts tabanlı arama + çerçeveli önbellek), host-check'te derlenir.
+- **P3.2** — video sağlayıcı TU mobil kolda `video_provider_ffmpeg` ✔ (kare-doğru
+  GetFrame: ts tabanlı geri sarma + çerçeve önbelleği), çekirdek `.so`'ya bağlı
+  (`FFmpeg` fabrika kaydı; masa koluna etkisiz).
 - **P3.3** — Ses decode → PCM disk önbellek CLI dilimi ✔ (`velnosub-audio-probe`),
   büyük dosya için parça-parça okuma kanıtlama (arm64 + x86_64 ikili çıktı).
 - **P3.4** — Oboe oynatma (arm64 cihaz dumanı; x86_64 için AAudio yolu).
@@ -45,6 +46,15 @@ Bu dosya planı ve künyeleri tutar.
   Commit'ler: TU + meson kapısı
   [`3f85e7897`](https://github.com/velnoxy/velnosub/commit/3f85e7897), imza
   düzeltmesi [`105a635f2`](https://github.com/velnoxy/velnosub/commit/105a635f2).
+- P3.2 ✔ (03:48/03:50): `src/video_provider_ffmpeg.cpp` çekirdek kola katıldı —
+  `VideoProvider` arayüzü; kare-doğru GetFrame (PTS tablosu birikimi ile ts
+  geri sarma + tek kare önbellek + swscale BGRA), manager'a `FFmpeg` fabrika
+  kaydı. Kapı yalnız `-Dvelnosub_mobile` + libav pc bulunduğunda açılır
+  (`WITH_VELNOSUB_FFMPEG`); masa baseline'ı etkilenmez (`DESK_RC=0` iki kez).
+  Kanıt: arm64 `libvelnosub-core.so` ~72 MB → **117.401.312 B**, x86_64 →
+  **146.968.936 B**; `llvm-nm -D`: `CreateFFmpegVideoProvider` +
+  `avformat_open_input` dışa açık. Commit
+  [`5fd29e77c`](https://github.com/velnoxy/velnosub/commit/5fd29e77c).
 - Derinleşen bulgular:
   1. `ffbuild/version.sh` `... | tail -1` boru hattı proot kesintlerinde/mesaj
      yönlendirmelerinde asılı: make tek hedefte 1:33:08 bekledi (0 ek .o).
@@ -66,6 +76,20 @@ Bu dosya planı ve künyeleri tutar.
   5. `av_samples_alloc_array_and_samples` ilk argüman `uint8_t ***`
      ister: `uint8_t *dst[8]` yerine `uint8_t **dst` bildirimi gerekli
      (derleyici uyarısıyla yakalandı).
+  6. Çekirdekte PCH yok (`agi_pre.h` sadece wx kolu): conf tanımları çekirdek
+     TU'suna akmaz ve `#ifdef`'lu TU BOŞ derlenir (784 B .o, sembolsüz).
+     Çözüm: tanımı mesondan `cpp_args`'a açıkça beslemek
+     (`-DWITH_VELNOSUB_FFMPEG=1`).
+  7. FFmpeg `.a` bağının DSO kuralı: farklı TU'lardaki genel sembollere (fft
+     tabloları) çapraz-nesne `adrp` atıfları `R_AARCH64_ADR_PREL_PG_HI21
+     cannot be used against symbol` hatası verir — `-Wl,-Bsymbolic` bağ
+     argümanıyla semboller .so içi bağlanır (interpoz hedeflenmiyor).
+  8. FFmpeg 6.1'de `AVStream::display_aspect_ratio` yok —
+     `sample_aspect_ratio` × çözünürlük oranından türet; `agi::BackgroundRunner`
+     ileri bildirimi TU içinde yapılmalı.
+  9. Ayrık zincir betiğinde PATH'i atlamak meson regen'i düşürür: cross clang
+     PATH'ten aranır (`FileNotFoundError: 'aarch64-linux-android29-clang'`);
+     zincir betiklerinde PATH ihracı bilinçli satır olmalı.
 
 ## Künyeler
 
