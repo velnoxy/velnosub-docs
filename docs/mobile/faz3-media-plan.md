@@ -19,6 +19,7 @@ Bu dosya planı ve künyeleri tutar.
 - **P3.3** — Ses decode → PCM disk önbellek CLI dilimi ✔ (`velnosub-audio-probe`),
   büyük dosya için parça-parça okuma kanıtlama (arm64 + x86_64 ikili çıktı).
 - **P3.4** — Oboe oynatma (arm64 cihaz dumanı; x86_64 için AAudio yolu).
+  Altyapı ✔: Oboe 1.9.0 statik kurulum iki ABI'de (aşağıda).
 - **P3.5** — Spektrum/dalga hesap döngüsü UI katmanına çizim teslim arayüzü.
 
 ## P3.0 + P3.1 künyesi — FFmpeg aarch64 kurulum + video-probe ikilisi (2026-10-19, 02:18/02:23)
@@ -90,6 +91,21 @@ Bu dosya planı ve künyeleri tutar.
   9. Ayrık zincir betiğinde PATH'i atlamak meson regen'i düşürür: cross clang
      PATH'ten aranır (`FileNotFoundError: 'aarch64-linux-android29-clang'`);
      zincir betiklerinde PATH ihracı bilinçli satır olmalı.
+  10. Oboe CMake 4.x'te `cmake_minimum_required` < 3.5 kuralıyla düşer —
+      `-DCMAKE_POLICY_VERSION_MINIMUM=3.5` geçiş çare
+      (deprecation uyarısı kalır ama derlama birebir tamamlanır).
+
+### P3.4 altyapı künyesi — Oboe 1.9.0 statik kurulum (2026-10-20, 04:03)
+
+- Kaynak: google/oboe 1.9.0 tarball; CMake cross
+  (`android.toolchain.cmake`, `ANDROID_PLATFORM=android-29`,
+  `BUILD_SHARED_LIBS=OFF`); kurulum `ndk-deps/<abi>/` başlıklarla.
+- Kanıt: arm64 `liboboe.a` 6.952.108 B (`Machine: AArch64`), x86_64
+  6.601.164 B (`Machine: Advanced Micro Devices X86-64`); `include/oboe/`
+  her iki prefix'te. cmake install ABI alt-dizinine koyar (`lib/<abi>/`) —
+  prefix düzenine taşındı (`lib/liboboe.a`).
+- P3.4 TU dolumu (oboe oynatma hattı + cihaz dumanı) bir sonraki adım:
+  cihaz gerektirir.
 
 ## Künyeler
 
