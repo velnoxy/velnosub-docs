@@ -47,10 +47,11 @@ LD_LIBRARY_PATH=$PWD/lib ./velnosub-ass-render in.ass out.ppm \
   yalnızca ass_add_font adı olarak geçer; işlevsel eşleşme sağlamaz.
 
 ## Hazır cihaz paketi (2026-10-20 sabah, device-pkg)
-- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, 30.612.644 B):
+- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, 37.746.033 B):
   `bin/velnosub-cli`, `bin/velnosub-ass-render`, **`bin/velnosub-automation`** (P5.0),
   **`bin/velnosub-abi-smoke`** (P4.1, aarch64-PIE), **`bin/velnosub-video-probe`**
-  (P3.1, strip'li 13.841.040 B), `lib/libvelnosub-core.so`,
+  (P3.1, strip'li 13.841.040 B), **`bin/velnosub-audio-probe`** (P3.3, strip'li
+  13.842.600 B), `lib/libvelnosub-core.so`,
   **`lib/libvelnosub-abi.so`** (P4.1), `lib/libfreetype.so`, `lib/libpng16.so`,
   `lib/libfribidi.so`, `lib/libharfbuzz.so`, `lib/libuchardet.so`,
   `lib/libc++_shared.so`, `ass-format-tests.ass`, **`default_config.json`**,
@@ -79,6 +80,21 @@ LD_LIBRARY_PATH=$PWD/lib ./bin/velnosub-video-probe kisa.mp4 --frames 5
 ```
 - Beklenen şerit: `[VP0] açıldı: <kapsayıcı adı> süre: X sn`, `[VP1] akış: <codec>
   WxH fps: F (time_base a/b)`, `[VP2]` PTS satırları; hata satırları `[VPE]`.
+
+## P3.3 cihaz dumanı (velnosub-audio-probe)
+- Örnek ses dosyası elle pushlanır (`adb push kisa.wav /data/local/tmp/velnosub/`;
+  pcm_s16le wav doğrudan destekli; aac/mp3/flac/opus/vorbis decoderları da açık):
+```sh
+cd /data/local/tmp/velnosub
+LD_LIBRARY_PATH=$PWD/lib ./bin/velnosub-audio-probe kisa.wav --seconds 5
+```
+- Beklenen şerit: `[AP0] açıldı: <kapsayıcı> süre: X sn`, `[AP1] akış: <codec>
+  kanal: N samplerate: R (girdi <fmt>)`, `[AP2] parça K: S sample (toplam T)`
+  satırları, `[AP3] toplam: T sample / B bayt / K parça → kisa.wav.pcm`,
+  `[AP4] tamam`; hata satırları `[APE]`.
+- PCM s16'ya swresample'la çevrilip parça-parça diske yazılır (bellek sınırlı;
+  P3.4 Oboe oynatma zemini kanıtı). NEEDED yalnız
+  `libm/libc++_shared/libdl/libc` (FFmpeg statik).
 
 ## P5.0 cihaz dumanı (velnosub-automation)
 ```sh

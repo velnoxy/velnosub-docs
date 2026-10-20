@@ -13,10 +13,11 @@
 > 2.1.1791988261, `[AU0..AU3]`; faz5 planındaki künye; arm64+x86_64 LuaJIT
 > cross kurulumları + automation ikilileri, reconfigure clearcache tuzağı
 > çözüldü). Faz 2 x86_64: ABI merdiveni (ICU+Boost) ve masa 476/476 ✔
-> (boost b2 ABI-kimlik düzeltmesi başlıca; künye eki V). Faz 3 P3.0+P3.1 arm64 ✔ (statik headless FFmpeg 6.1.2 kurulum +
-> `velnosub-video-probe` 71.902.704 B PIE; version.sh boru-tuzağı düzeltmesi;
-> künye faz3 planında). Cihaz paketi ve reçete:
-> docs/mobile/faz2-device-test.md.
+> (boost b2 ABI-kimlik düzeltmesi başlıca; künye eki V). Faz 3 P3.0–P3.3
+> arm64+x86_64 ✔ (statik headless FFmpeg 6.1.2; x86'da `--disable-x86asm`;
+> `velnosub-video-probe` + `velnosub-audio-probe` (s16 PCM) iki ABI'de PIE;
+> version.sh boru-tuzağı düzeltmesi; künye faz3 planında). Cihaz paketi ve
+> reçete: docs/mobile/faz2-device-test.md.
 
 ## 0. Proje bilgisi
 

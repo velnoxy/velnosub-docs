@@ -15,8 +15,8 @@ Bu dosya planı ve künyeleri tutar.
   marker satırlarıyla (çözünürlük, kare sayısı, ilk kare PTS) duman.
 - **P3.2** — video sağlayıcı TU mobil kolda `video_provider_ffmpeg` (kare-doğru seek:
   ts tabanlı arama + çerçeveli önbellek), host-check'te derlenir.
-- **P3.3** — Ses decode → PCM disk önbellek CLI dilimi (`velnosub-audio-probe`),
-  büyük dosya için parça-parça okuma kanıtlama.
+- **P3.3** — Ses decode → PCM disk önbellek CLI dilimi ✔ (`velnosub-audio-probe`),
+  büyük dosya için parça-parça okuma kanıtlama (arm64 + x86_64 ikili çıktı).
 - **P3.4** — Oboe oynatma (arm64 cihaz dumanı; x86_64 için AAudio yolu).
 - **P3.5** — Spektrum/dalga hesap döngüsü UI katmanına çizim teslim arayüzü.
 
@@ -39,6 +39,12 @@ Bu dosya planı ve künyeleri tutar.
   LLVM readelf `libavcodec.a` REL/X86-64.
 - P3.1 x86_64 ✔ (02:43): `build-android-x86_64/tools/cross/velnosub-video-probe`
   71.518.992 B (`Type: DYN`, `Machine: Advanced Micro Devices X86-64`).
+- P3.3 ✔ (02:50): `velnosub-audio-probe` her iki ABI'de — arm64 71.915.040 B
+  (`DYN`/AArch64), x86_64 71.534.224 B. swresample ile s16 dönüşümü +
+  parça-parça disk yazımı (`--seconds N`, varsayılan 5 sn; çıktı `<girdi>.pcm`).
+  Commit'ler: TU + meson kapısı
+  [`3f85e7897`](https://github.com/velnoxy/velnosub/commit/3f85e7897), imza
+  düzeltmesi [`105a635f2`](https://github.com/velnoxy/velnosub/commit/105a635f2).
 - Derinleşen bulgular:
   1. `ffbuild/version.sh` `... | tail -1` boru hattı proot kesintlerinde/mesaj
      yönlendirmelerinde asılı: make tek hedefte 1:33:08 bekledi (0 ek .o).
@@ -52,6 +58,14 @@ Bu dosya planı ve künyeleri tutar.
      unexpected token ')'`): zincir kaydı DEAD gösterdi ama make tamamlanmıştı
      (kurulum 02:18'de birebir). Ders: koşum başladıktan sonra yürüyen betiği
      düzenleme; düzeltmeyi ayrı commit ile SONRAKİ koşuma bırak.
+  4. x86_64 FFmpeg configure nasm ister: `nasm/yasm not found or too old` →
+     x86_64 moduna `--disable-x86asm` eklendi
+     ([`9571e3039`](https://github.com/velnoxy/velnosub/commit/9571e3039));
+     assembly'siz headless decode için yeterli (arm64'ün 1,5 saatinin tersine
+     x86_64 kurulumu 8 dk'da bitti — asm TÜ'ler tamamen atlandı).
+  5. `av_samples_alloc_array_and_samples` ilk argüman `uint8_t ***`
+     ister: `uint8_t *dst[8]` yerine `uint8_t **dst` bildirimi gerekli
+     (derleyici uyarısıyla yakalandı).
 
 ## Künyeler
 
