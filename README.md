@@ -1,8 +1,9 @@
 # velnosub
 
-**velnosub**, [Aegisub](https://github.com/arch1t3cht/Aegisub)'ın mobil (Android/iOS)
-yeniden mühendislik portudur. UI yığını Rust/**egui-eframe** olarak seçilmiştir
-(ilk seçenek Qt 6'nın bu konakta ilerletilme zorluğu → karar kaydı master plan
+**velnosub**, [Aegisub](https://github.com/arch1t3cht/Aegisub)'ın mobil (Android)
+yeniden mühendislik portudur (iOS 2026-10-20'de kapsam dışı). UI yığını
+Rust/**egui-eframe** olarak seçilmiştir (ilk seçenek Qt 6'nın bu konakta
+ilerletilme zorluğu → karar kaydı master plan
 §3'te). Kod tabanı:
 [arch1t3cht/Aegisub](https://github.com/arch1t3cht/Aegisub) (`feature` dalı, `9bfd500`).
 
@@ -96,7 +97,8 @@ sınırlı — APK bağlamında ayrı doğrulanacak). Faz 4 mobil UI:
 P4.0 Rust/egui bootstrap ✔, P4.1 C ABI ✔ (host+cihaz), **P4.2 grid+edit ✔
 (host+cihaz `[AG0..AG5]`)**; sırada P4.3+ UI dolumu (APK bağlamı), Faz 5
 automation ✔ (host+arm64+x86_64 + cihaz `[AU0..AU3]`; LuaJIT script
-dumaları sıradaki), Faz 6 iOS, Faz 7 paketleme ve test.
+dumaları sıradaki), Faz 6 (iOS) 2026-10-20'de **iptal** — Faz 7 paketleme
+ve test Android hedefiyle sürer.
 
 ## Atıf / lisans
 

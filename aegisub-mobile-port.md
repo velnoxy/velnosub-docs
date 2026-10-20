@@ -1,4 +1,4 @@
-# velnosub — Aegisub Mobil Port Planı (Android öncelikli, iOS sonra)
+# velnosub — Aegisub Mobil Port Planı (Android; iOS 2026-10-20'de iptal)
 
 > **2026-10-18 durum notu:** Kod deposu bağımsız repo
 > [`velnoxy/velnosub`](https://github.com/velnoxy/velnosub) (fork ilişkisi bırakıldı; eski fork `Velsub-fork` arşiv olarak durur), belge deposu [`velnoxy/velnosub-docs`](https://github.com/velnoxy/velnosub-docs). Adlandırma revizyonu `velsub → velnosub` commit [`997c5819a`](https://github.com/velnoxy/velnosub/commit/997c5819a). Arayüz yığını kararı Qt 6'dan Rust (egui/eframe)'a döndü; gerekçe ve yeni Faz 4 paketleri §3 ve Faz 4'te.
@@ -57,7 +57,7 @@ Dil dağılımı: C/C++ (~94%), Lua (~3%), MoonScript, Meson
 
 ## 1. Hedef
 
-Aegisub'un **tam** işlevselliğini Android'de (sonra iOS) çalıştırmak:
+Aegisub'un **tam** işlevselliğini Android'de çalıştırmak (iOS 2026-10-20'de kapsam dışı):
 
 - ASS/SSA/SRT vb. altyazı düzenleme (grid, edit box, stil yöneticisi, find/replace, timing araçları)
 - Video önizleme + libass render (mevcut libass entegrasyonu)
@@ -92,7 +92,7 @@ wxWidgets mobilde resmi olarak desteklenmiyor. Bu yüzden:
    - wx tiplerini (`wxString`, `wxRect`, `wxColour`, event sistemi vb.) soyutlama katmanıyla değiştir
 2. **`velnosub-ui` (Rust, egui/eframe)** *(2026-10-18 revizyonu: Qt yerine Rust)*
    - C++ çekirdek (`libvelnosub-core.so`) üstünde ince bir `extern "C"` ABI katmanı; Rust (egui/eframe) bu ABI'ye bağlanır, `cargo-ndk` + `cargo-apk`/`xbuild` ile gradle'sız APK
-   - Tek kod tabanı ile Android + iOS (+ masaüstü test)
+   - Tek kod tabanı ile Android (+ masaüstü test); iOS 2026-10-20'de kapsam dışı
    - Karar gerekçesi: hedef konak (Termux+PRoot, aarch64) Qt 6 Android kaynak derlemesini praktikte taşımıyor ve gradle/aapt2 zinciri kapalı; egui/eframe bu konakta çalışan en kısa bootstrap yoludur. Eski Qt 6 kararı git geçmişinde durur
    - Alternatif (seçilmedi): Kotlin + Jetpack Compose + JNI (JNI köprüsü şart)
 3. **Platform adaptörleri**
@@ -144,7 +144,7 @@ Eski Qt 6 metni git geçmişinde durur; Faz 4 çıktısı cihazda duman edilmede
 Mevcut yapı: `src/auto4_lua*.cpp` Lua motorunu barındırır, `automation/include` ve `automation/autoload` içinde kütüphane ve scriptler bulunur.
 
 Yapılacaklar:
-1. **Lua motoru:** Aegisub Lua 5.1 / LuaJIT API'sine göre yazılmış scriptleri çalıştırır. Android arm64'te LuaJIT kullan. iOS'ta JIT yasak → LuaJIT interpreter modu veya PUC Lua 5.1; FFI kullanan scriptler iOS'ta sınırlı olacak (belgelendir).
+1. **Lua motoru:** Aegisub Lua 5.1 / LuaJIT API'sine göre yazılmış scriptleri çalıştırır. Android arm64'te LuaJIT kullan. (iOS kalemi 2026-10-20'de iptal; JIT kısıtı notu artık müteferri.)
 2. **Aegisub Lua API'sinin tamamı** korunmalı: `aegisub.*` (log, progress, dialog, decode_path, cancel, text_extents, frame_from_ms, ms_from_frame, project_properties, video_size, vm API, gettext, lua_api eklemeleri: selection/cursor kontrolü vb. — bu fork'ta `lua_api` branch'i)
 3. **`aegisub.dialog.display` / `aegisub.dialog.open|save`:** Script diyaloglarını (label, edit, intedit, floatedit, textbox, dropdown, checkbox, color, coloralpha, alpha, slider vb.) Qt/QML'de dinamik form olarak yeniden uygula. Bu, wx'e en bağımlı kısımdır.
 4. **MoonScript:** `automation/include/moonscript.lua` ile gömülü gelir; doğrudan çalışmalı
@@ -154,11 +154,13 @@ Yapılacaklar:
 8. **Harici bağımlılıklar:** Birçok script `require("ffi")` veya Windows DLL'i (`requireffi`, `ILL`, `Yutils`, `clipper`, `lfs`, `re` vb.) kullanır. Android için bunların .so karşılıklarını derle/paketle ve bir uyumluluk tablosu üret (çalışan / kısmi / çalışmayan).
 9. **Çalıştırma güvenliği:** Scriptler kullanıcı yetkisinde çalışır; ağ erişimi (`io`, `os.execute`, `io.popen`) mobilde kısıtlanabilir → `os.execute`/`io.popen` Android'de işlev dışı bırakılmalı veya sandbox'lanmalı, bu belgelenmeli
 
-### Faz 6 — iOS
-- Qt for iOS, Metal tabanlı render
-- Lua: JIT'siz mod
-- Bağımlılıklar statik link
-- Dosya erişimi: UIDocumentPicker, security-scoped bookmarks
+### Faz 6 — iOS (**İPTAL, 2026-10-20 — kullanıcı kararı**)
+
+Bu faz kapsamdan çıkarıldı. Eski metin (Qt/Metal, JIT'siz Lua, UIDocumentPicker
+gibi kalemler) ve iOS'e özel hasar katmanı yapılmayacak; Qt metni zaten Faz 4
+egui revizyonuyla geçersizdi. Android hedefi tek platform olarak kalır; cleanup
+olarak yapılmadı — JIT'siz Lua kararı ve UIDocumentPicker kalemleri iOS payı
+talep edilirse künyelerden geri okunabilir (git geçmişi).
 
 ### Faz 7 — Paketleme ve test
 - Android: AAB/APK, ABI split, imzalama
@@ -176,7 +178,7 @@ Yapılacaklar:
 | Büyük ses dosyaları | Bellek/depolama | Disk önbellekli PCM |
 | Doğru kare seek | Typesetting için kritik | İndeksleme + BestSource benzeri doğruluk modu |
 | Lisans | Dağıtım | Kod GPL uyumlu BSD tarzı; fftw nedeniyle birleşik çıktı GPLv2 → kaynak açma yükümlülüğü |
-| Mağaza politikaları | Kullanıcı scripti çalıştırma (özellikle iOS) | Politikaları araştır, gerekirse script desteğini sınırla |
+| Mağaza politikaları | Kullanıcı scripti çalıştırma | Politikaları araştır, gerekirse script desteğini sınırla |
 
 ## 6. Teslim edilecekler
 
