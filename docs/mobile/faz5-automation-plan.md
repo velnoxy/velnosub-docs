@@ -70,3 +70,16 @@ Bu dosya dilim planını ve künye/koşum kayıtlarını tutar.
 | Koşumlar | host: mini 40-commit+save+reopen RC=0 (evvelki SIGSEGV), `MALLOC_CHECK_=3` ile 0,1,2,3 sırası yeşil (evvelki abort), Clean Tags manager RC=0 (evvelki SEGFAULT); cihaz: abi-smoke `[AB7]` ✔ + Clean Tags manager RC=0 + `Form dene` (DUMAN-FORMU @7) + `Ana harf` RC=0 — birebir |
 | Paket | 86.865.035 B, 37 dosya; `share/lua/autos/` (upstream birebir kopyalar) + `share/lua/inc/cleantags.lua` + `share/lua/lua-noop.lua` eklendi (refresh script bloğu) |
 | Sırada | P5.2 devam (zaman nesnesi, insert/delete ABI), DependencyControl zemini, moonscript/karaskel paketi |
+
+## P5.2 (devam) — satır ekleme/silme ABI'sı + auto4 yöntemleri ✔ (2026-10-20, host + cihaz)
+
+| Kayıt | Değer |
+|---|---|
+| Kod commit | [`8d4eb608a`](https://github.com/velnoxy/velnosub/commit/8d4eb608a) (feature dalı) |
+| Çekirdek vekiller | `velnosub_core_insert_line(AssFile&, int idx, metin, bas_zaman, son_zaman, stil)` — idx 0-taban, düğüm konumun ÖNÜNE (idx == adet → sona); zamanlar ASS dizgesi (`agi::Time(std::string)` ile çözüm), boşsa varsayılan (0/5000); Text/Style flyweight yazımı **yine core.so kolu** (P5.3 kök neden kuralı). `velnosub_core_delete_line` — intrusive erase + delete, `COMMIT_DIAG_ADDREM` |
+| Yeni ABI | `velnosub_abi_line_insert(h, idx, metin, bas, son, stil)` + `velnosub_abi_line_delete(h, idx)` — nm defteri 40→**42** sembol; aralık denetimleri (insert 0..adet, delete 0..adet-1) |
+| Shim | subtitle nesnesine auto4 yöntemleri: `subs:insert_line(konum, satır)` (konum 1-taban, satır tablosu `.text` zorunlu; `.start_time`/`.end_time` ASS dizge geçişi; `.style` isteğe), `subs:delete_line(konum)`, `subs.n_lines` özelliği; adet sayacı ekle/sil ile canlı güncellenir |
+| Demo makro | `velnosub-demo-macro.lua` üçüncü makro **Ekle sil dene**: seçili satırın ÖNÜNE `"önce: "` önekli kopya (`text+times` kopyalanır, style mimlenir) ekler, asıl satırı siler (net önekleme; adet değişmez). `--sel 4` → `[AUL] ekle sil: 4. satır öncesi/sonrası` + `[AUS6]` kalıcılık: `"önce: Now going to test..."` + `0:00:07.00,0:00:09.00` **birebir** |
+| Regresyon | abi-smoke `[AB8]` ekleme/silme şeridi: 41→42 satır (metin `ab8 ekleme domatesi`, `0:00:01.00 / 0:00:02.00` birebir) → geri 41; host + cihaz RC=0; `Ekle sil dene` host+cihaz birebir; Clean Tags manager regresyonu yerinde (RC=0) |
+| Paket | 86.880.742 B, 37 dosya; ABI 42 sembol |
+| Kalan | `aegisub.time` nesnesi (aritmetik ve dizge dönüşümleri), `aegisub.text_extents`, `aegisub.frame_from_ms`/`ms_from_frame` (video bilgi köprüsü), DependencyControl zemini, moonscript/karaskel paketi |

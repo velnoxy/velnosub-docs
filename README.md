@@ -102,10 +102,12 @@ P4.0 Rust/egui bootstrap ✔, P4.1 C ABI ✔ (host+cihaz), **P4.2 grid+edit ✔
 (arka-iplikli Oboe, `[AW0..AW5]` host+cihaz+paket-içi; çalma APK
 bağlamında)**, **P4.5 stiller omurgası + tam editör ✔ (`[AS0..AS6]` ABI 30
 sembol + egui font/renk/hiza yazım hattı)**, **P4.5 III dialog formları
-omurgası ✔ (`[AD0..AD6]`, ABI 40 sembol line_meta dahil, egui dpanel)**,
-**P5.3 manager + gerçek upstream makroları ✔ (birebir kopya Strip tags /
-Clean Tags; flyweight çapraz-DSO yığın bozulması kökte giderildi +
-`[AB7]` regresyon şeridi, ABI 40 sembol)**; sırada libass
+omurgası ✔ (`[AD0..AD6]`, ABI 42 sembol line_meta/insert/delete dahil,
+egui dpanel)**, **P5.3 manager + gerçek upstream makroları ✔ (birebir
+kopya Strip tags / Clean Tags; flyweight çapraz-DSO yığın bozulması
+kökte giderildi + `[AB7]`/`[AB8]` regresyon şeritleri)**, **P5.2 devam
+✔ — `subs:insert_line`/`delete_line`/`n_lines` + demo "Ekle sil dene"
+(host+cihaz birebir; ABI 42 sembol)**; sırada libass
 önizleme, P4.6 jestler/düzenler ve APK
 bağlamı; Faz 5
 automation ✔ (host+arm64+x86_64 + cihaz `[AU0..AU3]`; LuaJIT script

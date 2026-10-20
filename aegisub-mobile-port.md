@@ -63,6 +63,11 @@
 > [`c362063a5`](https://github.com/velnoxy/velnosub/commit/c362063a5));
 > aynı dilimde boost::flyweight çapraz-DSO yığın bozulması kökten
 > giderildi (mutasyonlar core.so'da tek kolda; ABI 40 sembol line_meta).
+> P5.2 devam ✔ — satır ekleme/silme hatta: `velnosub_abi_line_insert/
+> delete` (ABI 42 sembol), `subs:insert_line/delete_line/n_lines`
+> yöntemleri ve "Ekle sil dene" demo makrosu; `[AB8]` 41→42→41 şeridi
+> host+cihaz birebir (commit
+> [`8d4eb608a`](https://github.com/velnoxy/velnosub/commit/8d4eb608a)).
 > Rust-bionic zinciri cihaz kanıtı: abi-smoke proot'ta DOĞRUDAN koştu.
 > eframe ikilisi proot'ta libicu/apex bind eksikliğinden durur (APK
 > bağlamına kalır). P3.4 audio-play AAudio→OpenSLES yedeği eklendi;
@@ -171,7 +176,14 @@ Eski Qt 6 metni git geçmişinde durur; Faz 4 çıktısı cihazda duman edilmede
 ### Faz 5 — Automation (scriptler dahil, kritik)
 Mevcut yapı: `src/auto4_lua*.cpp` Lua motorunu barındırır, `automation/include` ve `automation/autoload` içinde kütüphane ve scriptler bulunur.
 
-İlerleme (2026-10-20): **P5.0 LuaJIT zemini ✔** (host+arm64+x86_64, cihaz proot koşumu kanıtlı), **P5.1/P5.2 ilk dilim ✔** — `aegisub.*` gerçek yüzeyi LuaJIT FFI ile `libvelnosub-abi.so` kolu üzerinden: dosya aç/düzenle/kaydet (`subs[i]` newproxy-userdata, `#subs` işler), `aegisub.dialog.display` → P4.5 III dialog ABI pompası (tipli cevap dönüşü), demo makrolar host+cihaz birebir (`DUMAN-FORMU @7` + kalıcılık teyidi; künye faz5 planında), **P5.3 ilk dilim ✔** — manager dizin taraması (`--dir/--script/--include`, `[AUZ]` izleri), aegisub 2.x `include()` globali, `decode_path`, satır `class/comment` (`velnosub_abi_line_meta`, ABI 40 sembol) ve **gerçek upstream scriptler koşutu**: birebir kopya `strip-tags.lua` + `cleantags-autoload.lua` [+ `cleantags.lua`] manager akışında yüklenip Clean Tags 40 satırı temizledi (host+cihaz RC=0). Aynı dilimde **boost::flyweight çapraz-DSO yığın bozulması kökten giderildi**: Text/Style/Actor/Effect alanları refcounted flyweight — fabrika tekili DSO'ya göre bölünüyor (core.so F1 yükler, abi.so/cli F2/F3'ten yazınca yabancı düğüm erası → `free(): invalid size`/`double free`/SEGFAULT); tüm flyweight yazmaları artık core.so'da `velnosub_core_edit_*` vekilinde tek kolda (+ abi-smoke `[AB7]` tekrarlı-düzenleme regresyon şeridi). Kalan: 2-6 kalemleri (zaman nesnesi, text_extents/frame köprüsü, MoonScript/karaskel paketi, DependencyControl).
+İlerleme (2026-10-20): **P5.0 LuaJIT zemini ✔** (host+arm64+x86_64, cihaz proot koşumu kanıtlı), **P5.1/P5.2 ilk dilim ✔** — `aegisub.*` gerçek yüzeyi LuaJIT FFI ile `libvelnosub-abi.so` kolu üzerinden: dosya aç/düzenle/kaydet (`subs[i]` newproxy-userdata, `#subs` işler), `aegisub.dialog.display` → P4.5 III dialog ABI pompası (tipli cevap dönüşü), demo makrolar host+cihaz birebir (`DUMAN-FORMU @7` + kalıcılık teyidi; künye faz5 planında), **P5.3 ilk dilim ✔** — manager dizin taraması (`--dir/--script/--include`, `[AUZ]` izleri), aegisub 2.x `include()` globali, `decode_path`, satır `class/comment` (`velnosub_abi_line_meta`, ABI 40 sembol) ve **gerçek upstream scriptler koşutu**: birebir kopya `strip-tags.lua` + `cleantags-autoload.lua` [+ `cleantags.lua`] manager akışında yüklenip Clean Tags 40 satırı temizledi (host+cihaz RC=0). Aynı dilimde **boost::flyweight çapraz-DSO yığın bozulması kökten giderildi**: Text/Style/Actor/Effect alanları refcounted flyweight — fabrika tekili DSO'ya göre bölünüyor (core.so F1 yükler, abi.so/cli F2/F3'ten yazınca yabancı düğüm erası → `free(): invalid size`/`double free`/SEGFAULT); tüm flyweight yazmaları artık core.so'da `velnosub_core_edit_*` vekilinde tek kolda (+ abi-smoke `[AB7]` tekrarlı-düzenleme regresyon şeridi). **P5.2 devam ✔** — satır ekleme/
+silme hatta: `velnosub_core_insert_line/delete_line` vekilleri (flyweight
+yazımı yine core.so'da), `velnosub_abi_line_insert/line_delete` (ABI 42
+sembol), auto4 yöntemleri `subs:insert_line(konum, satır)`/
+`subs:delete_line(konum)`/`subs.n_lines` ve "Ekle sil dene" demo makrosu
+— `[AB8]` 41→42→41 + makro kalıcılığı host+cihaz birebir (commit
+[`8d4eb608a`](https://github.com/velnoxy/velnosub/commit/8d4eb608a)).
+Kalan: zaman nesnesi, text_extents/frame köprüsü, MoonScript/karaskel paketi, DependencyControl.
 
 Yapılacaklar:
 1. **Lua motoru:** Aegisub Lua 5.1 / LuaJIT API'sine göre yazılmış scriptleri çalıştırır. Android arm64'te LuaJIT kullan. (iOS kalemi 2026-10-20'de iptal; JIT kısıtı notu artık müteferri.)

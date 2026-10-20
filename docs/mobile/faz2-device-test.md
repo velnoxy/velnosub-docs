@@ -46,11 +46,11 @@ LD_LIBRARY_PATH=$PWD/lib ./velnosub-ass-render in.ass out.ppm \
   `fontselect: (Arial, 400, 0) -> DejaVuSans.ttf` seçimi gösterir. `--family`
   yalnızca ass_add_font adı olarak geçer; işlevsel eşleşme sağlamaz.
 
-## Hazır cihaz paketi (2026-10-20, device-pkg — P5.3 yenilemeli)
-- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, **86.865.035 B**;
+## Hazır cihaz paketi (2026-10-20, device-pkg — P5.2 devam yenilemeli)
+- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, **86.880.742 B**;
   37 dosya):
   `bin/velnosub-cli`, `bin/velnosub-ass-render`, **`bin/velnosub-automation`** (P5.0+P5.1/P5.2 manager taramalı),
-  **`bin/velnosub-abi-smoke`** (P4.1–P4.5 III şeritleri + `[AB7]`, strip'li),
+  **`bin/velnosub-abi-smoke`** (P4.1–P4.5 III şeritleri + `[AB7]`+`[AB8]`, strip'li),
   **`bin/velnosub-video-probe`**
   (P3.1, strip'li 13.841.040 B), **`bin/velnosub-audio-probe`** (P3.3, strip'li
   13.842.600 B), **`bin/velnosub-audio-play`** (P3.4, strip'li 188.600 B;
@@ -59,7 +59,7 @@ LD_LIBRARY_PATH=$PWD/lib ./velnosub-ass-render in.ass out.ppm \
   eframe ikilisi, strip'li 5.554.368 B; stil+dialog panelleri dahil; pencere
   APK bağlamı ister), `lib/libvelnosub-core.so` (P3.2
   sağlayıcılı 117.401.312 B),
-  **`lib/libvelnosub-abi.so`** (P4.1–P4.5 III + P5.3 line_meta, **40 sembol**; Oboe-bağlı), `lib/libfreetype.so`, `lib/libpng16.so`,
+  **`lib/libvelnosub-abi.so`** (P4.1–P4.5 III + P5.3 line_meta + P5.2 devam insert/delete, **42 sembol**; Oboe-bağlı), `lib/libfreetype.so`, `lib/libpng16.so`,
   `lib/libfribidi.so`, `lib/libharfbuzz.so`, `lib/libuchardet.so`,
   `lib/libc++_shared.so`, `ass-format-tests.ass`, **`default_config.json`**,
   `DejaVuSans.ttf`, **`media/`** (`kisa.wav` 192.044 B, `kisa.wav.pcm`
@@ -112,6 +112,13 @@ adb shell
   Tags + `[AUS6]` idx2/idx4 içerik birebir) — cihaz RC=0; `--macro
   "Strip tags" --sel 4 --sel 6` etiket sıyırma şeridi (bkz. faz5 plan
   P5.3 künyesi).
+- **Ekle sil reçetesi (P5.2 devam)**: demo şeridine `--macro "Ekle sil
+  dene" --sel 4 --save` → seçili satırın öne `"önce: "` önekli kopyası
+  `subs:insert_line` ile eklenip aslı `subs:delete_line` ile siliniyor
+  (net önekleme; adet değişmez); `[AUL] ekle sil: 4. satır öncesi/
+  sonrası` + `[AUS2]` + `[AUS6]` kalıcılık `"önce: Now going to
+  test..."` + `0:00:07.00,0:00:09.00` **birebir** — host + cihaz
+  RC=0 (bkz. faz5 plan P5.2 devam künyesi).
 
 ## 2026-10-20 — proot-içi cihaz dumanı: tüm şeritler yeşil (KEŞİF)
 
@@ -135,6 +142,10 @@ sistem linker64 devreye girer; `LD_LIBRARY_PATH=$PWD/lib` ile lib/
 | P5.1/P5.2 `automation` makro şeridi | `[AUS0] yüzey yüklendi` `[AUS1] dosya (satır 41)` `[AUL] form döndü: düğme Uygula, metin duman-formu, sayı 7, buyuk true` `[AUL] form hattı: DUMAN-FORMU @7` `[AUS2] makro koştu` `[AUS3] yazıldı` `[AUS4] kalıcılık @7` `[AUS5] pump tamam` `[AUP0]` | ✔ RC=0 (host + cihaz birebir); `--macro "Ana harf"` seçim-upper da ✔ |
 | P5.3 `[AB7]` tekrarlı düzenleme | `3 tur x 4 satır birebir` (aynı tutamaçta çoklu atama; flyweight çapraz-DSO regresyonu) | ✔ RC=0 (host + cihaz) |
 | P5.3 manager + Clean Tags | `[AUZ0] tarama (2 script)` `[AUZ1] cleantags-autoload/strip-tags` `[AUL] progress: 40 lines cleaned` `[AUS3/4/6]` kayıt+kalıcılık | ✔ RC=0 (host + cihaz; upstream scriptler birebir) |
+| P5.2 devam `[AB8]` ekleme/silme | `41→42 satır` (`ab8 ekleme domatesi` + `0:00:01.00 / 0:00:02.00` birebir) → `42→41 satır — şerit tamam` | ✔ RC=0 (host + cihaz) |
+| P5.2 devam `Ekle sil dene` makrosu | `[AUL] ekle sil: 4. satır öncesi/sonrası` `[AUS2] makro koştu` `[AUS6] önce: Now going to test...` + `0:00:07.00,0:00:09.00` birebir | ✔ RC=0 (host + cihaz; `subs:insert_line`/`delete_line`/`n_lines`) |
+| P5.2 devam `[AB8]` ekleme/silme | `41→42 satır` (metin+zaman birebir) → `42→41 satır — şerit tamam` | ✔ RC=0 (host + cihaz) |
+| P5.2 devam `Ekle sil dene` makrosu | `[AUL] ekle sil: 4. satır öncesi/sonrası` `[AUS2] makro koştu` `[AUS6] önce: Now going to test... +0:00:07.00/0:00:09.00 birebir` | ✔ RC=0 (host + cihaz; `subs:insert_line`/`delete_line`/`n_lines`) |
 
 Notlar:
 - **Proot boru tuzağı**: `… \| head/tail` ile koşan ikili ortada takılabiliyor
