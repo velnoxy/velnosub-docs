@@ -143,3 +143,32 @@ modu işledi (önce kurulum, ardından numaralı denetim — aşağıda).
 | Koşum dürüst notu (R-35) | etkileşimli GUI pencere koşumu bu ortamda mümkün değil (DISPLAY yok, Xvfb yok); gerçek dokunma doğrulaması APK bağlamı fazından sonra cihazda koşulacak |
 | antislop tayini | AFTER modu teslimatı: [`anti-slop/audit-001-2026-10-20.md`](../../anti-slop/audit-001-2026-10-20.md) — numaralı bulgu listesi (1-3 YÜKSEK: dar sekme kırpılması, kontrast ölçümsüzlüğü, etkileşimli koşum eksiği); düzeltmeler yalnız kullanıcı onayladığı numaralara uygulanır |
 | Paket | 86.918.580 B / 37 dosya (velnosub-ui yenilendi); ABI 45 sembol değişmedi |
+
+### P4.7 Δ — denetim düzeltmeleri ✔ (2026-10-20, kullanıcı "tümünü düzelt" onayıyla)
+
+| Kayıt | Değer |
+|---|---|
+| Kod commit'leri | [`abacb542a`](https://github.com/velnoxy/velnosub/commit/abacb542a) (düzeltmeler) + [`9d3476892`](https://github.com/velnoxy/velnosub/commit/9d3476892) (yorum imlası) |
+| #1 sekme kırpılması | uyarlanır metin boyu `gen*0.22, 9–15.5pt` + `button_padding 4px` + alt genişlik 48→44pt: 300px'te 6 sekme kırpılmasız (R-03 dokunma alanı korunur) |
+| #2 kontrast | `parlaklik`/`kontrast` (WCAG 2.1 göreli parlaklık) + `stil_tamir`: egui varsayılan soluk metin koyu zeminde **2.27:1 (ihlal tespit)** → tamir sonrası koyu **7.41**, zaman-gri `from_gray(170)` **7.41** (iki kol da değişti), hata rengi **5.64**, açık tema **6.49** — hepsi ≥4.5 (test kanıt: `kontrast_tamiri_aa_uyumlu`) |
+| #3 + #6 koşum/ölçüm | şimdi koşulamaz (DISPLAY yok); APK bağlamı için `[UI0..]` cihaz şeridi planı aşağıda kayıtlı — APK fazının ilk işi |
+| #4 klavye/erişim | masaüstünde de Ayarlar erişilebilir: durum çubuğuna "Ayarlar" düğmesi + `egui::Window` modal (mobil Ayarlar gövdesiyle AYNI `ayarlar_icerik`); egui'nin yerleşik odak çerçevesi devrede — cihaz şeridine görsel doğrulama kayıtlı |
+| #5 satır metin | tespit: egui 0.37 `TextEdit::singleline` `clip_text: true` — Denetimim varsayıldığı gibi iç yatay kaydırma çubuğu zaten YOK; metin kırpılır, imleç takip eder. Düzeltme değil kayıt: davranış egui ürünü olarak doğru |
+| #7 açık tema | `Tema{Koyu,Acik}` + ayar dosyası `{"ui","tema"}` ikili alan; `tema_sec` anında `all_styles_mut` + `Visuals::dark()/light()` + `stil_tamir` + kalıcı yazım; `main.rs` açılışta kayıtlı temayı uygular; Ayarlar'da Koyu/Açık 44pt seçim düğmeleri |
+| #8 yön belgesi | [`DESIGN.md`](../../DESIGN.md) yazıldı: kimlik, renk/tipografi temelleri, iki resmî düzen, doğrulama reçeteleri |
+| #9 kayıt | kullanıcı yüzü metinlerinde jargon yok — ihlal değil; kod yorumlarındaki derin jargon (44pt referansları) DESIGN.md ile bağlandı |
+| Test | `cargo test` → **2 passed** (`ayar_dongusu` + `kontrast_tamiri_aa_uyumlu`), RC=0; host + aarch64 release RC=0 (aarch64 ikili 8.167.536 B) |
+| Paket | 86.948.448 B / 37 dosya; ABI 45 sembol değişmedi |
+
+### P4.7 [UI0..] — cihaz koşum şeridi planı (APK bağlamı fazının ilk işi)
+
+| Adım | Beklenen |
+|---|---|
+| `[UI0]` ilk açılış (ayar dosyası silinmiş) | seçim ekranı çıkar: iki kart (Mobil UI / Masaüstü UI) + ayar yolu satırı; hiçbir şerit çizilmez |
+| `[UI1]` Mobil seçilir | alt sekme çubuğu: yalnız Altyazı+Ayarlar; Altyazı bölmesinde durum satırı + "dosya açılmadı"; `velnosub-ui.json` yazılmış |
+| `[UI2]` dosya açılır (`VELNOSUB_OPEN`) | sekmeler büyür: Altyazı/Stil (+Video/Ses yüklenmişse); grid dikey satırlar ≥44pt; uzun satırda iç yatay kaydırma YOK (clip) |
+| `[UI3]` Ayarlar sekmesi | düzen seçici seçili "Mobil UI" vurgulu; tema seçici uygulanır ve kalıcı |
+| `[UI4]` Masaüstü'ne geç | şeritler üst üste + durum çubuğu + "Ayarlar" düğmesi; grid yatay iki sütun; pencere açıkken düzen değiştirilebilir |
+| `[UI5]` yeniden açılış | seçim ekranı ÇIKMAZ (kayıtlı düzen+tema uygulanır); açılış teması: ekran görüntüsüyle kontrast ölçü teyidi |
+| `[UI6]` açılış süresi ölçümü (bulgu 6) | gerçek boyutlu .ass dosyasında `UI2` adım süresi ölçülür; makul üzerinde ise yükleme durumu ekranı dilimi açılır |
+| `[UI7]` regresyon | satır düzenle → Commit (`[AG0..AG5]` şeridiyle aynı dosyada) — düzen seçimi veriyi bozmaz |

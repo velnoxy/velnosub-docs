@@ -110,7 +110,9 @@ glyph; libass statik bağlandı)**, **P4.7 arayüz düzeni seçimi ✔
 değiştirilebilir; mobil desen alt sekme çubuğu + dikey grid reflow,
 44pt dokunma hedefleri; masaüstü yerleşimi birebir; host RC=0 + test
 1 passed + aarch64 RC=0; etkileşimli koşum APK fazına kaldı; antislop
-AFTER denetimi `anti-slop/audit-001-2026-10-20.md`)**, **P5.3 manager + gerçek upstream makroları ✔ (birebir
+AFTER denetimi `anti-slop/audit-001-2026-10-20.md`; Δ düzeltmeler:
+kontrast İHLAL tespiti 2.27:1 → tamir 7.41:1, açık tema, uyarlanır
+sekme boyu, masaüstü Ayarlar penceresi, DESIGN.md; test 2 passed)**, **P5.3 manager + gerçek upstream makroları ✔ (birebir
 kopya Strip tags / Clean Tags; flyweight çapraz-DSO yığın bozulması
 kökte giderildi + `[AB7]`/`[AB8]` regresyon şeritleri)**, **P5.2 devam
 ✔ — `subs:insert_line`/`delete_line`/`n_lines` + demo "Ekle sil dene"

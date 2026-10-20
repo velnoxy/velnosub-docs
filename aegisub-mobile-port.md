@@ -88,6 +88,14 @@
 > kaldı) — antislop AFTER modunda numaralı denetim
 > `anti-slop/audit-001-2026-10-20.md` (commit
 > [`1a433efdd`](https://github.com/velnoxy/velnosub/commit/1a433efdd)).
+> P4.7 Δ düzeltmelerim ✔ — kullanıcı "tümünü düzelt" onayıyla: kontrast
+> ölçüm kolu + tamir (egui varsayılan soluk metin koyu zeminde 2.27:1
+> İHLAL tespit → 7.41; hata 5.64; açık 6.49), uyarlanır sekme metin
+> boyu (300px/6 sekme kırpılmasız), AÇIK TEMA (ayar dosyasında "tema"
+> alanı + Ayarlar'da seçim düğmeleri + açılış uygulaması), masaüstüne
+> Ayarlar penceresi; [UI0..UI7] cihaz koşum şeridi planı APK fazına
+> kaydedildi; DESIGN.md yön belgesi yazıldı (test 2 passed; commit
+> [`abacb542a`](https://github.com/velnoxy/velnosub/commit/abacb542a)).
 
 ## 0. Proje bilgisi
 
@@ -221,6 +229,19 @@ AFTER modu teslimatı `anti-slop/audit-001-2026-10-20.md` (commit
 [`1a433efdd`](https://github.com/velnoxy/velnosub/commit/1a433efdd) +
 [`e639946f8`](https://github.com/velnoxy/velnosub/commit/e639946f8) +
 [`f485ba75d`](https://github.com/velnoxy/velnosub/commit/f485ba75d)).
+**P4.7 Δ ✔ (denetim düzeltmeleri, kullanıcının "tümünü düzelt" onayı)** —
+kontrast ölçüm kolu (`parlaklik`/`kontrast` WCAG 2.1) + tamir: egui
+varsayılan soluk metin koyu zeminde **2.27:1 İHLAL** tespit edildi →
+tamirle 7.41 (soluk), grid zaman gri `from_gray(170)` iki kol 7.41, hata
+rengi 5.64, açık tema 6.49 (test `kontrast_tamiri_aa_uyumlu` kanıtı);
+sekme kırpılması: uyarlanır metin boyu (9–15.5pt) + padding 4px + alt
+genişlik 44pt; AÇIK TEMA: `Tema{Koyu,Acik}` + ayar dosyasında `"tema"`
+alanı + Ayarlar'da 44pt seçim düğmeleri + açılış uygulaması
+(`main.rs`); masaüstüne Ayarlar penceresi (AYNI `ayarlar_icerik`
+gövdesiyle); [UI0..UI7] cihaz koşum şeridi planı APK fazının ilk işi
+olarak faz4 künyesine yazıldı; [`DESIGN.md`](DESIGN.md) yön belgesi yazıldı (commit
+[`abacb542a`](https://github.com/velnoxy/velnosub/commit/abacb542a) +
+[`9d3476892`](https://github.com/velnoxy/velnosub/commit/9d3476892)).
 Kalan: zaman nesnesi, text_extents/frame köprüsü, MoonScript/karaskel paketi, DependencyControl, egui video paneline ABI karesi (P4.6 dilim 2), APK bağlamı.
 
 Yapılacaklar:
