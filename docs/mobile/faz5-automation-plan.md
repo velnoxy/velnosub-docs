@@ -83,3 +83,46 @@ Bu dosya dilim planını ve künye/koşum kayıtlarını tutar.
 | Regresyon | abi-smoke `[AB8]` ekleme/silme şeridi: 41→42 satır (metin `ab8 ekleme domatesi`, `0:00:01.00 / 0:00:02.00` birebir) → geri 41; host + cihaz RC=0; `Ekle sil dene` host+cihaz birebir; Clean Tags manager regresyonu yerinde (RC=0) |
 | Paket | 86.880.742 B, 37 dosya; ABI 42 sembol |
 | Kalan | `aegisub.time` nesnesi (aritmetik ve dizge dönüşümleri), `aegisub.text_extents`, `aegisub.frame_from_ms`/`ms_from_frame` (video bilgi köprüsü), DependencyControl zemini, moonscript/karaskel paketi |
+
+## P5.2 (kalanı) — ms zamanları + video köprüsü + text_extents ✔ (2026-10-20, host + cihaz, üç dilim)
+
+Not: upstream `aegisub` tablosunda **`aegisub.time` nesnesi YOK** (auto4_lua
+`register` listesinde 18 ad: text_extents/frame_from_ms/ms_from_frame/
+video_size/keyframes/decode_path/cancel/lua_automation_version/file_name/
+gettext/project_properties/...). Zaman nesnesi kaydı upstream'e aykırıydı;
+P5.2 kalanı yerine GERÇEK boşluk kapatıldı.
+
+### Dilim A — ms zamanları [`b66794856`](https://github.com/velnoxy/velnosub/commit/b66794856)
+
+| Kayıt | Değer |
+|---|---|
+| C çekirdeği | `velnosub_core_set_line_times(AssFile&, idx, ms_bas, ms_son)` — `d.Start = agi::Time(int ms)` (`Time(int ms=0)` üretici kanıt), `COMMIT_DIAG_TIME`; flyweight disiplindeki TU'da (mutasyon tek kol) |
+| Yeni ABI | `velnosub_abi_line_times_set(h, idx, long long, long long)` — nm defteri 42→**46** sembol |
+| Shim | `zaman_ms` ("0:00:01.23" → 1230; negatif "-0:00:X") + `ms_zaman` (ms → "h:mm:ss.cc", yansımalı); `satir_oku` **start_time/end_time artık MS TAMSAYISI** (P5.1 dizgesel sınır kalktı — upstream auto4 satır alanları ms'dir); `insert_line` ms sayısını ASS dizgesine çevirir; `__newindex` alan yazımı: `text`→edit_line, `start_time`/`end_time`→line_times_set (ms-sayı veya ASS dizgesi kabulü, verilmeyen alan mevcut kalır) |
+| Şerit | abi-smoke `[AB10]`: set→`0:00:01.23 / 0:00:05.68` dizge teyiti + aralık-dışı red + eski değerlere geri dönüş döngüsü (sonraki şeritler orijinal durumu görür) |
+| Kanıt | 3-lane RC=0; `[AB10]` host+cihaz BİREBİR (52 şerit satırı eş, diff yalnız kayıt-yolu arg'ı + libass sürüm rozeti — her iki kötüleşme ortam farkıdır); pompa `Ekle sil dene` RC=0: satır 10 kopyası `0:02:40.00→0:03:00.00` birebir (ms→ASS çevrimi kayıpsız) |
+
+### Dilim B — video köprüsü + zarif yüzey [`634b588a9`](https://github.com/velnoxy/velnosub/commit/634b588a9) + [`1b9c4e41a`](https://github.com/velnoxy/velnosub/commit/1b9c4e41a)
+
+| Kayıt | Değer |
+|---|---|
+| Shim | `frame_from_ms`/`ms_from_frame`/`video_size` — **video yüklü değilken nil** (upstream auto4_lua davranışı birebir: `Timecodes().IsLoaded()` değilse pushnil); arg tip kancaları (tamsayı değilse hata); `keyframes` → boş küme; `lua_automation_version = 4`; `file_name` → pump açık dosyadan temel ad (yoksa nil — upstream `subsController->Filename()` boşken nil); `gettext` → özdeş (en); `project_properties` → upstream 14 alan (automation_scripts/export_filters/export_encoding/style_storage/video_zoom/ar_value/scroll_position/active_row/ar_mode/video_position + audio/video/timecodes/keyframes dosya yolları) nötr mobil değerleriyle |
+| Log etiketi | `[AUSB]` (pump'un "yeniden açılış" satırıyla çakışmayan ayrık etiket) |
+| Duman | `tools/cross/lua-autos/velnosub-b-dumani.lua` (testmedia/lua-autos kopyası sürüm altına alındı); `B duman` makrosu: nil'ler + boş küme + sürüm 4 + dosya adı + gettext + 14 alan liste baskısı |
+| Kanıt | pump RC=0: `[AUSB] frame_from_ms: video yüklü değil → nil` vb. 6 AUSB satırı + 14 alan yoklanır; kalıcılık `[AUS4]` zinciri zarar görmedi |
+
+### Dilim C — `aegisub.text_extents` [`8ef817bff`](https://github.com/velnoxy/velnosub/commit/8ef817bff)
+
+| Kayıt | Değer |
+|---|---|
+| Kol | ABI `velnosub_abi_text_extents(yol_font, boyut, kalin, italik, harf_bos, olcek_x, olcek_y, metin, out4[4])`; **upstream auto4_base.cpp CalculateTextExtents non-WIN32 dalının yapısıyla**: spacing≠0 → harf harf (kerning yok) + `fontsize/ink-yükseklik` normallemesi, spacing=0 → tek geçiş kerning'li (`FT_HAS_KERNING`); girişte `out4` sıfır küme (hata bitse bile — upstream davranışı); `scalex/scaley/100` telafisi; FreeType 26.6 sabit nokta → /64 piksel |
+| Sıfır-ink | boşluk gibi ink'siz harflerin ölçek zemini `ascender−descender` (wx font metrik yüksekliği karşılığı; yükseklik ölçümüne girmez) |
+| Sentetik | italik: 0.2 eğme matrisi (libass katsayısı — ilerletmeyi değiştirmez); kalin: ~%4 ilerletme artışı; fontname eşleşmesi cihaz font-servis fazına kalmakta — ölçüm tek paket fontu'ndan (pkg'ta DejaVuSans.ttf) |
+| meson | root'a `velnosub_ft2_dep = dependency('freetype2', fallback: ['freetype2','ft2_dep'])` — subproject hattında libass ile AYNI freetype derlemesine biner; host'ta pkg-config | 
+| nm defteri | 46→**47** sembol |
+| Shim | `text_extents(stil_tablosu, metin)`: `class=='style'` kanca; uyumsuz sınıf → hata **"Not a style entry"** (upstream dizgesi); araç font yolu `VELNOSUB_FONT` (varsayılan `./DejaVuSans.ttf`) |
+| Şerit | abi-smoke `[AB11]`: 28px *"HAHA VelnoSub"* → g=220.000 y=21.000 (DejaVu hint'li tam sayı ilerletmeler; FT probe ile teyit), 56px → oran **2.0000 birebir**, kalin 234.560 (%4 × 13 harf), `scale_x %150` → 330.000 (1.5x birebir), spacing 4px artışı, boş metin → rc 0 + sıfır küme, kötü font yolu + 600px boyut redleri |
+| Pompa | demo `Ölç dene` makrosu: **host+cihaz BİREBİR** (`g=260.00 y=21.00 d=0.00 l=0.00`; dialog sınıf red `Not a style entry`); kalıcılık zinciri zarar görmedi |
+| Kanıt | 3-lane RC=0; `[AB11]` host↔cihaz BİREBİR (52 satır eş, diff yalnız kayıt-yolu arg'ı + libass rozeti) |
+| Paket | 86.980.103 B, 37 dosya; velnosub-ui 5.651.784 B, abi-smoke 395.544 B |
+| Kalan | DependencyControl zemini, moonscript/karaskel paketi (karaskel artık text_extents + satır tabloları_READY), video köprüsünün FPS'li genişlemesi (apkg fazıyla) |

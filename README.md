@@ -111,7 +111,22 @@ birebir 9937 korundu; abi_close artık render şartını da yumlatır;
 `Oniz` kolu kare*1000/fps ile ms hesaplar, kare `ui.put` ile video
 üstüne biner; commit
 [`e78cf9ca9`](https://github.com/velnoxy/velnosub/commit/e78cf9ca9) +
-[`9cc02a7ed`](https://github.com/velnoxy/velnosub/commit/9cc02a7ed))**, **P4.7 arayüz düzeni seçimi ✔
+[`9cc02a7ed`](https://github.com/velnoxy/velnosub/commit/9cc02a7ed))**, **P5.2
+kalanı ✔ — üç dilim: (A) ms zamanları (ABI `line_times_set` 46 sembol,
+satır alanları ms tamsayısı — upstream auto4 davranışı, `[AB10]` host+cihaz
+birebir; pompa satır 10 kopyası 0:02:40.00→0:03:00.00 kayıpsız), (B) video
+köprüsü (frame_from_ms/ms_from_frame/video_size video yokken nil — upstream
+davranışı; keyframes boş küme, lua_automation_version=4, file_name,
+gettext, project_properties 14 alan; `B duman` betiği), (C) `text_extents`
+(FreeType 26.6 ölçüm kolu, 47 sembol, meson freetype2 bağı; upstream ölçüm
+yapısına eş: spacing dal ayrımı + scale telafisi; `[AB11]` host+cihaz
+BİREBİR — 28px 220.000/21.000, 56px oran 2.0000, scale_x %150 → 330.000,
+boş metin sıfır küme; demo "Ölç dene" host+cihaz birebir g=260.00 y=21.00);
+DÜRÜST NOT: upstream'te `aegisub.time` nesnesi YOK (satır zamanları düz
+ms'dir) — planın bu maddesi düzeltildi (commit
+[`b66794856`](https://github.com/velnoxy/velnosub/commit/b66794856) +
+[`634b588a9`](https://github.com/velnoxy/velnosub/commit/634b588a9) +
+[`8ef817bff`](https://github.com/velnoxy/velnosub/commit/8ef817bff))**, **P4.7 arayüz düzeni seçimi ✔
 (İlk girişte Mobil/Masaüstü kart seçimi — ayar dosyası yokken; Ayarlar'dan
 değiştirilebilir; mobil desen alt sekme çubuğu + dikey grid reflow,
 44pt dokunma hedefleri; masaüstü yerleşimi birebir; host RC=0 + test

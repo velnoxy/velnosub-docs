@@ -46,11 +46,11 @@ LD_LIBRARY_PATH=$PWD/lib ./velnosub-ass-render in.ass out.ppm \
   `fontselect: (Arial, 400, 0) -> DejaVuSans.ttf` seçimi gösterir. `--family`
   yalnızca ass_add_font adı olarak geçer; işlevsel eşleşme sağlamaz.
 
-## Hazır cihaz paketi (2026-10-20, device-pkg — P4.6 dilim 2 yenilemeli)
-- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, **86.955.311 B**;
+## Hazır cihaz paketi (2026-10-20, device-pkg — P5.2 kalanı yenilemeli)
+- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, **86.980.103 B**;
   37 dosya):
   `bin/velnosub-cli`, `bin/velnosub-ass-render`, **`bin/velnosub-automation`** (P5.0+P5.1/P5.2 manager taramalı),
-  **`bin/velnosub-abi-smoke`** (P4.1–P4.5 III şeritleri + `[AB7]`+`[AB8]`+`[AB9]` libass önizleme, strip'li),
+  **`bin/velnosub-abi-smoke`** (P4.1–P4.5 III şeritleri + `[AB7]`/`[AB8]`/`[AB9]` libass önizleme + `[AB10]` ms zamanları + `[AB11]` text_extents, strip'li 395.544 B; ABI **47 sembol**),
   **`bin/velnosub-video-probe`**
   (P3.1, strip'li 13.841.040 B), **`bin/velnosub-audio-probe`** (P3.3, strip'li
   13.842.600 B), **`bin/velnosub-audio-play`** (P3.4, strip'li 188.600 B;

@@ -103,6 +103,21 @@
 > render yok, hata dürüst şeritte), kare ui.put ile videonun üstüne
 > biner (commit [`e78cf9ca9`](https://github.com/velnoxy/velnosub/commit/e78cf9ca9) +
 > [`9cc02a7ed`](https://github.com/velnoxy/velnosub/commit/9cc02a7ed)).
+> P5.2 kalanı ✔ — üç dilim: (A) ms zamanları — C vekili `set_line_times` +
+> ABI `line_times_set` (46 sembol), satır alanları artık ms tamsayısı
+> (upstream auto4), `[AB10]` host+cihaz birebir; (B) video köprüsü —
+> frame_from_ms/ms_from_frame/video_size video yokken nil (upstream
+> davranışı), keyframes/lua_automation_version=4/file_name/gettext/
+> project_properties (14 alan), `B duman` betiği; (C) `text_extents` —
+> FreeType 26.6 ölçüm kolu (47 sembol, meson freetype2 bağı), upstream
+> ölçüm yapısına eş (spacing dal ayrımı + scale telafisi), `[AB11]`
+> host+cihaz BİREBİR (28px 220.000/21.000; 56px 2.0000; scale_x %150
+> → 330.000), demo "Ölç dene" host+cihaz birebir. Not: upstream'te
+> `aegisub.time` NESNESİ yoktur (satır zamanları düz ms'dir) — planın
+> bu maddesi dürüstçe düzeltildi (commit
+> [`b66794856`](https://github.com/velnoxy/velnosub/commit/b66794856) +
+> [`634b588a9`](https://github.com/velnoxy/velnosub/commit/634b588a9) +
+> [`8ef817bff`](https://github.com/velnoxy/velnosub/commit/8ef817bff)).
 
 ## 0. Proje bilgisi
 
@@ -263,7 +278,30 @@ RC=0 (.so), host RC=0 + test 2 passed + aarch64 RC=0 (8.175.232 B) —
 egui penceresi görsel kanıtı cihaz [UI8] adımında (APK fazı) (commit
 [`e78cf9ca9`](https://github.com/velnoxy/velnosub/commit/e78cf9ca9) +
 [`9cc02a7ed`](https://github.com/velnoxy/velnosub/commit/9cc02a7ed)).
-Kalan: zaman nesnesi, text_extents/frame köprüsü, MoonScript/karaskel paketi, DependencyControl, APK bağlamı (ve [UI0..] koşum şeritleri).
+Kalan: DependencyControl zemini, MoonScript/karaskel paketi, APK bağlamı (ve [UI0..UI8] koşum şeritleri).
+
+**P5.2 kalanı ✔ — ms zamanları + video köprüsü + text_extents (üç dilim)** —
+kayıt şeridi faz5 künyesinde. Kritik düzeltmen: upstream `aegisub` tablosunda
+`aegisub.time` nesnesi **yok** (auto4_lua kayıt listesi 18 ad — satır
+zamanları düz ms'dir); planın "aegisub.time" maddesi dürüstçe güncellendi.
+Dilim A ([`b66794856`](https://github.com/velnoxy/velnosub/commit/b66794856)):
+çekirdek vekili `velnosub_core_set_line_times` + ABI
+`velnosub_abi_line_times_set` (42→46 sembol); shim'de satır alanları
+**ms tamsayısı** (upstream auto4 davranışı) + `__newindex` alan yazımı;
+abi-smoke `[AB10]` host+cihaz birebir (pompa satır 10 kopyası
+0:02:40.00→0:03:00.00 kayıpsız). Dilim B
+([`634b588a9`](https://github.com/velnoxy/velnosub/commit/634b588a9)):
+frame_from_ms/ms_from_frame/video_size — video yokken **nil** (upstream
+davranışı), keyframes boş küme, lua_automation_version=4, file_name,
+gettext, project_properties (upstream 14 alan), `B duman` betiği. Dilim C
+([`8ef817bff`](https://github.com/velnoxy/velnosub/commit/8ef817bff)):
+`velnosub_abi_text_extents` — FreeType 26.6 ölçüm kolu (47 sembol; meson
+freetype2 bağı), upstream ölçüm yapısına eş (spacing≠0/spacing=0 dal
+ayrımı + scalex/scaley telafisi); abi-smoke `[AB11]`: 28px g=220.000
+y=21.000, 56px oran 2.0000 birebir,
+kalın/`scale_x`/spacing teyitleri, boş metin sıfır küme + kötü font yolu
+redleri; demo "Ölç dene" host+cihaz birebir (g=260.00 y=21.00).
+Kalan: DependencyControl zemini, MoonScript/karaskel paketi, APK bağlamı (ve [UI0..UI8] koşum şeritleri).
 
 Yapılacaklar:
 1. **Lua motoru:** Aegisub Lua 5.1 / LuaJIT API'sine göre yazılmış scriptleri çalıştırır. Android arm64'te LuaJIT kullan. (iOS kalemi 2026-10-20'de iptal; JIT kısıtı notu artık müteferri.)
