@@ -102,8 +102,10 @@ P4.0 Rust/egui bootstrap ✔, P4.1 C ABI ✔ (host+cihaz), **P4.2 grid+edit ✔
 (arka-iplikli Oboe, `[AW0..AW5]` host+cihaz+paket-içi; çalma APK
 bağlamında)**, **P4.5 stiller omurgası + tam editör ✔ (`[AS0..AS6]` ABI 30
 sembol + egui font/renk/hiza yazım hattı)**, **P4.5 III dialog formları
-omurgası ✔ (`[AD0..AD6]`, ABI 42 sembol line_meta/insert/delete dahil,
-egui dpanel)**, **P5.3 manager + gerçek upstream makroları ✔ (birebir
+omurgası ✔ (`[AD0..AD6]`, ABI 45 sembol line_meta/insert/delete/libass
+render dahil, egui dpanel)**, **P4.6 dilim 1 libass önizleme ABI ✔
+(`[AB9]`: render_open/frame(RGBA)/close; host+cihaz birebir 9937
+glyph; libass statik bağlandı)**, **P5.3 manager + gerçek upstream makroları ✔ (birebir
 kopya Strip tags / Clean Tags; flyweight çapraz-DSO yığın bozulması
 kökte giderildi + `[AB7]`/`[AB8]` regresyon şeritleri)**, **P5.2 devam
 ✔ — `subs:insert_line`/`delete_line`/`n_lines` + demo "Ekle sil dene"

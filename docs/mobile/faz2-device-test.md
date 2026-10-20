@@ -46,11 +46,11 @@ LD_LIBRARY_PATH=$PWD/lib ./velnosub-ass-render in.ass out.ppm \
   `fontselect: (Arial, 400, 0) -> DejaVuSans.ttf` seçimi gösterir. `--family`
   yalnızca ass_add_font adı olarak geçer; işlevsel eşleşme sağlamaz.
 
-## Hazır cihaz paketi (2026-10-20, device-pkg — P5.2 devam yenilemeli)
-- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, **86.880.742 B**;
+## Hazır cihaz paketi (2026-10-20, device-pkg — P4.6 dilim 1 yenilemeli)
+- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, **86.904.159 B**;
   37 dosya):
   `bin/velnosub-cli`, `bin/velnosub-ass-render`, **`bin/velnosub-automation`** (P5.0+P5.1/P5.2 manager taramalı),
-  **`bin/velnosub-abi-smoke`** (P4.1–P4.5 III şeritleri + `[AB7]`+`[AB8]`, strip'li),
+  **`bin/velnosub-abi-smoke`** (P4.1–P4.5 III şeritleri + `[AB7]`+`[AB8]`+`[AB9]` libass önizleme, strip'li),
   **`bin/velnosub-video-probe`**
   (P3.1, strip'li 13.841.040 B), **`bin/velnosub-audio-probe`** (P3.3, strip'li
   13.842.600 B), **`bin/velnosub-audio-play`** (P3.4, strip'li 188.600 B;
@@ -59,7 +59,7 @@ LD_LIBRARY_PATH=$PWD/lib ./velnosub-ass-render in.ass out.ppm \
   eframe ikilisi, strip'li 5.554.368 B; stil+dialog panelleri dahil; pencere
   APK bağlamı ister), `lib/libvelnosub-core.so` (P3.2
   sağlayıcılı 117.401.312 B),
-  **`lib/libvelnosub-abi.so`** (P4.1–P4.5 III + P5.3 line_meta + P5.2 devam insert/delete, **42 sembol**; Oboe-bağlı), `lib/libfreetype.so`, `lib/libpng16.so`,
+  **`lib/libvelnosub-abi.so`** (P4.1–P4.5 III + P5.3 line_meta + P5.2 devam insert/delete + **P4.6 dilim 1 libass render** — libass STATİK bağlandı, **45 sembol**; Oboe-bağlı), `lib/libfreetype.so`, `lib/libpng16.so`,
   `lib/libfribidi.so`, `lib/libharfbuzz.so`, `lib/libuchardet.so`,
   `lib/libc++_shared.so`, `ass-format-tests.ass`, **`default_config.json`**,
   `DejaVuSans.ttf`, **`media/`** (`kisa.wav` 192.044 B, `kisa.wav.pcm`
@@ -144,6 +144,7 @@ sistem linker64 devreye girer; `LD_LIBRARY_PATH=$PWD/lib` ile lib/
 | P5.3 manager + Clean Tags | `[AUZ0] tarama (2 script)` `[AUZ1] cleantags-autoload/strip-tags` `[AUL] progress: 40 lines cleaned` `[AUS3/4/6]` kayıt+kalıcılık | ✔ RC=0 (host + cihaz; upstream scriptler birebir) |
 | P5.2 devam `[AB8]` ekleme/silme | `41→42 satır` (`ab8 ekleme domatesi` + `0:00:01.00 / 0:00:02.00` birebir) → `42→41 satır — şerit tamam` | ✔ RC=0 (host + cihaz) |
 | P5.2 devam `Ekle sil dene` makrosu | `[AUL] ekle sil: 4. satır öncesi/sonrası` `[AUS2] makro koştu` `[AUS6] önce: Now going to test...` + `0:00:07.00,0:00:09.00` birebir | ✔ RC=0 (host + cihaz; `subs:insert_line`/`delete_line`/`n_lines`) |
+| P4.6-1 `[AB9]` libass önizleme | `render açıldı: 240x180` `erken kare render: en çok glyph etki 9937` `uzak gele empty kare 0` `deposit boyu reddedildi` `şartı kapandı` | ✔ RC=0 (host + cihaz **birebir 9937**); ass-render lehine kanıt: `--t 8 --defaultfont DejaVuSans.ttf` → `glyph pikseli 11569`, PPM 691.215 B |
 | P5.2 devam `[AB8]` ekleme/silme | `41→42 satır` (metin+zaman birebir) → `42→41 satır — şerit tamam` | ✔ RC=0 (host + cihaz) |
 | P5.2 devam `Ekle sil dene` makrosu | `[AUL] ekle sil: 4. satır öncesi/sonrası` `[AUS2] makro koştu` `[AUS6] önce: Now going to test... +0:00:07.00/0:00:09.00 birebir` | ✔ RC=0 (host + cihaz; `subs:insert_line`/`delete_line`/`n_lines`) |
 

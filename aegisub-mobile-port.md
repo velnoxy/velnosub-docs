@@ -68,6 +68,11 @@
 > yöntemleri ve "Ekle sil dene" demo makrosu; `[AB8]` 41→42→41 şeridi
 > host+cihaz birebir (commit
 > [`8d4eb608a`](https://github.com/velnoxy/velnosub/commit/8d4eb608a)).
+> P4.6 dilim 1 libass önizleme ABI ✔ — `velnosub_abi_render_open/frame/
+> close` (ABI 45 sembol; libass statik); `[AB9]` şeridi host+cihaz
+> birebir 9937 glyph etki, cihaz ass-render `--t 8 --defaultfont` kanıtı
+> 11569 glyph / PPM 691.215 B (commit
+> [`3dcae0830`](https://github.com/velnoxy/velnosub/commit/3dcae0830)).
 > Rust-bionic zinciri cihaz kanıtı: abi-smoke proot'ta DOĞRUDAN koştu.
 > eframe ikilisi proot'ta libicu/apex bind eksikliğinden durur (APK
 > bağlamına kalır). P3.4 audio-play AAudio→OpenSLES yedeği eklendi;
@@ -183,7 +188,14 @@ sembol), auto4 yöntemleri `subs:insert_line(konum, satır)`/
 `subs:delete_line(konum)`/`subs.n_lines` ve "Ekle sil dene" demo makrosu
 — `[AB8]` 41→42→41 + makro kalıcılığı host+cihaz birebir (commit
 [`8d4eb608a`](https://github.com/velnoxy/velnosub/commit/8d4eb608a)).
-Kalan: zaman nesnesi, text_extents/frame köprüsü, MoonScript/karaskel paketi, DependencyControl.
+**P4.6 dilim 1 ✔** — libass önizleme ABI'sı: `velnosub_abi_render_open/
+frame/close` (ABI 45 sembol; libass alt projeden STATİK bağlandı),
+başına bellek-dizge serileştirme (`GetEntryData` okuma-kolu) ile
+düzenlenmiş durum önizlemeye taşınıyor; `[AB9]` şeridi 9937 glyph etki
+host+cihaz **birebir**, ass-render cihaz kanıtı `--t 8 --defaultfont` →
+11569 glyph / PPM 691.215 B (commit
+[`3dcae0830`](https://github.com/velnoxy/velnosub/commit/3dcae0830)).
+Kalan: zaman nesnesi, text_extents/frame köprüsü, MoonScript/karaskel paketi, DependencyControl, egui video paneline ABI karesi (P4.6 dilim 2), APK bağlamı.
 
 Yapılacaklar:
 1. **Lua motoru:** Aegisub Lua 5.1 / LuaJIT API'sine göre yazılmış scriptleri çalıştırır. Android arm64'te LuaJIT kullan. (iOS kalemi 2026-10-20'de iptal; JIT kısıtı notu artık müteferri.)

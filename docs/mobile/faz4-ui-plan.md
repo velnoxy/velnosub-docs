@@ -106,3 +106,18 @@ Notlar:
 | Derinleşen bulgular | (1) init'te boş config sessizce geçiliyordu; şimdi `config boş` hatası döner. (2) cargo ikilisi koşumunda `LD_LIBRARY_PATH` ister. (3) ilk derlemede eksik `<fstream>` geldiği gündeme dair düzeltme commiti [`ebe19435d`](https://github.com/velnoxy/velnosub/commit/ebe19435d) |
 | Cihaz yolu | abi-smoke + `libvelnosub-abi.so` + `libvelnosub-core.so` pakette; aynı şerit `/data/local/tmp` reçetesiyle koşur |
 | Cihaz koşumu (2026-10-20) | ✔.Termux proot'ta DOĞRUDAN koştu (adb'siz): tam şerit `[AB0..AB5]` + `[AB3] düzenlendi` (`--edit-first` ile), `CAPI=0`; reçete faz2-device-test.md'de |
+
+## P4.6 dilim 1 — libass önizleme ABI'sı ✔ (2026-10-20, host + cihaz)
+
+| Kayıt | Değer |
+|---|---|
+| Kod commit | [`3dcae0830`](https://github.com/velnoxy/velnosub/commit/3dcae0830) (feature dalı) |
+| Yeni ABI | `velnosub_abi_render_open(h, gen, yuk, font_yolu, font_ailesi)` + `velnosub_abi_render_frame(h, ms, RGBA sekizlisi deposit, boy)` + `velnosub_abi_render_close(h)` — nm defteri 42→**45** sembol |
+| Meson | `tools/cross/meson.build` abi_deps'a `velnosub_libass_dep` eklendi — libass alt projeden **statik** bağlanır (cihaz paketine ek .so gerekmez; DT_NEEDED AYNI KALIR: core/m/log/c++_shared/dl/c) |
+| Şart mimarisi | tutamaç başına `RCtx{ASS_Library*, ASS_Renderer*, ASS_Track*}` harita; yeniden açılışta önceki şart kapatılır; bellek dizge serileştirme: `AssStyle::GetEntryData()` + `AssDialogue::GetEntryData()` (okuma-kolu, fabrika dokunmuyor) → `[Script Info]+[V4+ Styles]+[Events]` → `ass_process_data` — **düzenlenmiş DURUM birebir taşınır** (edit_line/insert_line sonrası önizleme doğru) |
+| Font düzeni | fontconfig cihazda YOK: `ass_add_font` blob (font yolu parametreli, aile varsayılan "Default") + `ass_set_fonts(..., ASS_FONTPROVIDER_NONE, ...; nokta-of-example: default font dosyası)` — **Fontname eşleşmese bile ass_set_fonts'in default font dosyası glyphleri çözüyor** (ass-render tool'da --defaultfont verilmezse `[AR2]` 0 piksel — bu notun kökeni) |
+| Kare kompozisyonu | P2.3 pipeline: `ass_render_frame(ms)` → ASS_Image listesi → kapsama*etki kompozit (uint32 0xFFRRGGBB iç kare) → RGBA (r,g,b,255) sekizli deposit yazımı; deposit boyu katı denetimi (`n == gen*yuk*4` — yoksa hata), dönüş glyph etki pikseli (0 = boş kare, hata değil) |
+| Regresyon | abi-smoke `[AB9]` şeridi: 240x180 açık → ms {0,8k,16k,24k,32k} taraması en yüksek glyph etki **9937 (host+cihaz BİREBİR)** → uzak gele (60 dk) kare 0 → deposit boy reddi → kapanış; ayrıca `Ekle sil dene` + `Clean Tags` device regresyonları yerinde (RC=0) |
+| Tool lehine kanıt | cihaz ass-render `--t 8 --defaultfont DejaVuSans.ttf` → `[AR2] glyph pikseli 11569`, PPM 691.215 B — libass cihazda gerçek kare basıyor |
+| UI bağlanma | (soyulan dilim) egui video paneli ColorImage olarak ABI karesini basacak (P4.6 dilim 2: egui tarafı) |
+| Paket | 86.904.159 B, 37 dosya; ABI 45 sembol |
