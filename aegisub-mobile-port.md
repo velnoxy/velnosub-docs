@@ -156,11 +156,11 @@ Yapılacaklar:
 
 ### Faz 6 — iOS (**İPTAL, 2026-10-20 — kullanıcı kararı**)
 
-Bu faz kapsamdan çıkarıldı. Eski metin (Qt/Metal, JIT'siz Lua, UIDocumentPicker
-gibi kalemler) ve iOS'e özel hasar katmanı yapılmayacak; Qt metni zaten Faz 4
-egui revizyonuyla geçersizdi. Android hedefi tek platform olarak kalır; cleanup
-olarak yapılmadı — JIT'siz Lua kararı ve UIDocumentPicker kalemleri iOS payı
-talep edilirse künyelerden geri okunabilir (git geçmişi).
+Bu faz kapsamdan çıkarıldı; iOS'e özel bir geliştirme yapılmayacak. Eski
+kalemler (Qt/Metal, JIT'siz Lua, UIDocumentPicker) zaten Faz 4 egui
+revizyonuyla çoğunlukla geçersizdi. Android hedefi tek platform olarak kalır;
+bölüm tam silinmedi — iOS yeniden gündeme gelirse eski metin git
+geçmişinden geri okunur.
 
 ### Faz 7 — Paketleme ve test
 - Android: AAB/APK, ABI split, imzalama
