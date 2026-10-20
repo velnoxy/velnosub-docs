@@ -36,8 +36,9 @@ LuaJIT'in aarch64 JIT/FFI mimarisi Faz 5'e kadar saklanır, çekirdekten hiçbir
 | Faz 2 / P2.3 (kare render) | ✔ kod + host koşum | [`f1deb8ada`](https://github.com/velnoxy/velnosub/commit/f1deb8ada) | `velnosub-ass-render`: libass 0.17 `ass_process_data` + `ass_add_font` + `ass_render_frame`, PPM; üç düzeltme: mobil `libresrc` kapısı ([`3b170e897`](https://github.com/velnoxy/velnosub/commit/3b170e897)), boş karede PPM ([`e01a6e7eb`](https://github.com/velnoxy/velnosub/commit/e01a6e7eb)), `--defaultfont` fallback ([`5da6fd29b`](https://github.com/velnoxy/velnosub/commit/5da6fd29b)) |
 | Faz 2 / P2.2 yeniden kanıt (ek IV) | ✔ | [`5da6fd29b`](https://github.com/velnoxy/velnosub/commit/5da6fd29b) | arm64 sıfır-temiz tam koval: `ninja 484/484` (`A64BUILD=0`); üç artefakt readelf doğrulamalı; künye eki III-IV faz2 planında |
 | Test çerçevesi | ✔ | [`d878c06af`](https://github.com/velnoxy/velnosub/commit/d878c06af) | gtest `protocol: 'gtest'` kaybı bulundu ve onarıldı; masaüstü baseline 345/351 birebir yeniden üretildi |
-| Faz 4 / P4.0 (UI bootstrap) | ✔ | [`e4e69a0da`](https://github.com/velnoxy/velnosub/commit/e4e69a0da) | Rust/egui-eframe 0.37, 223 crate, aarch64-PIE artifact 7.431.952 B (NEEDED yalnız libdl/libandroid/libm/libc); cihazda açma denemesi sırada |
-| Faz 4 / P4.1 (C ABI şeridi) | ✔ host koşum | [`564d9739e`](https://github.com/velnoxy/velnosub/commit/564d9739e) | `libvelnosub-abi.so` (`init/open/edit/save/reload` 9 sembol) + `velnosub-ui/abi-smoke`; host şeridi `[AB0..AB5]` `CAPI=0`; künye faz4 planında |
+| Faz 4 / P4.0 (UI bootstrap) | ✔ | [`e4e69a0da`](https://github.com/velnoxy/velnosub/commit/e4e69a0da) | Rust/egui-eframe 0.37, 223 crate, aarch64-PIE artifact 7.431.800 B (NEEDED yalnız libdl/libandroid/libm/libc); proot koşumu: NEEDED çözülür, `libicu.so` apex yolu proot bind'ı olmadığından duran (APK bağlamı sıradaki) |
+| Faz 4 / P4.1 (C ABI şeridi) | ✔ host + **cihaz** koşum | [`564d9739e`](https://github.com/velnoxy/velnosub/commit/564d9739e) | `libvelnosub-abi.so` + `velnosub-ui/abi-smoke`; şerit `[AB0..AB5]` `CAPI=0` — host VE proot'ta Rust-bionic ikiliyle birebir; künye faz4 planında |
+| Faz 4 / P4.2 (grid + edit) | ✔ host + **cihaz** koşum | [`4c623cf2a`](https://github.com/velnoxy/velnosub/commit/4c623cf2a) | ABI 12 sembole büyüdü (`line_text/line_times/edit_line`, COMMIT_DIAG_TEXT hattı); Rust smoke şeridi `[AG0..AG5]` host+cihaz birebir (ikinci-tutamaç kalıcılığı dahil); egui GridApp (sanallaştırılmış liste, hücre düzenleme, Kaydet/Yeniden aç); künye faz4 planında |
 | Faz 5 / P5.0 (LuaJIT zemini) | ✔ host + arm64 + x86_64 | [`46cbecd32`](https://github.com/velnoxy/velnosub/commit/46cbecd32) | host `[AU0..AU3]` koşumu + arm64/x86_64 LuaJIT cross kurulumu; `velnosub-automation` arm64 763.168 B, x86_64 801.264 B; reconfigure clearcache tuzağı çözüldü; künye faz5 planında |
 | Faz 3 / P3.0–P3.4 + P3.1 destek (FFmpeg+probe+sağlayıcı+oboe+mkmpeg) | ✔ arm64 + x86_64 + **cihaz dumanı yeşil** | [`5fd29e77c`](https://github.com/velnoxy/velnosub/commit/5fd29e77c) | statik headless FFmpeg 6.1.2: arm64 (libavcodec 124.293.294 B ...) + x86_64 (121.003.582 B; `--disable-x86asm`); `velnosub-video-probe` arm64 71.902.704 B / x86_64 71.518.992 B; `velnosub-audio-probe` (s16 PCM) arm64 71.915.040 B / x86_64 71.534.224 B; P3.2 sağlayıcı çekirdeğe bağlı (core.so arm64 117.401.312 B / x86_64 146.968.936 B, `CreateFFmpegVideoProvider` ihracı; `-Wl,-Bsymbolic`; masa `DESK_RC=0`); P3.4 `velnosub-audio-play` (oboe içsel, AAudio→OpenSLES yedeği) arm64 2.584.368 B / x86_64 2.448.544 B; P3.1 destek `velnosub-mkmpeg` (sentetik mp4, `e7dd229bb`); **proot-içi cihaz şeritleri**: `[AB0..AB5]` `[AU0..AU3]` `[AP0..AP2]` `[MK0..MK3]→[VP0..VP3]` yeşil — künye faz3 planında + faz2-device-test tablosu |
 | Faz 2 / x86_64 | ✔ tam koval | [`1584bf29a`](https://github.com/velnoxy/velnosub/commit/1584bf29a) | b2 boost ABI-kimlik düzeltmesi (AArch64 sızması giderildi) + masa7 476/476: core.so 72.495.784 B (X86-64 DYN), cli 585.976 B, ass-render 223.040 B, abi.so 692.704 B (9 sembol); künye eki V |
@@ -87,12 +88,14 @@ locale/regex/thread; GIL clang-22 yaması dahil). Aşılan kapıların künyeli 
 
 ## Yol haritası
 
-Faz 2'nin kalanı: cihaz duman testleri (paket hazır; reçete faz2-device-test'te).
-Faz 3 çekirdeği ✔ (P3.0–P3.3 + P3.2 sağlayıcı: arm64+x86_64); kalan P3.4 Oboe
-oynatma dumanı ve P3.5 UI çizimi (oboe altyapısı kurulu). Faz 4 mobil UI
-(P4.0 Rust/egui bootstrap ✔, P4.1 C ABI şeridi ✔ `CAPI=0`; sırada P4.2+ UI
-dolumu), Faz 5 automation (P5.0 host+arm64+x86_64 ✔; sırada LuaJIT entegrasyon
-dumaları), Faz 6 iOS, Faz 7 paketleme ve test.
+Faz 2'nin kalanı: — tüm dumalar cihazda (proot) yeşil koşuldu. Faz 3 ✔
+(P3.0–P3.4 + mkmpeg test-varlık üreticisi: arm64+x86_64; cihaz şeritleri
+`[AP0..AP2]`, `[MK0..MK3]→[VP0..VP3]` dâhil; P3.4 akış açımı proot'ta
+sınırlı — APK bağlamında ayrı doğrulanacak). Faz 4 mobil UI:
+P4.0 Rust/egui bootstrap ✔, P4.1 C ABI ✔ (host+cihaz), **P4.2 grid+edit ✔
+(host+cihaz `[AG0..AG5]`)**; sırada P4.3+ UI dolumu (APK bağlamı), Faz 5
+automation ✔ (host+arm64+x86_64 + cihaz `[AU0..AU3]`; LuaJIT script
+dumaları sıradaki), Faz 6 iOS, Faz 7 paketleme ve test.
 
 ## Atıf / lisans
 

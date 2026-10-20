@@ -26,6 +26,16 @@
 > `[AP0..AP2]`, `[MK0..MK3]→[VP0..VP3]` yeşil (P3.4 sadece akış açımı
 > proot-kısıtlı; künye faz3 planı). Cihaz paketi (83.459.415 B) ve
 > reçete: docs/mobile/faz2-device-test.md.
+>
+> **20-10 gündüz ekleri:** P4.2 grid+edit ✔ (ABI 12 sembole büyüdü,
+> `[AG0..AG5]` şeridi host+cihaz birebir — ikinci-tutamaç kalıcılığı dahil;
+> egui GridApp: sanallaştırılmış liste + hücre düzenleme; commit
+> [`4c623cf2a`](https://github.com/velnoxy/velnosub/commit/4c623cf2a)).
+> Rust-bionic zinciri cihaz kanıtı: abi-smoke proot'ta DOĞRUDAN koştu.
+> eframe ikilisi proot'ta libicu/apex bind eksikliğinden durur (APK
+> bağlamına kalır). P3.4 audio-play AAudio→OpenSLES yedeği eklendi;
+> P3.1 reçetesi mkmpeg ile kullanıcı medyasından bağımsız. Paket
+> 83.468.209 B.
 
 ## 0. Proje bilgisi
 

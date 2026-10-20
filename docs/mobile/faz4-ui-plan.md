@@ -23,11 +23,26 @@ Notlar:
 - eframe 0.37 ile `App::update` kaldırıldı; ilgili yöntem `fn ui(&mut self, ui: &mut egui::Ui, frame: &mut eframe::Frame)`. Kod buna göre yazıldı.
 - Açık kısıt (bloker değil): ikili yalnız derlendi, koşulmadı; çalıştırma Android cihazı gerektirir (API ≥ 29). Pencere/açılış davranışı P4.0 cihaz dumanıyla doğrulanacak.
 - xbuild/APK paketleme bu dilimde gerekmedi; gerektiğinde ayrı künye gelir.
+- 2026-10-20 eki: (1) ikili taze derleme 7.431.800 B (RC=0, artımlı 1 dk 22 sn). (2) termux proot'ta koşum girişimi: kendi NEEDED zinciri çözlür; ama `libharfbuzz_ng.so`'nun istediği `libicu.so` `/apex/com.android.i18n` altında — proot'ta apex bind yok → `CANNOT LINK` (APK/gerçek kabuk bağlamında normal). (3) Rust-bionic zincirinin cihaz kanıtı abi-smoke ile geldi: `[AB0..AB5]` RC=0 (P4.1 künyesi).
+
+## P4.2 — Grid + edit ✔ (2026-10-20, host + cihaz koşumu)
+
+| Kayıt | Değer |
+|---|---|
+| Kod commit | [`4c623cf2a`](https://github.com/velnoxy/velnosub/commit/4c623cf2a) (feature dalı) |
+| ABI yüzeyi | 9 sembol → 12 sembol: `line_text(h,idx,buf,n)`/`line_times(...)`/`edit_line(h,idx,text)`; hepsi `Commit("velnosub abi", COMMIT_DIAG_TEXT)` hattında (P2.2 CLI kanalıyla aynı); okuma tampon-gelişimi: yetmezse tam uzunluk döner |
+| Host şeridi | `[AG0] satır metinleri okundu: 41 (dolu 41)` `[AG1] 5. satır …/zamanları 0:00:07.50 / 0:00:09.00` `[AG2] düzenlendi + geri okundu` `[AG3] kayıt ikinci tutamaçta doğrulandı` `[AG4] kapandı` `[AG5] şerit tamam`; AB şeridinin üstüne ekli (birebir) |
+| Cihaz şeridi | Rust-bionic ikili (cargo aarch64-linux-android) proot'ta DOĞRUDAN koştu; AG şeridi host ile birebir RC=0. Yol: `LD_LIBRARY_PATH=<arm64-cross tools/cross>:<pkg lib>` — taze ABI .so önce gereklidir |
+| egui GridApp | `velnosub-ui/src/abi.rs`: `ScrollArea::show_rows` sanallaştırma (yalnız görünen satır çizilir), her hücre değişimi `edit_line`+Commit, Kaydet/Yeniden aç düğmeleri; `VELNOSUB_OPEN`/`VELNOSUB_SAVE` env ile dosyaya bağlanır; build.rs hedef-duyarlı bağ yolu (android→mobil kolu sarmalı) |
+| egui 0.37 bulguları | `TopBottomPanel` tekilleşti → `Panel::bottom(id_salt)`; panel `show(&mut Ui, …)` alır; `CentralPanel::show_inside` deprecated (panel içi kullanım için yine de doğru) |
+| Derleme kanıtı | host `-p velnosub-abi-smoke` 3,77 sn RC=0; android workspace 5,26 sn artımlı RC=0; `velnosub-ui` 7.431.800 B (AArch64 PIE) |
+| Etki sınırları | (1) GridApp koşumu Activity ister → APK bağlamı ayrı dilim. (2) host tüm-workspace derlemesi winit'te takılıyor ("platform not supported" — host-GUI özellik seti ayrı künye konusu); host doğrulama `-p velnosub-abi-smoke` ile |
 
 ## Bekleyen paketler
 
-- P4.2 grid+edit, P4.3 video paneli, P4.4 ses paneli, P4.5 stil/dialog,
-P4.6 jestler/hotkey/düzenler: plan metni master plan Faz 4'te.
+- P4.3 video paneli, P4.4 ses paneli (Faz 3 P3.5 dalga/spektrum teslimi bunun
+  içinden bağlanır), P4.5 stil/dialog, P4.6 jestler/hotkey/düzenler: plan
+  metni master plan Faz 4'te.
 
 ## P4.1 — C ABI şeridi ✔ (2026-10-19, host koşum)
 

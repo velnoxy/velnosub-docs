@@ -47,7 +47,7 @@ LD_LIBRARY_PATH=$PWD/lib ./velnosub-ass-render in.ass out.ppm \
   yalnızca ass_add_font adı olarak geçer; işlevsel eşleşme sağlamaz.
 
 ## Hazır cihaz paketi (2026-10-20 sabah, device-pkg)
-- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, 83.459.415 B):
+- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, 83.468.209 B):
   `bin/velnosub-cli`, `bin/velnosub-ass-render`, **`bin/velnosub-automation`** (P5.0),
   **`bin/velnosub-abi-smoke`** (P4.1, aarch64-PIE), **`bin/velnosub-video-probe`**
   (P3.1, strip'li 13.841.040 B), **`bin/velnosub-audio-probe`** (P3.3, strip'li
