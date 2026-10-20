@@ -88,9 +88,11 @@ locale/regex/thread; GIL clang-22 yaması dahil). Aşılan kapıların künyeli 
 ## Yol haritası
 
 Faz 2'nin kalanı: cihaz duman testleri (paket hazır; reçete faz2-device-test'te).
-Sonra: Faz 3 medya katmanı (FFmpeg video/ses sağlayıcı), Faz 4 mobil UI (P4.0
-Rust/egui bootstrap ✔; sırada P4.1 C ABI köprüsü), Faz 5 automation (LuaJIT
-aarch64), Faz 6 iOS, Faz 7 paketleme ve test.
+Faz 3 çekirdeği ✔ (P3.0–P3.3 + P3.2 sağlayıcı: arm64+x86_64); kalan P3.4 Oboe
+oynatma dumanı ve P3.5 UI çizimi (oboe altyapısı kurulu). Faz 4 mobil UI
+(P4.0 Rust/egui bootstrap ✔, P4.1 C ABI şeridi ✔ `CAPI=0`; sırada P4.2+ UI
+dolumu), Faz 5 automation (P5.0 host+arm64+x86_64 ✔; sırada LuaJIT entegrasyon
+dumaları), Faz 6 iOS, Faz 7 paketleme ve test.
 
 ## Atıf / lisans
 
