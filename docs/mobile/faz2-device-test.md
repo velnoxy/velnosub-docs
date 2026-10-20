@@ -47,11 +47,13 @@ LD_LIBRARY_PATH=$PWD/lib ./velnosub-ass-render in.ass out.ppm \
   yalnızca ass_add_font adı olarak geçer; işlevsel eşleşme sağlamaz.
 
 ## Hazır cihaz paketi (2026-10-20 sabah, device-pkg)
-- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, 62.400.401 B):
+- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, 76.325.745 B):
   `bin/velnosub-cli`, `bin/velnosub-ass-render`, **`bin/velnosub-automation`** (P5.0),
   **`bin/velnosub-abi-smoke`** (P4.1, aarch64-PIE), **`bin/velnosub-video-probe`**
   (P3.1, strip'li 13.841.040 B), **`bin/velnosub-audio-probe`** (P3.3, strip'li
-  13.842.600 B), `lib/libvelnosub-core.so` (P3.2 sağlayıcılı 117.401.312 B),
+  13.842.600 B), **`bin/velnosub-audio-play`** (P3.4, strip'li 188.152 B;
+  Oboe statik içsel), `lib/libvelnosub-core.so` (P3.2 sağlayıcılı
+  117.401.312 B),
   **`lib/libvelnosub-abi.so`** (P4.1), `lib/libfreetype.so`, `lib/libpng16.so`,
   `lib/libfribidi.so`, `lib/libharfbuzz.so`, `lib/libuchardet.so`,
   `lib/libc++_shared.so`, `ass-format-tests.ass`, **`default_config.json`**,
@@ -95,6 +97,21 @@ LD_LIBRARY_PATH=$PWD/lib ./bin/velnosub-audio-probe kisa.wav --seconds 5
 - PCM s16'ya swresample'la çevrilip parça-parça diske yazılır (bellek sınırlı;
   P3.4 Oboe oynatma zemini kanıtı). NEEDED yalnız
   `libm/libc++_shared/libdl/libc` (FFmpeg statik).
+
+## P3.4 cihaz dumanı (velnosub-audio-play)
+- P3.3 çıktısı (`kisa.wav.pcm`) mét verisiz ham PCM'dir: rate/kanal bilgisi
+  P3.3 koşumunun `[AP1] samplerate/kanal` satırıyla eşleştirilip argümanla
+  verilir:
+```sh
+cd /data/local/tmp/velnosub
+LD_LIBRARY_PATH=$PWD/lib ./bin/velnosub-audio-play kisa.wav.pcm --rate 48000 --ch 2
+```
+- Beklenen şerit: `[OP1] tampon yüklü: N sample / S sn (rate R, ch C)`,
+  `[OP0] akış açıldı: rate R, ch C, buffer B frames`, `[OP2] koşum: ... sample
+  oynatıldı / süre S sn`, `[OP3] tamam`; hata satırları `[OPE]`.
+- Oboe statik bağlı (NEEDED yalnız `liblog/libc++_shared/libm/libdl/libc`):
+  hoparlörden gerçek çıkış duyulur (duyulmasa bile `[OP2]` satırı oynatma
+  sayacını verir).
 
 ## P5.0 cihaz dumanı (velnosub-automation)
 ```sh

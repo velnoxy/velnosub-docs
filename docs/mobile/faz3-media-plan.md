@@ -18,8 +18,9 @@ Bu dosya planı ve künyeleri tutar.
   (`FFmpeg` fabrika kaydı; masa koluna etkisiz).
 - **P3.3** — Ses decode → PCM disk önbellek CLI dilimi ✔ (`velnosub-audio-probe`),
   büyük dosya için parça-parça okuma kanıtlama (arm64 + x86_64 ikili çıktı).
-- **P3.4** — Oboe oynatma (arm64 cihaz dumanı; x86_64 için AAudio yolu).
-  Altyapı ✔: Oboe 1.9.0 statik kurulum iki ABI'de (aşağıda).
+- **P3.4** — Oboe oynatma ✔ ikili (`velnosub-audio-play` iki ABI; oboe
+  1.9.0 statik altyapısı da kurulu; cihaz dumanı reçete faz2-device-test'te;
+  x86 ABI'sinde de bağlanır).
 - **P3.5** — Spektrum/dalga hesap döngüsü UI katmanına çizim teslim arayüzü.
 
 ## P3.0 + P3.1 künyesi — FFmpeg aarch64 kurulum + video-probe ikilisi (2026-10-19, 02:18/02:23)
@@ -104,8 +105,21 @@ Bu dosya planı ve künyeleri tutar.
   6.601.164 B (`Machine: Advanced Micro Devices X86-64`); `include/oboe/`
   her iki prefix'te. cmake install ABI alt-dizinine koyar (`lib/<abi>/`) —
   prefix düzenine taşındı (`lib/liboboe.a`).
-- P3.4 TU dolumu (oboe oynatma hattı + cihaz dumanı) bir sonraki adım:
-  cihaz gerektirir.
+
+### P3.4 ikili künyesi — velnosub-audio-play (2026-10-20, 04:14/04:15)
+
+- `tools/cross/velnosub-audio-play.cpp`: Oboe `AudioStreamDataCallback` +
+  `AudioStreamErrorCallback` kalıtımıyla s16 PCM çalar (LowLatency önergesi;
+  Shared paylaşım, cihaz Exclusive'e düşebilir). Meson kapısı `oboe.pc`
+  üzerinden (oboe install çıktısına elle yazılan pc; pkg_config_libdir
+  hattı); masa kolunda sistem oboe yok → hedef bilinçli atlanır.
+- Kanıt: arm64 2.584.368 B (`DYN`/AArch64), x86_64 2.448.544 B; NEEDED yalnız
+  `liblog/libc++_shared/libm/libdl/libc` (oboe statik). Commit'ler: TU +
+  meson kapısı ve hata-arayüzü düzeltmesi — son hâli
+  `git log --oneline -3` (feature dalında `velnosub: P3.4 velnosub-audio-play`
+  başlıklı iki kayıt).
+- Cihaz dumanı: `[OP0..OP3]` şeridi faz2-device-test.md'de; ham PCM
+  metaverisiz olduğu için rate/kanal P3.3 `[AP1]` çıktısıyla eşleşir.
 
 ## Künyeler
 

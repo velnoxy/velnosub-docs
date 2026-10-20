@@ -17,7 +17,8 @@
 > ✔ (statik headless FFmpeg 6.1.2; x86'da `--disable-x86asm`); P3.1/P3.3
 > probe ikilileri iki ABI'de; P3.2 `video_provider_ffmpeg` çekirdek .so'ya
 > bağlı (`CreateFFmpegVideoProvider` ihracı, core.so arm64 117.401.312 B;
-> `-Wl,-Bsymbolic` bağ düzeltmesi; masa DESK_RC=0); version.sh boru-tuzağı
+> `-Wl,-Bsymbolic` bağ düzeltmesi; masa DESK_RC=0); P3.4 oboe oynatma
+> ikilisi iki ABI'de (oboe 1.9.0 statik altyapılı); version.sh boru-tuzağı
 > düzeltmesi; künye faz3 planında. Cihaz paketi ve
 > reçete: docs/mobile/faz2-device-test.md.
 
