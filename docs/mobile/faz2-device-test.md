@@ -47,7 +47,7 @@ LD_LIBRARY_PATH=$PWD/lib ./velnosub-ass-render in.ass out.ppm \
   yalnızca ass_add_font adı olarak geçer; işlevsel eşleşme sağlamaz.
 
 ## Hazır cihaz paketi (2026-10-20, device-pkg — P4.4 yenilemeli)
-- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, **86.643.617 B**;
+- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, **86.700.458 B**;
   30 dosya):
   `bin/velnosub-cli`, `bin/velnosub-ass-render`, **`bin/velnosub-automation`** (P5.0),
   **`bin/velnosub-abi-smoke`** (P4.1+P4.2+P4.3+P4.4 şeritleri, strip'li 342.168 B),
@@ -74,6 +74,15 @@ adb push device-pkg /data/local/tmp/velnosub
 adb shell
 # içinde: yukarıdaki CLI ve ass-render koşumları (LD_LIBRARY_PATH=$PWD/lib)
 ```
+
+- **proot-içi paket-içi koşum reçetesi** (adb'siz, Termux içinden —
+  2026-10-20'de kanıtlı): paket dizinine girip
+  `LD_LIBRARY_PATH=$PWD/lib VELNOSUB_CONFIG_JSON=$PWD/default_config.json
+  VELNOSUB_AUDIO=$PWD/media/kisa.wav.pcm ./bin/velnosub-abi-smoke
+  $PWD/ass-format-tests.ass /tmp/out.ass` — `[AB0..AB5]`, `[AG0..AG5]`,
+  `[AS0..AS5]`, `[AW0..AW5]`; video için `VELNOSUB_VIDEO=$PWD/media/kisa.mp4`
+  → `[AV0..AV4]`. Paket kendi medyasıyla dolu, bağımsız koşar. `bin/velnosub-ui`
+  eframe ikilisi pencereyi APK bağlamında açar (proot'ta beklenmedik durur).
 
 ## 2026-10-20 — proot-içi cihaz dumanı: tüm şeritler yeşil (KEŞİF)
 
@@ -148,7 +157,7 @@ LD_LIBRARY_PATH=$PWD/lib ./bin/velnosub-audio-probe kisa.wav --seconds 5
   `libm/libc++_shared/libdl/libc` (FFmpeg statik).
 
 ## P3.4 cihaz dumanı (velnosub-audio-play)
-- P3.3 çıktısı (`kisa.wav.pcm`) mét verisiz ham PCM'dir: rate/kanal bilgisi
+- P3.3 çıktısı (`kisa.wav.pcm`) meta verisiz ham PCM'dir: rate/kanal bilgisi
   P3.3 koşumunun `[AP1] samplerate/kanal` satırıyla eşleştirilip argümanla
   verilir:
 ```sh

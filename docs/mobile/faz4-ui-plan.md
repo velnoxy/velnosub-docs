@@ -40,10 +40,22 @@ Notlar:
 
 ## Bekleyen paketler
 
-- P4.3 video paneli ✔ ve P4.4 ses paneli ✔ aşağıda künyeli; P4.5 stil/dialog
-  (Faz 5 dialog eşlemesini besler), P4.6 jestler/hotkey/düzenler ve APK
-  bağlamı (NativeActivity + imza + yükleme; eframe ikilisi orada pencere
-  açar): plan metni master plan Faz 4'te.
+- P4.3 video paneli ✔, P4.4 ses paneli ✔, P4.5 stil omurgası ✔ aşağıda
+  künyeli; P4.5 devamı: tam stil editörü (tüm alanlar) + Faz 5 dialog
+  eşlemesi, P4.6 jestler/hotkey/düzenler ve APK bağlamı (NativeActivity +
+  imza + yükleme; eframe ikilisi orada pencere açar): plan metni master
+  plan Faz 4'te.
+
+## P4.5 — Stiller omurgası ✔ (2026-10-20, host + cihaz + paket-içi)
+
+| Kayıt | Değer |
+|---|---|
+| Kod commit | [`5c62ee6bb`](https://github.com/velnoxy/velnosub/commit/5c62ee6bb) (feature dalı) |
+| ABI yüzeyi | 26 → 29 sembol: `style_of(h, idx)` → 13-hanelik '\|' ayrıklı alan dizgesi (ad\|font\|boyut\|4 renk ASS biçimi\|biçim-baytları\|hiza\|kenarlar\|kodlama\|ölçek-haraba-açı\|kenarstili-kontur-gölge), `style_edit_size`, `style_edit_name` (ikisi de `UpdateData` + `AssFile::COMMIT_STYLES` commit'i) |
+| Rust smoke | `[AS0] stiller: 2` → `[AS1] stil 0: Default\|Arial\|20.000000\|&H00FFFFFF…` `[AS1] stil 1: Alt\|Times New Roman\|40.000000…` → `[AS2] boyutu 24 yazıldı; teyit: 24.000000` → `[AS3] adı yazıldı (VelnoSub)` → `[AS4] kalıcılık teyidi: ad+boyut ikinci tutamaçta birebir` → `[AS5]` — host RC=0, cihaz (proot) RC=0, **paket-içi** RC=0 |
+| egui Stiller paneli | `Panel::top("spanel")`: `StyleRow` ayıklayıcı (13 alan `direct parse`), canlı `DragValue` boyut düzenlemesi hattı → `style_edit_size` + nota; ad/font/renk/biçim dizgesi zayıf etiket; `load_styles()` açılışta + Yeniden-aç'ta tazelenir |
+| Paket | `refresh-device-pkg.sh` artık Rust ikililerini de kopyalar (`abi-smoke` 342.168 B + `velnosub-ui` eframe ikilisi) — eski bayat ikili tuzağı (ilk cihaz koşumunda yakalandı) kapandı; tar **86.700.458 B** |
+| Sıradaki | tam stil editörü (tüm alan yazma ABI'sı) + Faz 5 dialog formları (aynı widget dilimi), P4.6, APK bağlamı |
 
 ## P4.4 — Ses paneli omurgası ✔ (2026-10-20, host + cihaz koşumu)
 

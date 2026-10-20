@@ -40,12 +40,17 @@
 > `[AW3]` durum 2 verir, gerçek çalma APK bağlamına kalır; egui
 > AudioSection dalga paneli; commit
 > [`7fb1fc3d1`](https://github.com/velnoxy/velnosub/commit/7fb1fc3d1)).
+> P4.5 stiller omurgası ✔ (style_of 13-hanelik alan dizgesi + ad/boyut
+> düzenleme, COMMIT_STYLES; `[AS0..AS5]` host+cihaz+paket-içi birebir —
+> kalıcılık ikinci tutamaçta teyitli; egui Stiller paneli DragValue
+> canlı boyut; commit
+> [`5c62ee6bb`](https://github.com/velnoxy/velnosub/commit/5c62ee6bb)).
 > P5.0 bireysel script koşumu cihazda kanıtlandı (`[AUL]` akışı).
 > Rust-bionic zinciri cihaz kanıtı: abi-smoke proot'ta DOĞRUDAN koştu.
 > eframe ikilisi proot'ta libicu/apex bind eksikliğinden durur (APK
 > bağlamına kalır). P3.4 audio-play AAudio→OpenSLES yedeği eklendi;
 > P3.1 reçetesi mkmpeg ile kullanıcı medyasından bağımsız. Paket
-> 86.643.617 B (media/ test varlıkları + Rust ikilileri dahil).
+> 86.700.458 B (media/ test varlıkları + Rust ikilileri dahil).
 
 ## 0. Proje bilgisi
 
