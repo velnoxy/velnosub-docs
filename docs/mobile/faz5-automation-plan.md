@@ -18,7 +18,9 @@ Bu dosya dilim planını ve künye/koşum kayıtlarını tutar.
 - **P5.4** — dialog form omurgası: `aegisub.dialog` kontrol sınıfları + dinamik
   egui eşlemesi ✔ ABI/widget kısmı tamam (künye: faz4-ui-plan P4.5 III) —
   Lua pompası (`dialog.display`) P5.2 ile bağlandı ✔.
-- **P5.3** — script yükleme düzeni + DependencyControl uyum zeminleri.
+- **P5.3** — script yükleme düzeni + DependencyControl uyum zeminleri ✔
+  ilk dilim: manager taraması + gerçek upstream script koşumu + flyweight
+  kökten çözüm; aşağıda künye (kalan: DependencyControl, moonscript).
 
 ## P5.0 — LuaJIT zemini ✔ (2026-10-19, host koşumu)
 
@@ -52,3 +54,19 @@ Bu dosya dilim planını ve künye/koşum kayıtlarını tutar.
 | ABI dokunuşu | dialog DSL'de label satırı için boş `ad` izni (aegisub label name'siz kurılır) — üç kol + smoke yeniden yeşil |
 | Paket | `share/lua/velnosub-aegisub.lua` + `share/lua/velnosub-demo-macro.lua` eklendi (refresh script bloğu; 86.879.944 B, 33 dosya) |
 | Sırada | P5.2 devam (zaman nesnesi, subtitle.insert_line/delete_line, filtre kayıtları), P5.3 script düzeni (dir scan, DependencyControl) |
+
+## P5.3 (ilk dilim) — script manager + gerçek upstream koşumu + flyweight kök çözümü ✔ (2026-10-20, host + cihaz)
+
+| Kayıt | Değer |
+|---|---|
+| Kod commit | [`c362063a5`](https://github.com/velnoxy/velnosub/commit/c362063a5) (feature dalı) |
+| Manager taraması | runner'a `--dir D` / `--script F` / `--include F` içinden yazar noktası: dizindeki `*.lua` eşgörünümlü sıralı yükleme, `[AUZ0]` tarama + `[AUZ1]` yüklendi + `[AUZ2]` include izleri; `--macro/--btn/--val/--sel/--save` pump AYNI |
+| Shim ekleri | aegisub 2.x `include("x.lua")` globali (`VELNOSUB_AEGIINC` ;  ayırımlı dizin, BOM temizli okuma), `aegisub.decode_path` (`?user/?data/?script/?temp`), `set_undo_point` (kayıt notlu stub), `register_filter`, `progress.task/set`, satır tablosuna `class` + `comment` (ABI `velnosub_abi_line_meta`: 39→**40** sembol; olaylar hep "dialogue", Comment olayı bayrağı) |
+| Yeni ABI | `velnosub_abi_line_meta(h, idx, buf, n)` → `"dialogue|0/1"` dizgesi (upstream scriptlerin class/comment alanına erişimi için) |
+| Gerçek upstream koşumu | `automation/autoload/strip-tags.lua` **birebir kopya** (BAĞImlılıksız): `--macro "Strip tags" --sel 4 --sel 6` → ABI idx3/idx5 içeriğinde `{By the way…}` anahtar dizisi ve `{\an1}` etiketi birebir kalktı, seçimsiz satırlar dokunulmadı; `cleantags-autoload.lua` **birebir kopya** + `include cleantags.lua`: manager dizin taraması 2 script yükledi, Clean Tags 40 satırı temizledi, kayıt, ikinci tutamaç teyidi (`[AUS6]` idx2/idx4 içerikleri birebir) |
+| ✔ kök neden çözümü | **boost::flyweight çapraz-DSO yığın bozulması**: `Text/Style/Actor/Effect/ExtradataIds`/attachment alanları `boost::flyweight` (refcounted varsayılan). Meyers-singleton fabrika INLINE statik olduğu için DSO başına ayrı örneklenir: `libvelnosub-core.so` yükleyici F1'e, `libvelnosub-abi.so`/`velnosub-cli` yazma kolü F2/F3'e — yükleme F1'de, yazma F2'de → `assign` yabancı F1 düğümünü F2 tablosunda erase etmeye çalışan `free(): invalid size` (mini2 minibindirme Lua'sız C++ tekrarı: 0,1,2→3 sırasında deterministik; 3-first sıralamada esrarengiz geçer; 40-düzenleme Clean Tags akışı SEGFAULT; teardown'da "double free or corruption") |
+| ✓ Çözüm mimarisi | TÜM flyweight alan yazmaları `src/core/velnosub_core_edit.cpp` (core.so içinde derlenir — F1 kolu) ile tepsi kolda: `velnosub_core_edit_line_text(edit_line)` + `velnosub_core_edit_first_text(edit_first + cli)`; abi/cli yalnız vekil çağırır. OKUMALAR fabrika dokunmuyor → güvenli. abi.so/cli'den artık hiçbir Text mutasyonu geçmiyor |
+| ✔ regresyon şeridi | abi-smoke'a `[AB7]` eklendi: aynı tutamaçta 3 tur × 4 satır atama + her turda geri-okuma teyidi — bu alçak-frekans hatayı kalıcı yakalar; nm defteri 40 sembol |
+| Koşumlar | host: mini 40-commit+save+reopen RC=0 (evvelki SIGSEGV), `MALLOC_CHECK_=3` ile 0,1,2,3 sırası yeşil (evvelki abort), Clean Tags manager RC=0 (evvelki SEGFAULT); cihaz: abi-smoke `[AB7]` ✓ + Clean Tags manager RC=0 + `Form dene` (DUMAN-FORMU @7) + `Ana harf` RC=0 — birebir |
+| Paket | 86.865.035 B, 37 dosya; `share/lua/autos/` (upstream birebir kopyalar) + `share/lua/inc/cleantags.lua` + `share/lua/lua-noop.lua` eklendi (refresh script bloğu) |
+| Sırada | P5.2 devam (zaman nesnesi, insert/delete ABI), DependencyControl zemini, moonscript/karaskel paketi |

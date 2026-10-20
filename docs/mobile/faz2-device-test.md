@@ -46,11 +46,11 @@ LD_LIBRARY_PATH=$PWD/lib ./velnosub-ass-render in.ass out.ppm \
   `fontselect: (Arial, 400, 0) -> DejaVuSans.ttf` seçimi gösterir. `--family`
   yalnızca ass_add_font adı olarak geçer; işlevsel eşleşme sağlamaz.
 
-## Hazır cihaz paketi (2026-10-20, device-pkg — P5.1/P5.2 yenilemeli)
-- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, **86.879.944 B**;
-  33 dosya):
-  `bin/velnosub-cli`, `bin/velnosub-ass-render`, **`bin/velnosub-automation`** (P5.0+P5.1/P5.2),
-  **`bin/velnosub-abi-smoke`** (P4.1–P4.5 III şeritleri, strip'li 358.360 B),
+## Hazır cihaz paketi (2026-10-20, device-pkg — P5.3 yenilemeli)
+- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, **86.865.035 B**;
+  37 dosya):
+  `bin/velnosub-cli`, `bin/velnosub-ass-render`, **`bin/velnosub-automation`** (P5.0+P5.1/P5.2 manager taramalı),
+  **`bin/velnosub-abi-smoke`** (P4.1–P4.5 III şeritleri + `[AB7]`, strip'li),
   **`bin/velnosub-video-probe`**
   (P3.1, strip'li 13.841.040 B), **`bin/velnosub-audio-probe`** (P3.3, strip'li
   13.842.600 B), **`bin/velnosub-audio-play`** (P3.4, strip'li 188.600 B;
@@ -59,13 +59,15 @@ LD_LIBRARY_PATH=$PWD/lib ./velnosub-ass-render in.ass out.ppm \
   eframe ikilisi, strip'li 5.554.368 B; stil+dialog panelleri dahil; pencere
   APK bağlamı ister), `lib/libvelnosub-core.so` (P3.2
   sağlayıcılı 117.401.312 B),
-  **`lib/libvelnosub-abi.so`** (P4.1–P4.5 III, **39 sembol**; Oboe-bağlı 4.126.624 B), `lib/libfreetype.so`, `lib/libpng16.so`,
+  **`lib/libvelnosub-abi.so`** (P4.1–P4.5 III + P5.3 line_meta, **40 sembol**; Oboe-bağlı), `lib/libfreetype.so`, `lib/libpng16.so`,
   `lib/libfribidi.so`, `lib/libharfbuzz.so`, `lib/libuchardet.so`,
   `lib/libc++_shared.so`, `ass-format-tests.ass`, **`default_config.json`**,
   `DejaVuSans.ttf`, **`media/`** (`kisa.wav` 192.044 B, `kisa.wav.pcm`
   192.000 B, `kisa.mp4` 96.065 B, `dialog-ornak.txt` 288 B), **`share/lua/`**
-  (`velnosub-aegisub.lua` yüzeyi + `velnosub-demo-macro.lua` — P5.1/P5.2
-  makro koşumu, aşağıda reçete) — paket kendi test varlıklarıyla dolu.
+  (`velnosub-aegisub.lua` yüzeyi + `velnosub-demo-macro.lua` + `lua-noop.lua`
+  + **`autos/`** upstream birebir kopyalar: `cleantags-autoload.lua`,
+  `strip-tags.lua` + **`inc/cleantags.lua`** — P5.1/P5.2/P5.3 makro koşumları,
+  aşağıda reçete) — paket kendi test varlıklarıyla dolu.
   (Kök seviyede eski kopya `velnosub-cli/velnosub-ass-render`
   de duruyor; `bin/` kullanın.) Eski `device-pkg4.tar.gz` (23.479.573 B, 19-10)
   yedektir.
@@ -99,6 +101,17 @@ adb shell
   `[AUS2] makro koştu` `[AUS3] yazıldı` `[AUS4] kalıcılık: yeniden açılış
   satır 1: DUMAN-FORMU @7` `[AUS5] pump tamam` `[AUP0] pompacı koştu` —
   host + cihaz birebir; `--macro "Ana harf" --sel 2 --sel 3` seçim-upper şeridi.
+- **Manager + upstream reçetesi (P5.3)**: paket dizininden
+  `VELNOSUB_AEGISHIM=$PWD/share/lua/velnosub-aegisub.lua
+  VELNOSUB_AEGIINC=$PWD/share/lua/inc LD_LIBRARY_PATH=$PWD/lib
+  VELNOSUB_CONFIG_JSON=$PWD/default_config.json ./bin/velnosub-automation
+  share/lua/lua-noop.lua --dir share/lua/autos --ass $PWD/ass-format-tests.ass
+  --macro "Clean Tags" --sel 10 --save /tmp/f7-dev-clean.ass` →
+  `[AUZ0] tarama: share/lua/autos (2 script)` `[AUZ1] yüklendi
+  cleantags-autoload.lua / strip-tags.lua` `[AUS1..AUS5]` (40 satır Clean
+  Tags + `[AUS6]` idx2/idx4 içerik birebir) — cihaz RC=0; `--macro
+  "Strip tags" --sel 4 --sel 6` etiket sıyırma şeridi (bkz. faz5 plan
+  P5.3 künyesi).
 
 ## 2026-10-20 — proot-içi cihaz dumanı: tüm şeritler yeşil (KEŞİF)
 
@@ -120,6 +133,8 @@ sistem linker64 devreye girer; `LD_LIBRARY_PATH=$PWD/lib` ile lib/
 | P4.4 `abi-smoke` ses şeridi | `[AW0] ses açıldı (tutamaç: 1, rate 48000, ch 2)` `[AW1] s16 48000Hz 2k 48000 örnek` `[AW2] peak kovaları: 64 (boş olmayan 64, min<=max true)` `[AW3] oynatma durumu: 2 — arka-iplik openStream proot binder'da hızlı hata veriyor` `[AW4] oynatma kesildi` `[AW5] ses kol kapandı` | ✔ RC=0; **play artık bloke etmiyor** (senkron sürümün süresiz gömülmesi giderildi); gerçek çalma APK bağlamına kalır |
 | P4.5 III `abi-smoke` dialog şeridi | `[AD0] dialog açıldı (alan 7, düğme 2)` `[AD1] ctl 0..6` `[AD2] 5 alan yazıldı` `[AD3] teyit: beş alan ikinci okumada birebir` `[AD4] düğme 1 seçildi (İptal, kayıt tutarlı)` `[AD5] tip reddi (-1,-1)` `[AD6] dialog kol kapandı` | ✔ RC=0 (host/cihaz/paket-içi birebir); 39 sembol defteri |
 | P5.1/P5.2 `automation` makro şeridi | `[AUS0] yüzey yüklendi` `[AUS1] dosya (satır 41)` `[AUL] form döndü: düğme Uygula, metin duman-formu, sayı 7, buyuk true` `[AUL] form hattı: DUMAN-FORMU @7` `[AUS2] makro koştu` `[AUS3] yazıldı` `[AUS4] kalıcılık @7` `[AUS5] pump tamam` `[AUP0]` | ✔ RC=0 (host + cihaz birebir); `--macro "Ana harf"` seçim-upper da ✔ |
+| P5.3 `[AB7]` tekrarlı düzenleme | `3 tur x 4 satır birebir` (aynı tutamaçta çoklu atama; flyweight çapraz-DSO regresyonu) | ✔ RC=0 (host + cihaz) |
+| P5.3 manager + Clean Tags | `[AUZ0] tarama (2 script)` `[AUZ1] cleantags-autoload/strip-tags` `[AUL] progress: 40 lines cleaned` `[AUS3/4/6]` kayıt+kalıcılık | ✔ RC=0 (host + cihaz; upstream scriptler birebir) |
 
 Notlar:
 - **Proot boru tuzağı**: `… \| head/tail` ile koşan ikili ortada takılabiliyor
