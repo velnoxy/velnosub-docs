@@ -35,12 +35,17 @@
 > host+cihaz birebir — P3.2 sağlayıcının cihazdaki İLK koşumu: mpeg4 çözgü,
 > BGRA kare, PTS geri-sarma byte-birebir; egui VideoSection doku paneli;
 > commit [`04ede790e`](https://github.com/velnoxy/velnosub/commit/04ede790e)).
+> P4.4 ses paneli ✔ (peak ABI + arka-iplikli Oboe oynatma — play hemen
+> döner, durum -1/4/0/1/2; proot'ta kurulum ipliği binder kısıtına
+> `[AW3]` durum 2 verir, gerçek çalma APK bağlamına kalır; egui
+> AudioSection dalga paneli; commit
+> [`7fb1fc3d1`](https://github.com/velnoxy/velnosub/commit/7fb1fc3d1)).
 > P5.0 bireysel script koşumu cihazda kanıtlandı (`[AUL]` akışı).
 > Rust-bionic zinciri cihaz kanıtı: abi-smoke proot'ta DOĞRUDAN koştu.
 > eframe ikilisi proot'ta libicu/apex bind eksikliğinden durur (APK
 > bağlamına kalır). P3.4 audio-play AAudio→OpenSLES yedeği eklendi;
 > P3.1 reçetesi mkmpeg ile kullanıcı medyasından bağımsız. Paket
-> 83.490.454 B.
+> 86.643.617 B (media/ test varlıkları + Rust ikilileri dahil).
 
 ## 0. Proje bilgisi
 

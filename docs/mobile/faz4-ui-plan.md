@@ -40,9 +40,25 @@ Notlar:
 
 ## Bekleyen paketler
 
-- P4.3 video paneli ✔ omurgası aşağıda künyeli; ses paneli (Faz 3 P3.5
-  dalga/spektrum teslimi bunun içinden bağlanır) sırada, P4.5 stil/dialog,
-  P4.6 jestler/hotkey/düzenler: plan metni master plan Faz 4'te.
+- P4.3 video paneli ✔ ve P4.4 ses paneli ✔ aşağıda künyeli; P4.5 stil/dialog
+  (Faz 5 dialog eşlemesini besler), P4.6 jestler/hotkey/düzenler ve APK
+  bağlamı (NativeActivity + imza + yükleme; eframe ikilisi orada pencere
+  açar): plan metni master plan Faz 4'te.
+
+## P4.4 — Ses paneli omurgası ✔ (2026-10-20, host + cihaz koşumu)
+
+| Kayıt | Değer |
+|---|---|
+| Kod commit | [`7fb1fc3d1`](https://github.com/velnoxy/velnosub/commit/7fb1fc3d1) (feature dalı; öncül WIP `23c81033b`) |
+| ABI yüzeyi | 17 → 26 sembol: `audio_open(yol, rate, ch)` (s16 PCM açım + tek-geçiş 256-kare kova peak taraması), `audio_len/len64`, `audio_info` ("s16 {rate}Hz {ch}k {N} örnek" dizgesi), `audio_peaks(h, d0, adet, k, minv, maxv)`, `audio_play(h, d0, adet)`, `audio_state`, `audio_stop`, `audio_close` |
+| Oynatma mimarisi | **Arka-iplikli kurulum**: `play` yalnız oynatıcıyı kurar ve `std::thread(ses_kurulum_ipligi).detach()` fırlatır, hemen 0 döner; iplik fopen→fseek→openStream→start yapar. Gerekçe: proot/edarlisiz ortamlarda `openStream` binder'da süresiz bloke edebilir (P3.4'te senkron sürüm cihaz koşumunu gömmüştü) — çağıran iplik ASLA beklemez |
+| Durum kodları | `-1` oynatma yok, `4` hazırlanıyor (kurulma benekli), `0` oynatılıyor, `1` boşalma, `2` hata; `AudioPlayer` akışı sahipler (`akis` alanı; yıkıcı dosya+akışı kapatır), `ses_kes_kilitli` kilitli iç kesici — play-içi stop yeniden kilitleyip ölü kilide düşme hatası düzeltildi |
+| Dallama | `meson.build`: `oboe.pc` bulunursa `abi_oboe_dep` + `-DVELNOSUB_ABI_OBOE` → meson yoksa zarif yed (`[AVE] "oboe bu derlemede yok (masa kolu)"`); cross'ta gerçek play, host-check'ta yed |
+| Host şeridi | `[AW0] ses açıldı (tutamaç: 1, rate 48000, ch 2)` `[AW1] s16 48000Hz 2k 48000 örnek (1.00 sn)` `[AW2] peak kovaları: 64 (boş olmayan 64, min<=max true)` `[AVE]` `[AW5] kol kapandı` — RC=0 |
+| Cihaz şeridi | proot birebir RC=0 + **paket içi bağımsız koşum** (`media/kisa.wav.pcm`): `[AW0..AW2]` yeşil, `[AW3] oynatma durumu: 2` (arka-iplik binder kısıtını hızlı hata olarak raporlar — senkron sürümün süresiz gömülmesi bitti), `[AW4] kesildi`, `[AW5]`; P3.4 proot konum ARTIK belgeli: APK bağlamı gerçek çalmayı açar |
+| P3.5 kapanışı | dalga/spektrum "hesaplamayı yeniden kullan, çizimi UI'ya bırak" maddesi: peak defteri çekirdekte (ABI), çizim egui'de |
+| egui AudioSection | `Panel::top("wpanel")`: `▶ oynat` (ilk ≤5 sn)/`⏹ kes`/durum adları, **512-kova Painter waveform** (`Painter::line_segment` çubukları; `allocate_exact_size` çizim dikdörtgeni), `VELNOSUB_AUDIO` env |
+| Sıradaki | P4.5 stil yöneticisi + dialog (Faz 5.3 widget dilimi), APK bağlamı (NativeActivity paketleme yolu) |
 
 ## P4.3 — Video paneli omurgası ✔ (2026-10-20, host + cihaz koşumu)
 

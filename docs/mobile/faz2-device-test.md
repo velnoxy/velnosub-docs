@@ -46,19 +46,24 @@ LD_LIBRARY_PATH=$PWD/lib ./velnosub-ass-render in.ass out.ppm \
   `fontselect: (Arial, 400, 0) -> DejaVuSans.ttf` seçimi gösterir. `--family`
   yalnızca ass_add_font adı olarak geçer; işlevsel eşleşme sağlamaz.
 
-## Hazır cihaz paketi (2026-10-20 sabah, device-pkg)
-- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, 83.490.454 B):
+## Hazır cihaz paketi (2026-10-20, device-pkg — P4.4 yenilemeli)
+- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, **86.643.617 B**;
+  30 dosya):
   `bin/velnosub-cli`, `bin/velnosub-ass-render`, **`bin/velnosub-automation`** (P5.0),
-  **`bin/velnosub-abi-smoke`** (P4.1, aarch64-PIE), **`bin/velnosub-video-probe`**
+  **`bin/velnosub-abi-smoke`** (P4.1+P4.2+P4.3+P4.4 şeritleri, strip'li 342.168 B),
+  **`bin/velnosub-video-probe`**
   (P3.1, strip'li 13.841.040 B), **`bin/velnosub-audio-probe`** (P3.3, strip'li
   13.842.600 B), **`bin/velnosub-audio-play`** (P3.4, strip'li 188.600 B;
   Oboe statik içsel), **`bin/velnosub-mkmpeg`** (P3.1 destek, strip'li
-  13.841.416 B; sentetik mp4 üreticisi), `lib/libvelnosub-core.so` (P3.2
+  13.841.416 B; sentetik mp4 üreticisi), **`bin/velnosub-ui`** (P4.0 egui
+  eframe ikilisi, strip'li 5.338.624 B; pencere APK bağlamı ister), `lib/libvelnosub-core.so` (P3.2
   sağlayıcılı 117.401.312 B),
-  **`lib/libvelnosub-abi.so`** (P4.1), `lib/libfreetype.so`, `lib/libpng16.so`,
+  **`lib/libvelnosub-abi.so`** (P4.1–P4.4, 26 sembol; Oboe-bağlı 3.592.184 B), `lib/libfreetype.so`, `lib/libpng16.so`,
   `lib/libfribidi.so`, `lib/libharfbuzz.so`, `lib/libuchardet.so`,
   `lib/libc++_shared.so`, `ass-format-tests.ass`, **`default_config.json`**,
-  `DejaVuSans.ttf`. (Kök seviyede eski kopya `velnosub-cli/velnosub-ass-render`
+  `DejaVuSans.ttf`, **`media/`** (`kisa.wav` 192.044 B, `kisa.wav.pcm`
+  192.000 B, `kisa.mp4` 96.065 B — paket kendi test varlıklarıyla dolu).
+  (Kök seviyede eski kopya `velnosub-cli/velnosub-ass-render`
   de duruyor; `bin/` kullanın.) Eski `device-pkg4.tar.gz` (23.479.573 B, 19-10)
   yedektir.
 - Aktarım:
@@ -87,6 +92,7 @@ sistem linker64 devreye girer; `LD_LIBRARY_PATH=$PWD/lib` ile lib/
 | P3.3 `audio-probe` | `[AP0] WAV` `[AP1] pcm_s16le 2ch 48000` `[AP2] parça…` | ✔ `.pcm` 192.000 B |
 | P3.1 `mkmpeg`→`video-probe` | `[MK0..MK3]` (48 paket) → `[VP0] QuickTime/MOV 1.95833 sn` `[VP1] mpeg4 320x240 24fps` `[VP2]×3` `[VP3] decode 3` | ✔ |
 | P3.4 `audio-play` | `[OP1] tampon 96000 sample` → `[OPE] ErrorInternal` (AAudio + OpenSLES yemleri) | ⚠ proot kısıtı (aşağıda) |
+| P4.4 `abi-smoke` ses şeridi | `[AW0] ses açıldı (tutamaç: 1, rate 48000, ch 2)` `[AW1] s16 48000Hz 2k 48000 örnek` `[AW2] peak kovaları: 64 (boş olmayan 64, min<=max true)` `[AW3] oynatma durumu: 2 — arka-iplik openStream proot binder'da hızlı hata veriyor` `[AW4] oynatma kesildi` `[AW5] ses kol kapandı` | ✔ RC=0; **play artık bloke etmiyor** (senkron sürümün süresiz gömülmesi giderildi); gerçek çalma APK bağlamına kalır |
 
 Notlar:
 - **Proot boru tuzağı**: `… \| head/tail` ile koşan ikili ortada takılabiliyor
