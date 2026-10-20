@@ -101,12 +101,15 @@ P4.0 Rust/egui bootstrap ✔, P4.1 C ABI ✔ (host+cihaz), **P4.2 grid+edit ✔
 (host+cihaz `[AG0..AG5]`)**, **P4.3 video paneli ✔**, **P4.4 ses paneli ✔
 (arka-iplikli Oboe, `[AW0..AW5]` host+cihaz+paket-içi; çalma APK
 bağlamında)**, **P4.5 stiller omurgası + tam editör ✔ (`[AS0..AS6]` ABI 30
-sembol + egui font/renk/hiza yazım hattı)**; sırada Faz 5 dialog
-formları, P4.6
-jestler/düzenler ve APK
-bağlamı, Faz 5
+sembol + egui font/renk/hiza yazım hattı)**, **P4.5 III dialog formları
+omurgası ✔ (`[AD0..AD6]`, ABI 39 sembol, egui dpanel)**; sırada libass
+önizleme, P4.6 jestler/düzenler ve APK
+bağlamı; Faz 5
 automation ✔ (host+arm64+x86_64 + cihaz `[AU0..AU3]`; LuaJIT script
-dumaları sıradaki), Faz 6 (iOS) 2026-10-20'de **iptal** — Faz 7 paketleme
+dumaları sıradaki), **P5.1/P5.2 aegisub.* gerçek yüzeyi ✔ — makrolar
+ABI hattında gerçek dosyayı düzenliyor, kayıt edip kalıcılık teyitli
+(`[AUS1..AUS5]` host+cihaz birebir; dialog pompası `DUMAN-FORMU @7`)**,
+Faz 6 (iOS) 2026-10-20'de **iptal** — Faz 7 paketleme
 ve test Android hedefiyle sürer.
 
 ## Atıf / lisans

@@ -53,6 +53,11 @@
 > egui dinamik form paneli dpanel; commit
 > [`03cbf985f`](https://github.com/velnoxy/velnosub/commit/03cbf985f)).
 > P5.0 bireysel script koşumu cihazda kanıtlandı (`[AUL]` akışı).
+> P5.1/P5.2 aegisub.* gerçek yüzeyi ✔ — shim Lua FFI ile ABI kolunda
+> makro çalıştırıyor: dosya aç/düzenle/kaydet + dialog pompası; "Form
+> dene" makrosu `DUMAN-FORMU @7` üretip kalıcılığı ikinci tutamacta
+> teyit etti ([AUS1..AUS5] host+cihaz birebir; commit
+> [`0328d339d`](https://github.com/velnoxy/velnosub/commit/0328d339d)).
 > Rust-bionic zinciri cihaz kanıtı: abi-smoke proot'ta DOĞRUDAN koştu.
 > eframe ikilisi proot'ta libicu/apex bind eksikliğinden durur (APK
 > bağlamına kalır). P3.4 audio-play AAudio→OpenSLES yedeği eklendi;
@@ -160,6 +165,8 @@ Eski Qt 6 metni git geçmişinde durur; Faz 4 çıktısı cihazda duman edilmede
 
 ### Faz 5 — Automation (scriptler dahil, kritik)
 Mevcut yapı: `src/auto4_lua*.cpp` Lua motorunu barındırır, `automation/include` ve `automation/autoload` içinde kütüphane ve scriptler bulunur.
+
+İlerleme (2026-10-20): **P5.0 LuaJIT zemini ✔** (host+arm64+x86_64, cihaz proot koşumu kanıtlı), **P5.1/P5.2 ilk dilim ✔** — `aegisub.*` gerçek yüzeyi LuaJIT FFI ile `libvelnosub-abi.so` kolu üzerinden: dosya aç/düzenle/kaydet (`subs[i]` newproxy-userdata, `#subs` işler), `aegisub.dialog.display` → P4.5 III dialog ABI pompası (tipli cevap dönüşü), demo makrolar host+cihaz birebir (`DUMAN-FORMU @7` + kalıcılık teyidi); künye faz5 planında. Kalan: 3-6 kalemleri (zaman nesnesi, text_extents/frame köprüsü, MoonScript/karaskel paketi, decode_path, DependencyControl).
 
 Yapılacaklar:
 1. **Lua motoru:** Aegisub Lua 5.1 / LuaJIT API'sine göre yazılmış scriptleri çalıştırır. Android arm64'te LuaJIT kullan. (iOS kalemi 2026-10-20'de iptal; JIT kısıtı notu artık müteferri.)
