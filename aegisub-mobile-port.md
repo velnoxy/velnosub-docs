@@ -31,11 +31,16 @@
 > `[AG0..AG5]` şeridi host+cihaz birebir — ikinci-tutamaç kalıcılığı dahil;
 > egui GridApp: sanallaştırılmış liste + hücre düzenleme; commit
 > [`4c623cf2a`](https://github.com/velnoxy/velnosub/commit/4c623cf2a)).
+> P4.3 video paneli omurgası ✔ (ABI 17 sembole; `[AV0..AV4]` şeridi
+> host+cihaz birebir — P3.2 sağlayıcının cihazdaki İLK koşumu: mpeg4 çözgü,
+> BGRA kare, PTS geri-sarma byte-birebir; egui VideoSection doku paneli;
+> commit [`04ede790e`](https://github.com/velnoxy/velnosub/commit/04ede790e)).
+> P5.0 bireysel script koşumu cihazda kanıtlandı (`[AUL]` akışı).
 > Rust-bionic zinciri cihaz kanıtı: abi-smoke proot'ta DOĞRUDAN koştu.
 > eframe ikilisi proot'ta libicu/apex bind eksikliğinden durur (APK
 > bağlamına kalır). P3.4 audio-play AAudio→OpenSLES yedeği eklendi;
 > P3.1 reçetesi mkmpeg ile kullanıcı medyasından bağımsız. Paket
-> 83.468.209 B.
+> 83.490.454 B.
 
 ## 0. Proje bilgisi
 

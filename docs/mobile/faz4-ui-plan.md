@@ -40,9 +40,20 @@ Notlar:
 
 ## Bekleyen paketler
 
-- P4.3 video paneli, P4.4 ses paneli (Faz 3 P3.5 dalga/spektrum teslimi bunun
-  içinden bağlanır), P4.5 stil/dialog, P4.6 jestler/hotkey/düzenler: plan
-  metni master plan Faz 4'te.
+- P4.3 video paneli ✔ omurgası aşağıda künyeli; ses paneli (Faz 3 P3.5
+  dalga/spektrum teslimi bunun içinden bağlanır) sırada, P4.5 stil/dialog,
+  P4.6 jestler/hotkey/düzenler: plan metni master plan Faz 4'te.
+
+## P4.3 — Video paneli omurgası ✔ (2026-10-20, host + cihaz koşumu)
+
+| Kayıt | Değer |
+|---|---|
+| Kod commit | [`04ede790e`](https://github.com/velnoxy/velnosub/commit/04ede790e) (feature dalı) |
+| ABI yüzeyi | 12 → 17 sembol: `video_open` (VideoProviderFactory::GetProvider hattı — P3.2 sağlayıcının cihazdaki İLK koşumu), `video_info` ("WxH fps kare çözücü" dizgesi), `video_geom` (sayısal W/H/fps/kare çıkışları), `video_frame(h, kare, buf, n)` (BGRA, pitch=w·4, satır-satır kopya; tampon azsa gereken boyutu döner), `video_close` |
+| Host şeridi | `[AV0] tutamaç 1` `[AV1] 320x240 fps:24.000 kare:47 FFmpeg (velnosub)` `[AV2] kare 0 (307.200 B) ve kare 1 farklı: BGRA akışı canlı` `[AV3] geri sarma kanıtlandı (kare 0 birebir)` `[AV4] kapandı` — host-check çekirdeği de FFmpeg sağlayıcılı derlendi (swscale uyarısı normal: hızlandırılmış yuv420p→bgra sıralaması yok) |
+| Cihaz şeridi | Rust-bionic ikili proot'ta birebir RC=0; sağlayıcı-fabrikası mpeg4 çözer, swscale BGRA, PTS-geri-sarma byte-birebir — P3.2 sağlayıcısı artık cihaz kanıtlı |
+| egui VideoSection | `Panel::top("vpanel")`: doku + `◀ geri/ileri ▶` + `kare i/N` etiketi; BGRA→`ColorImage` R/B takası (alfa doygun); `ctx.load_texture` adlı önbellek; `VELNOSUB_VIDEO` env ile açılır |
+| Sıradaki | ses paneli (P3.5 dalga/spektrum ABI teslimi + oynatma Oboe), libass önizleme katmanı (P2.3 render yolunun sayfa-dışı hattı) |
 
 ## P4.1 — C ABI şeridi ✔ (2026-10-19, host koşum)
 
