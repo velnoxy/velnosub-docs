@@ -77,8 +77,17 @@
 > eframe ikilisi proot'ta libicu/apex bind eksikliğinden durur (APK
 > bağlamına kalır). P3.4 audio-play AAudio→OpenSLES yedeği eklendi;
 > P3.1 reçetesi mkmpeg ile kullanıcı medyasından bağımsız. Paket
-> 86.872.719 B (media/ test varlıkları + dialog-ornak spec + Rust
-> ikilileri dahil).
+> 86.918.580 B (P4.7 yenilemeli: media/ test varlıkları + dialog-ornak
+> spec + Rust ikilileri dahil).
+> P4.7 Arayüz düzeni seçimi ✔ — kullanıcı kararıyla: ilk girişte (ayar
+> dosyası yokken Mobil/Masaüstü iki kartla) düzen seçimi, Ayarlar'dan
+> sonradan değiştirilebilir; mobil desen alt sekme çubuğu (44pt hedefler,
+> R-24 boş sekme yok), grid dikey reflow; masaüstü yerleşimi birebir
+> korundu, şerit gövdeleri tek kaynağa çıkarıldı. Kanıt: host RC=0 + test
+> 1 passed + aarch64 RC=0; etkileşimli koşum ekran yok (APK fazına
+> kaldı) — antislop AFTER modunda numaralı denetim
+> `anti-slop/audit-001-2026-10-20.md` (commit
+> [`1a433efdd`](https://github.com/velnoxy/velnosub/commit/1a433efdd)).
 
 ## 0. Proje bilgisi
 
@@ -195,6 +204,23 @@ düzenlenmiş durum önizlemeye taşınıyor; `[AB9]` şeridi 9937 glyph etki
 host+cihaz **birebir**, ass-render cihaz kanıtı `--t 8 --defaultfont` →
 11569 glyph / PPM 691.215 B (commit
 [`3dcae0830`](https://github.com/velnoxy/velnosub/commit/3dcae0830)).
+**P4.7 ✔ (kullanıcı dilimi)** — arayüz düzeni seçimi: ilk girişte (ayar
+dosyası `velnosub-ui.json` yokken) Mobil/Masaüstü iki 96pt kartla seçim,
+Ayarlar bölümünden sonradan değiştirilebilir ve "İlk seçim ekranını tekrar
+göster" gerçek eylemi; mobil desen alt sekme çubuğu (44pt+ hedefler,
+oranlı sekme genişlikleri, R-24 gereği boş sekme yok), mobil grid dikey
+reflow (zaman üstte + tam genişlik metin, ≥44pt satır), Kaydet/Yeniden aç
+ve şerit düğmeleri mobilde 44pt; masaüstü yerleşimi birebir korundu.
+Şerit gövdeleri `video/ses/stil/form/durum/grid_icerik` yöntemlerine
+çıkarılıp iki çerçevede tek kaynağa bağlandı. Cargo.toml'a android dışı
+hedeflerde eframe `x11` kabiliyeti (winit host derlemesi düzeltildi).
+Kanıt: host release RC=0, `cargo test` 1 passed (ayar yazım/okuma
+habercisi), aarch64-linux-android release RC=0 (8.067.368 B); etkileşimli
+GUI koşumu bu ortamda ekran olmadığından APK fazına kaldı. antislop
+AFTER modu teslimatı `anti-slop/audit-001-2026-10-20.md` (commit
+[`1a433efdd`](https://github.com/velnoxy/velnosub/commit/1a433efdd) +
+[`e639946f8`](https://github.com/velnoxy/velnosub/commit/e639946f8) +
+[`f485ba75d`](https://github.com/velnoxy/velnosub/commit/f485ba75d)).
 Kalan: zaman nesnesi, text_extents/frame köprüsü, MoonScript/karaskel paketi, DependencyControl, egui video paneline ABI karesi (P4.6 dilim 2), APK bağlamı.
 
 Yapılacaklar:

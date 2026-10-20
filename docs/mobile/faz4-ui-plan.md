@@ -121,3 +121,25 @@ Notlar:
 | Tool lehine kanıt | cihaz ass-render `--t 8 --defaultfont DejaVuSans.ttf` → `[AR2] glyph pikseli 11569`, PPM 691.215 B — libass cihazda gerçek kare basıyor |
 | UI bağlanma | (soyulan dilim) egui video paneli ColorImage olarak ABI karesini basacak (P4.6 dilim 2: egui tarafı) |
 | Paket | 86.904.159 B, 37 dosya; ABI 45 sembol |
+
+## P4.7 — Arayüz düzeni seçimi (ilk giriş + Ayarlar + mobil sekme çerçevesi) ✔ (2026-10-20, host derleme; etkileşimli koşum ekransız)
+
+Kullanıcı kararı: "ilk girişte mobile uygun bir UI seçimi; mobil kullanıma
+daha uygun bir UI olsun; ayarlardan değiştirilebilir." antislop **AFTER**
+modu işledi (önce kurulum, ardından numaralı denetim — aşağıda).
+
+| Kayıt | Değer |
+|---|---|
+| Kod commit'leri | [`1a433efdd`](https://github.com/velnoxy/velnosub/commit/1a433efdd) (özellik), [`e639946f8`](https://github.com/velnoxy/velnosub/commit/e639946f8) (Cargo.lock), [`f485ba75d`](https://github.com/velnoxy/velnosub/commit/f485ba75d) (imla temizliği) |
+| Ayar deposu | `velnosub-ui.json` (çalışma dizini; `VELNOSUB_UI_JSON` ile yol geçilebilir) — `{"ui": "mobil|masaustu"}`; dosya yok → ilk giriş seçim ekranı; bilinmeyen içerik → yeniden sorar; yazma hatası oturumu bozmadan dürüst gösterilir |
+| İlk giriş ekranı | iki 96pt yükseklikli seçim kartı (Mobil UI / Masaüstü UI) + gerçek işlevi anlatan açıklamalar + ayar dosyası yolu satırı; seçim dosyaya kalıcı yazılır ve oturum anında düzene geçer |
+| Mobil düzen | alt sekme çubuğu `Panel::bottom("vtabs")` — 44pt+ sekme yüksekliği, kalan genişliğe oranlı sekme genişlikleri (dar pencere taşıma yok), seçili vurgusu; sekme gizliliği gerçek içeriğe göre (R-24: Video/Ses/Stil/Form yalnız yüklüyse; Altyazı+Ayarlar her zaman); geçersiz kalan aktif sekme Altyazı'ya düşer |
+| Mobil grid | dikey reflow: zaman üstte, metin tam genişlik (satır içi yatay taşma yok), satır yüksekliği 3.2x gövde (≥44pt dokunma alanı); masaüstünde mevcut yatay satır AYNI |
+| Mobil şeritler | Kaydet/Yeniden aç dolu genişlik 44pt düğme; video ◀/▶, ses ▶/⏹, form düğmeleri 44pt yükseklik; masaüstü boyutları değişmedi |
+| Ayarlar bölümü | canlı düzen seçici (seçili vurgulu iki 44pt düğme, kalıcı yazım, hatada uyarı), "İlk seçim ekranını tekrar göster" gerçek eylem, ayar dosyası yolu satırı |
+| Tek kaynak | şerit gövdeleri `video/ses/stil/form/durum/grid_icerik` yöntemlerine çıkarıldı; masaüstü çerçevesi (`masaustu_cerceve`) ve mobil çerçevesi (`mobil_cerceve`) AYNI gövdeyi paylaşır — fark yalnız `mobil` bayrağı (hedef boyu + satır düzeni); masaüstü yerleşimi görsel olarak değişmedi |
+| Cargo.toml | android dışı hedeflerde eframe `x11` kabiliyeti — winit `aarch64-linux-gnu` host derlemesindeki "platform not supported" düzeltildi; android AArch64 yolu etkilenmez (android-native-activity kalır) |
+| Kanıt | host `cargo build -p velnosub-ui --release` RC=0; `cargo test` → 1 passed (`ayar_yoksa_secim_kaydi_birebir`: dosya yok→seçim, yazım/okuma birebir, bilinmeyen→tekrar sor); `--target aarch64-linux-android --release` RC=0 (8.067.368 B) |
+| Koşum dürüst notu (R-35) | etkileşimli GUI pencere koşumu bu ortamda mümkün değil (DISPLAY yok, Xvfb yok); gerçek dokunma doğrulaması APK bağlamı fazından sonra cihazda koşulacak |
+| antislop tayini | AFTER modu teslimatı: [`anti-slop/audit-001-2026-10-20.md`](../../anti-slop/audit-001-2026-10-20.md) — numaralı bulgu listesi (1-3 YÜKSEK: dar sekme kırpılması, kontrast ölçümsüzlüğü, etkileşimli koşum eksiği); düzeltmeler yalnız kullanıcı onayladığı numaralara uygulanır |
+| Paket | 86.918.580 B / 37 dosya (velnosub-ui yenilendi); ABI 45 sembol değişmedi |
