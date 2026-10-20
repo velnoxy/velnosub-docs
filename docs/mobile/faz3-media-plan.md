@@ -4,15 +4,14 @@ Master plan Faz 3 hedefleri: FFmpeg tabanlı kare-doğru video sağlayıcı, FFm
 PCM önbellek (disk tabanlı) → Oboe oynatma, mevcut spektrum/dalga hesap kodunun yeniden
 kullanımı, dahili keyframe üretimi (VapourSynth/Avisynth mobilde devre dışı).
 
-Bu dosya planı ve künyeleri tutar; şu an uygulama başlanmadı (bekleme: x86_64 dep
-massası build-deps.sh x86_64 sırasında).
+Bu dosya planı ve künyeleri tutar.
 
 ## Dilim planı
 
-- **P3.0** — FFmpeg aarch64 cross bootstrap: `tools/cross/build-ffmpeg.sh`
+- **P3.0** — FFmpeg aarch64 cross bootstrap ✔: `tools/cross/build-ffmpeg.sh`
   (build-deps.sh örneğine benzer kabuk; statik headless libs: `--disable-programs
   --disable-doc --disable-network --disable-avdevice`, seçili demuxer/decoder seti).
-- **P3.1** — `velnosub-video-probe` CLI: dosyayı aç, ilk N kareyi decode et,
+- **P3.1** — `velnosub-video-probe` CLI ✔ (arm64 ikili çıktı): dosyayı aç, ilk N kareyi decode et,
   marker satırlarıyla (çözünürlük, kare sayısı, ilk kare PTS) duman.
 - **P3.2** — video sağlayıcı TU mobil kolda `video_provider_ffmpeg` (kare-doğru seek:
   ts tabanlı arama + çerçeveli önbellek), host-check'te derlenir.
@@ -20,6 +19,33 @@ massası build-deps.sh x86_64 sırasında).
   büyük dosya için parça-parça okuma kanıtlama.
 - **P3.4** — Oboe oynatma (arm64 cihaz dumanı; x86_64 için AAudio yolu).
 - **P3.5** — Spektrum/dalga hesap döngüsü UI katmanına çizim teslim arayüzü.
+
+## P3.0 + P3.1 künyesi — FFmpeg aarch64 kurulum + video-probe ikilisi (2026-10-19, 02:18/02:23)
+
+- `tools/cross/build-ffmpeg.sh arm64` (JOBS=2; FFmpeg 6.1.2, statik headless): kurulum
+  `ndk-deps/arm64-v8a/lib` → `libavcodec.a` 124.293.294 B, `libavformat.a` 38.434.070 B,
+  `libavutil.a` 4.115.922 B, `libswscale.a` 4.707.174 B, `libswresample.a` 565.430 B
+  (+ `libavcodec/libavformat/libavutil.pc`). LLVM readelf: `libavcodec.a` REL/AArch64.
+- Seçilmiş yıldız kümesi: demuxer `mov,matroska,avi,ogg,flv,wav,ass,srt`; decoder
+  `h264,hevc,vp8,vp9,aac,mp3,flac,opus,vorbis,pcm_s16le,pcm_f32le,srt`; parser
+  `h264,hevc,aac,vorbis,opus,flac`; protocol yalnız `file`.
+- P3.1 probe: arm64 build dir'e `meson configure --clearcache` (bağımlılık önbelleği
+  tazelenir) + reconfigure + `ninja -j2` → `build-android-arm64/tools/cross/
+  velnosub-video-probe` 71.902.704 B (ELF64, `Type: DYN`, `Machine: AArch64`; `-g`
+  statik bağlı FFmpeg nedeniyle büyük — cihaz paketine strip'li gider).
+- Derinleşen bulgular:
+  1. `ffbuild/version.sh` `... | tail -1` boru hattı proot kesintlerinde/mesaj
+     yönlendirmelerinde asılı: make tek hedefte 1:33:08 bekledi (0 ek .o).
+     `tail`'i öldürmek yetti; kök-düzeltme: `tools/cross/ffversion-fast.sh`
+     (sabit sürüm yazan yardımcı; script artık make öncesi version.sh'i bununla
+     değiştirir — [`212131afc`](https://github.com/velnoxy/velnosub/commit/212131afc)).
+  2. `build-ffmpeg.sh` +x biti eksikken zincir `Permission denied` (126) ile öldü;
+     commit [`77dac02da`](https://github.com/velnoxy/velnosub/commit/77dac02da).
+  3. Koşan zincirin yürüttüğü betik dosyası o anda elle düzenlenirse bash'in
+     tembel ayrıştırması bozulan yerleşimde takıldı (`line 62: syntax error near
+     unexpected token ')'`): zincir kaydı DEAD gösterdi ama make tamamlanmıştı
+     (kurulum 02:18'de birebir). Ders: koşum başladıktan sonra yürüyen betiği
+     düzenleme; düzeltmeyi ayrı commit ile SONRAKİ koşuma bırak.
 
 ## Künyeler
 
