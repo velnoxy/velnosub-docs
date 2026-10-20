@@ -103,9 +103,15 @@ P4.0 Rust/egui bootstrap ✔, P4.1 C ABI ✔ (host+cihaz), **P4.2 grid+edit ✔
 bağlamında)**, **P4.5 stiller omurgası + tam editör ✔ (`[AS0..AS6]` ABI 30
 sembol + egui font/renk/hiza yazım hattı)**, **P4.5 III dialog formları
 omurgası ✔ (`[AD0..AD6]`, ABI 45 sembol line_meta/insert/delete/libass
-render dahil, egui dpanel)**, **P4.6 dilim 1 libass önizleme ABI ✔
+render dahil, egui paneli)**, **P4.6 dilim 1 libass önizleme ABI ✔
 (`[AB9]`: render_open/frame(RGBA)/close; host+cihaz birebir 9937
-glyph; libass statik bağlandı)**, **P4.7 arayüz düzeni seçimi ✔
+glyph; libass statik bağlandı)**, **P4.6 dilim 2 egui ASS önizleme ✔
+(render dizgi-alfa kompozit — zemin alfa 0 over; `[AB9]` host+cihaz
+birebir 9937 korundu; abi_close artık render şartını da yumlatır;
+`Oniz` kolu kare*1000/fps ile ms hesaplar, kare `ui.put` ile video
+üstüne biner; commit
+[`e78cf9ca9`](https://github.com/velnoxy/velnosub/commit/e78cf9ca9) +
+[`9cc02a7ed`](https://github.com/velnoxy/velnosub/commit/9cc02a7ed))**, **P4.7 arayüz düzeni seçimi ✔
 (İlk girişte Mobil/Masaüstü kart seçimi — ayar dosyası yokken; Ayarlar'dan
 değiştirilebilir; mobil desen alt sekme çubuğu + dikey grid reflow,
 44pt dokunma hedefleri; masaüstü yerleşimi birebir; host RC=0 + test
@@ -116,9 +122,8 @@ sekme boyu, masaüstü Ayarlar penceresi, DESIGN.md; test 2 passed)**, **P5.3 ma
 kopya Strip tags / Clean Tags; flyweight çapraz-DSO yığın bozulması
 kökte giderildi + `[AB7]`/`[AB8]` regresyon şeritleri)**, **P5.2 devam
 ✔ — `subs:insert_line`/`delete_line`/`n_lines` + demo "Ekle sil dene"
-(host+cihaz birebir; ABI 42 sembol)**; sırada libass
-önizleme, P4.6 jestler/düzenler ve APK
-bağlamı; Faz 5
+(host+cihaz birebir; ABI 42 sembol)**; sırada P4.6
+jestler/düzenler ve APK bağlamı ([UI0..UI8] koşum şeritleri); Faz 5
 automation ✔ (host+arm64+x86_64 + cihaz `[AU0..AU3]`; LuaJIT script
 dumaları sıradaki), **P5.1/P5.2 aegisub.* gerçek yüzeyi ✔ — makrolar
 ABI hattında gerçek dosyayı düzenliyor, kayıt edip kalıcılık teyitli

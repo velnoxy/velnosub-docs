@@ -96,6 +96,13 @@
 > Ayarlar penceresi; [UI0..UI7] cihaz koşum şeridi planı APK fazına
 > kaydedildi; DESIGN.md yön belgesi yazıldı (test 2 passed; commit
 > [`abacb542a`](https://github.com/velnoxy/velnosub/commit/abacb542a)).
+> P4.6 dilim 2 ✔ — egui video paneline ASS önizleme: render_frame dizgi-alfa
+> kompozitine çevrildi (zemin alfa 0, over), [AB9] host+cihaz BİREBİR 9937
+> korundu; abi_close artık render şartını da yumlatır (sızıntı kapandı);
+> Rust tarafında Oniz kolu (fps ile kare→ms, ms değişmedikçe yeniden
+> render yok, hata dürüst şeritte), kare ui.put ile videonun üstüne
+> biner (commit [`e78cf9ca9`](https://github.com/velnoxy/velnosub/commit/e78cf9ca9) +
+> [`9cc02a7ed`](https://github.com/velnoxy/velnosub/commit/9cc02a7ed)).
 
 ## 0. Proje bilgisi
 
@@ -242,7 +249,21 @@ gövdesiyle); [UI0..UI7] cihaz koşum şeridi planı APK fazının ilk işi
 olarak faz4 künyesine yazıldı; [`DESIGN.md`](DESIGN.md) yön belgesi yazıldı (commit
 [`abacb542a`](https://github.com/velnoxy/velnosub/commit/abacb542a) +
 [`9d3476892`](https://github.com/velnoxy/velnosub/commit/9d3476892)).
-Kalan: zaman nesnesi, text_extents/frame köprüsü, MoonScript/karaskel paketi, DependencyControl, egui video paneline ABI karesi (P4.6 dilim 2), APK bağlamı.
+**P4.6 dilim 2 ✔ — egui video paneline ASS önizleme** — C kol: render
+kompoziti dizgi-alfaya çevrildi (zemin alfa 0, over kuralı; eski
+çıkışta bölge siyah-opaktı), `[AB9]` glyph metriği etki koşuluna bağlı
+olduğundan değişmedi: host+cihaz **BİREBİR 9937** (taze .so pkg'da koşuldu);
+`velnosub_abi_close` artık render şartını da yumlatır (reload sızıntısı
+kapandı). Rust kol: `Oniz` durumu altyazı kolunu izler, açılış tek
+denemede (`VELNOSUB_FONT` + "Default"), ms = kare*1000/fps (VideoSection
+artık fps tutar), ms değişmedikçe yeniden render yok; kare `ui.put`
+ile video rect üstünde `etki > 0` iken işlenir, etkinin 0 olduğu
+boş karelerde doku işlenmez; hata şeritte dürüst weak satır. Kanıt: üç meson kan
+RC=0 (.so), host RC=0 + test 2 passed + aarch64 RC=0 (8.175.232 B) —
+egui penceresi görsel kanıtı cihaz [UI8] adımında (APK fazı) (commit
+[`e78cf9ca9`](https://github.com/velnoxy/velnosub/commit/e78cf9ca9) +
+[`9cc02a7ed`](https://github.com/velnoxy/velnosub/commit/9cc02a7ed)).
+Kalan: zaman nesnesi, text_extents/frame köprüsü, MoonScript/karaskel paketi, DependencyControl, APK bağlamı (ve [UI0..] koşum şeritleri).
 
 Yapılacaklar:
 1. **Lua motoru:** Aegisub Lua 5.1 / LuaJIT API'sine göre yazılmış scriptleri çalıştırır. Android arm64'te LuaJIT kullan. (iOS kalemi 2026-10-20'de iptal; JIT kısıtı notu artık müteferri.)

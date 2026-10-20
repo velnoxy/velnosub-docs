@@ -119,8 +119,21 @@ Notlar:
 | Kare kompozisyonu | P2.3 pipeline: `ass_render_frame(ms)` → ASS_Image listesi → kapsama*etki kompozit (uint32 0xFFRRGGBB iç kare) → RGBA (r,g,b,255) sekizli deposit yazımı; deposit boyu katı denetimi (`n == gen*yuk*4` — yoksa hata), dönüş glyph etki pikseli (0 = boş kare, hata değil) |
 | Regresyon | abi-smoke `[AB9]` şeridi: 240x180 açık → ms {0,8k,16k,24k,32k} taraması en yüksek glyph etki **9937 (host+cihaz BİREBİR)** → uzak gele (60 dk) kare 0 → deposit boy reddi → kapanış; ayrıca `Ekle sil dene` + `Clean Tags` device regresyonları yerinde (RC=0) |
 | Tool lehine kanıt | cihaz ass-render `--t 8 --defaultfont DejaVuSans.ttf` → `[AR2] glyph pikseli 11569`, PPM 691.215 B — libass cihazda gerçek kare basıyor |
-| UI bağlanma | (soyulan dilim) egui video paneli ColorImage olarak ABI karesini basacak (P4.6 dilim 2: egui tarafı) |
+| UI bağlanma | ✔ **P4.6 dilim 2 ile yapıldı** (aşağıda: egui ColorImage overlay) |
 | Paket | 86.904.159 B, 37 dosya; ABI 45 sembol |
+
+## P4.6 dilim 2 — egui ASS önizleme (ColorImage overlay) ✔ (2026-10-20, C kompozit + Rust kol)
+
+| Kayıt | Değer |
+|---|---|
+| Commit'ler | C: [`e78cf9ca9`](https://github.com/velnoxy/velnosub/commit/e78cf9ca9) (dizgi-alfa kompozit + close sızıntı kapanışı), Rust: [`9cc02a7ed`](https://github.com/velnoxy/velnosub/commit/9cc02a7ed) (Oniz kolu + video paneli overlay) |
+| C kolu | `velnosub_abi_render_frame` iç kare artık **dizgi alfa** (0xAARRGGBB, zemin alfa 0; over kompozit: `out_a = sa + da*(255-sa)/255`, `out_rgb = (src*sa + dst*w1)/oa`) → egui saydam dokusu video üstüne biner; eski çıkışta bölge arka plan siyah opaktı (video gizlenirdi); glyph sayacı `etki > 0` koşuluna bağlı olduğundan metrik sabit |
+| [AB9] birebir teyit | alfa kompoziti sonrası host **9937** + cihaz (taze .so ile pkg'da koşum) **9937** — BİREBİR; uzak-gele kare 0 ve deposit-boy reddi kanca satırları şeridin tamamını doğruladı |
+| Sızıntı kapanışı | `velnosub_abi_close` artık tutamaç kapanınca `g_r` şartını da yumlatır — reload'da RCtx sızması kapandı |
+| Rust kol | `VideoSection` +% `fps: f64`; `Oniz{h/gen/yuk/acik/denendi/son_ms/etki/tampon/dok/hata}`; `oniz_cek`: kol değişiminde durum sıfırlanır (C zaten kapattığından ayrı kapatma çağrısı yok), ölçü değişiminde eski şartı kapatır, açılış tek denemede (`VELNOSUB_FONT` + aile "Default" — [AB9] konvensiyonu), ms `kare*1000/fps`, ms değişmedikçe yeniden render yok; hata şeritte weak satır olarak gösterilir |
+| Overlay çizimi | `video_icerik`: video dokusu rect'i `ui.image` response'tan yakalanır; `ui.put(rect, Image)` ile `etki > 0` iken işlem — etkinin 0 olduğu boş karelerde işleme yok (boş doku geçişi yok); masaüstü + mobil Video sekmesi AYNI yol |
+| Kanıt | dört kanlı: host x86_64/aarch64/x2 (üç meson kanlı RC=0; abi-smoke host cihaz 9937 birebir), egui host RC=0 + aarch64 RC=0 (8.175.232 B) + test 2 passed; egui penceresi ekransız ortamda koşamaz — görsel doğrulama `[UI8]` adımına kaldı (aşağıda tabloda) |
+| Paket | 86.955.311 B / 37 dosya (velnosub-ui 5.651.784 B taze) |
 
 ## P4.7 — Arayüz düzeni seçimi (ilk giriş + Ayarlar + mobil sekme çerçevesi) ✔ (2026-10-20, host derleme; etkileşimli koşum ekransız)
 
@@ -172,3 +185,4 @@ modu işledi (önce kurulum, ardından numaralı denetim — aşağıda).
 | `[UI5]` yeniden açılış | seçim ekranı ÇIKMAZ (kayıtlı düzen+tema uygulanır); açılış teması: ekran görüntüsüyle kontrast ölçü teyidi |
 | `[UI6]` açılış süresi ölçümü (bulgu 6) | gerçek boyutlu .ass dosyasında `UI2` adım süresi ölçülür; makul üzerinde ise yükleme durumu ekranı dilimi açılır |
 | `[UI7]` regresyon | satır düzenle → Commit (`[AG0..AG5]` şeridiyle aynı dosyada) — düzen seçimi veriyi bozmaz |
+| `[UI8]` P4.6 dilim 2 önizleme | video aç → Video sekmesi: seçili ms'de altyazı metni video üstünde saydam binner; ◀/▶ kare değişiminde doku tazelenir, boş ms'de binme yok; `VELNOSUB_FONT` pkg'da DejaVuSans.ttf |

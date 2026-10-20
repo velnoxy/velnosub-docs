@@ -46,8 +46,8 @@ LD_LIBRARY_PATH=$PWD/lib ./velnosub-ass-render in.ass out.ppm \
   `fontselect: (Arial, 400, 0) -> DejaVuSans.ttf` seçimi gösterir. `--family`
   yalnızca ass_add_font adı olarak geçer; işlevsel eşleşme sağlamaz.
 
-## Hazır cihaz paketi (2026-10-20, device-pkg — P4.7 Δ yenilemeli)
-- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, **86.948.448 B**;
+## Hazır cihaz paketi (2026-10-20, device-pkg — P4.6 dilim 2 yenilemeli)
+- `device-pkg.tar.gz` (host'ta `/root/velsub/device-pkg.tar.gz`, **86.955.311 B**;
   37 dosya):
   `bin/velnosub-cli`, `bin/velnosub-ass-render`, **`bin/velnosub-automation`** (P5.0+P5.1/P5.2 manager taramalı),
   **`bin/velnosub-abi-smoke`** (P4.1–P4.5 III şeritleri + `[AB7]`+`[AB8]`+`[AB9]` libass önizleme, strip'li),
@@ -56,9 +56,10 @@ LD_LIBRARY_PATH=$PWD/lib ./velnosub-ass-render in.ass out.ppm \
   13.842.600 B), **`bin/velnosub-audio-play`** (P3.4, strip'li 188.600 B;
   Oboe statik içsel), **`bin/velnosub-mkmpeg`** (P3.1 destek, strip'li
   13.841.416 B; sentetik mp4 üreticisi), **`bin/velnosub-ui`** (P4.0 egui
-  eframe ikilisi, strip'li 5.647.032 B; stil+dialog panelleri + P4.7(+Δ)
-  ilk-giriş düzen seçimi, mobil sekme çerçevesi, açık tema ve Ayarlar
-  dahil; pencere APK bağlamı ister), `lib/libvelnosub-core.so` (P3.2
+  eframe ikilisi, strip'li 5.651.784 B; stil+dialog panelleri + P4.7(+Δ)
+  ilk-giriş düzen seçimi/mobil sekme/açık tema + P4.6 dilim 2 ASS
+  önizleme overlay dahil; pencere APK bağlamı ister),
+  `lib/libvelnosub-core.so` (P3.2
   sağlayıcılı 117.401.312 B),
   **`lib/libvelnosub-abi.so`** (P4.1–P4.5 III + P5.3 line_meta + P5.2 devam insert/delete + **P4.6 dilim 1 libass render** — libass STATİK bağlandı, **45 sembol**; Oboe-bağlı), `lib/libfreetype.so`, `lib/libpng16.so`,
   `lib/libfribidi.so`, `lib/libharfbuzz.so`, `lib/libuchardet.so`,
