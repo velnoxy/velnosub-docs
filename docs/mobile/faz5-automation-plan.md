@@ -210,3 +210,13 @@ P5.2 kalanı yerine GERÇEK boşluk kapatıldı.
   eklemeden çözüldü)
 - Paket: device-pkg.tar.gz 87.002.454 B / 44 dosya (karaskel vendor kümesi dahil)
 - APK alpha: imzali velnosub-0.1.0-alpha.apk **12.777.457 B** (yayın forum kullanıcıda; el-kitabı HANDOFF.md)
+
+## APK alpha2 — telefonun gerçek Android ortamında ilk koşum ✔ (2026-10-21, cihaz — proot dışı)
+
+| Kayıt | Değer |
+|---|---|
+| Düzeltme | alpha1'de pump çıktısı iş-parçasından TextView'a yazılınca `CalledFromWrongThreadException` (Expected: main, Calling: Thread-6) kesiyordu; süreç başlaması ve stdout birikimi sağlamdı — tek kusur görünüm yazımıydı. `MainActivity.log()` → `runOnUiThread` |
+| Sürüm | versionCode=2, `velnosub-0.1.0-alpha2.apk` **12.777.463 B**, apksigner verify OK (aynı debug keystore, üzerine güncelleme sorunsuz) |
+| Kanıt | Telefonunda iki pump RC=0 birebir: **Dolaş dene** toplam=51, sel=13 + 8 info/2 stil + aralık kırması; **Kara dene** 5 olay birebir — `libvelnosub_automation.so` (nativeLibraryDir exec) + `LD_LIBRARY_PATH` + `VELNOSUB_*` kancalarıyla |
+| Önemi | Bu, çekirdek zincirinin (ayrıştırıcı → sanal satır uzayı → subs.styles/script_resolution → parse_karaoke_data → karaskel vendor → text_extents) proot emülasyon şeridinden **bağımsız** ilk yerinde koşumu; bionic ikililerin gerçek Android çalışma zamanında doğrulanması |
+| Sırada | Kullanıcı tarafı: GitHub release (contributor kimliği); mimariye apkg fazı 2 (özellik + UI) genişlemesi |
