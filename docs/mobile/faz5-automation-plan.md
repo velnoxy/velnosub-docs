@@ -188,3 +188,14 @@ P5.2 kalanı yerine GERÇEK boşluk kapatıldı.
 | Kanıt | host(upstream include'larla)+cihaz(pkg include'larla) RC=0 BİREBİR; cihaz Ölç dene g=260.00 y=21.00 regresyon değerleri zarar görmez; masaüstü gtest **345/351** + velnosub-core-smoke Ok — 6 `lagi_acs.*Denied` testi proot-kök ortamının chmod bypass'ı — kök hesap izin-denetim testlerini geçemez (ortam kısıtı; bu zincirle ilgisiz) |
 | Paket | device-pkg.tar.gz **87.002.454 B / 44 dosya** (bin+lib+share/lua/inc karaskel kümesi); core.so 117 MB unstripped bırakıldı (künye açıklaması: hata ayıklama yararı) |
 | Kalan | DependencyControl zemini; moonscript apkg yolu; video köprüsü FPS'li genişleme (apkg fazıyla); satır `raw` alanı + extradata tabloları (upstream extradata — mobil zincir ileride) |
+
+## APK alpha hazırlığı (PAP fazı 1) ✔ [`b6ca32cb2`](https://github.com/velnoxy/velnosub/commit/b6ca32cb2) — 2026-10-21
+
+| Kayıt | Değer |
+|---|---|
+| Yer | `tools/cross/apk-alpha/` — AndroidManifest.xml (com.velnoxy.velnosub 0.1.0-alpha, minSdk 24/targetSdk 28, extractNativeLibs=true) + MainActivity.java (assets→filesDir kopyalayıcı + pump üç düğme: Paket kopyala / Dolaş dene / Kara dene; nativeLibraryDir'deki `libvelnosub_automation.so` — velnosub-automation ELF — VELNOSUB_* + LD_LIBRARY_PATH kancalarıyla koşar) + strings.xml (etiket) + build-apk.sh |
+| Derleme hattı | Debian arm64 `aapt 0.2` (yerli ikilisi) + `javac -encoding UTF-8` (android.jar 34) + `d8 --min-api 24` (bt jar) + `zip` (lib deflate) + Debian `zipalign 4` + `apksigner` (bt jar; Java olduğundan bt sarmalayıcıyla koşar) + keytool debug keystore |
+| Ortam notu | Google build-tools r34 ikilileri (aapt2/zipalign) x86_64 — aarch64 hatta koşmaz (ilk deneme SIGILL); Debian'ın arm64 ikilileri sorunu çözer; qemu-x86_64 prootta askıda kalır (yaklaşım düşürüldü) |
+| Kanıt | `velnosub-0.1.0-alpha.apk` **12.777.457 B**, `apksigner verify` OK, `aapt dump badging` (location body): package/sdks/label tam, launchable-activity MainActivity; lib/arm64-v8a 14 native + assets gövde + classes.dex 8.4 KB |
+| İçdenetim | APK gömülü native seti device-pkg ile aynı kanıt zincirinden şaşmaz; APK düğmelerinin sardığı pump koşumları iki kutupta zaten kanıtlı |
+| Yol | HANDOFF.md el-kitabı repo'da; GitHub release yayın adımı kullanıcıya ait (contributor tarafı kullanıcıda); APK zemini apkg fazı 2 ile genişleyecek |
