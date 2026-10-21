@@ -126,3 +126,65 @@ P5.2 kalanı yerine GERÇEK boşluk kapatıldı.
 | Kanıt | 3-lane RC=0; `[AB11]` host↔cihaz BİREBİR (52 satır eş, diff yalnız kayıt-yolu arg'ı + libass rozeti) |
 | Paket | 86.980.103 B, 37 dosya; velnosub-ui 5.651.784 B, abi-smoke 395.544 B |
 | Kalan | DependencyControl zemini, moonscript/karaskel paketi (karaskel artık text_extents + satır tabloları_READY), video köprüsünün FPS'li genişlemesi (apkg fazıyla) |
+
+## Karaskel zinciri (P5 ikinci kuşak) — LuaJIT 5.2 zemini + upstream subs semantiği ✔ (2026-10-20/21, host + cihaz)
+
+### Dilim L — LuaJIT 5.2 uyum zemini [`46e2dd0e7`](https://github.com/velnoxy/velnosub/commit/46e2dd0e7)
+
+| Kayıt | Değer |
+|---|---|
+| Build | `build-luajit.sh` host+arm64+x86_64 koluna `XCFLAGS="-DLUAJIT_ENABLE_LUA52COMPAT"` — upstream meson wrap'iyle (subprojects/packagefiles/luajit 15-16) aynı payda; üç lane yeniden derlendi (~15 dk/kol, seri) |
+| Kök neden | LuaJIT `ffh_pairs(L,MM_ipairs)` yalnız `LJ_52 \|\| tviscdata` şartıyla `__ipairs` metamethoduna bakar — 5.2 uyumsuz userdata'da ipairs tabloda bile HATA atar; `__ipairs`'i shim'in kendisi de tanımlıyor (upstream auto4_lua_assfile.cpp 770) — ikisi birden şart |
+| Teşhis | shim `[AUST2] LuaJIT 5.2 uyum zemini: <bool>` her pump koşumunda; `table.pack` mevcutluğu 5.2 modu kanıtı |
+| Kanıt | pump host+cihaz RC=0; dilim-C öncesi kanıt zinciri zarar görmedi (Ölç/Form/Ana harf/Ekle sil birebir) |
+
+### Dilim V — sanal satır uzayı [`d7c627114`](https://github.com/velnoxy/velnosub/commit/d7c627114)
+
+| Kayıt | Değer |
+|---|---|
+| Uzay | subs dizinleri upstream LuaAssFile lines = [Script Info] + Styles + Events; `#subs`/`subs.n` = TÜM satırlar, `subs.n_lines` olay sayısı (dilim-A önü korunur) |
+| Info tarama | `bilgi_satirlari()` AssParser::ParseScriptInfoLine kuralları bire bir: boş satır kayım değiştirmez; `;` + `Collisions:` satırı yutulur; `:` yoksa yutulur (küt boşluklu anahtar, değer trim-left); 19 işçi öznitelik anahtarı + `Automation Settings ` öneki Info'ya DÖNÜŞMEZ; `[script info]` küçük-harf karşılaştırması; kurucu başlangıç durumu info |
+| Stil alanları | ABI 13-kanal `stil_dizgesi` → upstream AssEntryToLua style dalı eşlemesi: fontname (font DEĞİL), colorN `GetAssStyleFormatted() + "&"`, margin_t/b tek slot = Margin[2] (margin_v KARASKEL'İN kendisi kurar), relative_to=2, class="style" |
+| Dolaşım | sayısal `__index` (1..n, aralık kırması upstream CheckBounds dizgesi) + `__ipairs` + `__len=to` + `__newindex` olay bölgesi (text/zaman yazımı, ABI idx'de ofset kayması) |
+| insert/delete | olay bölgesi sabit: bilgi/stil bölgesindeki konum dürüst reddi; upstream `insert(before)` 1..lines+1 semantik kayımlandırılmış |
+| Seçim | pump `--sel` upstream `selected_rows` uyumuyla TAM-uzay dizine çevrilir (offset=info+styles; auto4_lua.cpp 911 kanıt); demo makrolarda seçim baskıları `aktif=ofset+sel` gösterir |
+| Duman | `Dolaş dene`: 51 satır = 8 info + 2 stil + 41 olay (ass-format-tests); ilk 12 satır class'lı baskı; `subs[0]`/`subs[n+1]` kırması upstream dizgesiyle kanıtlı |
+| Kanıt | host+cihaz RC=0 birebir; Ölç g=260.00 y=21.00 birebir (regresyon zinciri sağlam) |
+
+### Dilim 1 — `subs.styles` okuma proxy [`b00e46304`](https://github.com/velnoxy/velnosub/commit/b00e46304)
+
+| Kayıt | Değer |
+|---|---|
+| Yüzey | `styles.n` / `styles[i]` (1..N) / `styles[ad]` (tanım sırası, ilk eşleşme; yoksa nil) / `__len` / `__ipairs`; her dönüş taze ABI (`velnosub_abi_style_count/style_of`), karaskel `styles[l.name]` hattına tam uyum |
+| Duman | `Stil dene`: n=2; Default Arial 20 align 2 marj 10×4 relative_to=2 renk1 `&H00FFFFFF&`; Alt Times 40 align 8; yok-stil nil; ölçüm kardeşliği y=19.00 |
+| Kanıt | host+cihaz RC=0 BİREBİR |
+
+### Dilim 2 — `subs.script_resolution()` [`024f79b4f`](https://github.com/velnoxy/velnosub/commit/024f79b4f)
+
+| Kayıt | Değer |
+|---|---|
+| Kurallar | upstream AssFile::GetResolution: PlayResX/Y Info'dan `iequals`-ilk-eşleşme (şim key:lower) + atoi baştan-tam-sayı; Gabest: (0,0)→384×288; x=0→y==1024?1280:floor(y·4/3); y=0→x==1280?1024:floor(x·3/4) |
+| Sunum | `testmedia/karaskel-dene.ass` (PlayRes yok + `Video File:` işçi öznitelik Info dışı + Kara stil/kara olayları dilim-3 payı) + `testmedia/res-yarim.ass` (yalnız PlayResY:480 → 4:3 kuralı) |
+| Kanıt | 3 koşum RC=0 BİREBİR iki kutup: 640×480 / 384×288 / 640×480 |
+
+### Dilim 3 — `aegisub.parse_karaoke_data` [`d7a58624b`](https://github.com/velnoxy/velnosub/commit/d7a58624b)
+
+| Kayıt | Değer |
+|---|---|
+| Durum makinesi | upstream AssKaraoke::SetLine(dia,false,false) saflua: k-tag = ad `\k` önek (büyük/küçük duyarsız); `\K`→`\kf`; `(sure>0 \|\| metin≠"")` push; push sonrası upstream YALNIZ metin/ovr temizler — baş zamanı ESKİ sure ile birikir (`start += duration`), yeni sure = param·10 ms; son sibek koşulsuz (taksiz metin dahi 0-sure sibek); ovr chunk: `{`+tag dizgesi…+`}`, k-tag chunk'ı kapar, `\p1/\p0` çizim devri düz metni offset'li ovr'a toplar |
+| Alanlar | auto4 kara[0] boş sibek sabiti + 1..n: duration/start_time/end_time (satıra bağıl ms), tag, text (ovr aralıklı dikt dize — GetText(false) karşılığı; map sıralı diken), text_stripped (saf metin) |
+| Duman | `Kara dene`: karaskel-dene.ass 5 olay el-izlenmiş beklenende birebir (ka/ra/oke zamanları; ilk-tag-öncesi 0-sure sibek sürprizi; `{!not}` yorum ovr; karaoke-siz satır) |
+| Kanıt | host+cihaz RC=0 BİREBİR — 11 sibek satırı, "5 olay birebir" |
+
+### Dilim 4 — karaskel vendor [`ca72a257a`](https://github.com/velnoxy/velnosub/commit/ca72a257a)
+
+| Kayıt | Değer |
+|---|---|
+| Vendor | `karaskel.lua`/`karaskel-auto4.lua`/`utils.lua`/`utils-auto4.lua`/`unicode.lua` upstream automation/include orijinalleri BOM'lu birebir → pkg `share/lua/inc/` (refreshDevice scripti "karaskel vendor kümesi"); host pump `VELNOSUB_AEGIINC=automation/include` (orijinal orijinaller) |
+| require kancaları | `package.preload["aegisub.unicode"]` (upstream unicode.moon karşılıkları: charwidth b<128→1/<224→2/<240→3/yok→4 + chars/len/codepoint; to_*_case `__unicode_impl` doğal kolu mobilde yok — dürüst red) + `package.preload["aegisub.util"]` (upstream util.moon gövdeleri saf-Lua birebir: copy, deep_copy seen haritası, ass_color/ass_alpha/ass_style_color, extract_color 3-deneme profili, HSV_to_RGB Hi dalları, HSL_to_RGB, trim/headtail/words, clamp/interpolate/_color/_alpha) |
+| Satır alanları | ABI `line_meta` dizgesi `dialogue|comment` → +layer/style/actor/effect/margin_t(b=c) (upstream LuaDialogueToLua 164-182; flyweight `.get()`, 47 sembol sabit — kanal büyümesi); shim `satir_oku` buna göre alan kümesini doldurur |
+| debug.out | seviye-1 argüman + `msg:format(...)` düzeltmesi (önceki hal `out(4, "…%f", x)` çağrısında "4" basardı) |
+| Duman | `Karaskel dene`: include("karaskel.lua") → collect_head(subs,false) → preproc_line_text/size/pos; res=384×288 (Gabest), stil.n=2, korrektör 1.000 (video nil), `margin_v` değerini gülüştürür; kırpık "karaoke" kara.n=3; konum sol=143.5 orta=192 sağ=240.5 x=192 h=center v=bottom (el-hesap birebir); etkin marj 10×4; sibek g 0/29/25/43 (toplam = satır g 97) |
+| Kanıt | host(upstream include'larla)+cihaz(pkg include'larla) RC=0 BİREBİR; cihaz Ölç dene g=260.00 y=21.00 regresyon değerleri zarar görmez; masaüstü gtest **345/351** + velnosub-core-smoke Ok — 6 `lagi_acs.*Denied` testi proot-kök ortamının chmod bypass'ı — kök hesap izin-denetim testlerini geçemez (ortam kısıtı; bu zincirle ilgisiz) |
+| Paket | device-pkg.tar.gz **87.002.454 B / 44 dosya** (bin+lib+share/lua/inc karaskel kümesi); core.so 117 MB unstripped bırakıldı (künye açıklaması: hata ayıklama yararı) |
+| Kalan | DependencyControl zemini; moonscript apkg yolu; video köprüsü FPS'li genişleme (apkg fazıyla); satır `raw` alanı + extradata tabloları (upstream extradata — mobil zincir ileride) |
