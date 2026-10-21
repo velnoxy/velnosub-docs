@@ -199,3 +199,14 @@ P5.2 kalanı yerine GERÇEK boşluk kapatıldı.
 | Kanıt | `velnosub-0.1.0-alpha.apk` **12.777.457 B**, `apksigner verify` OK, `aapt dump badging` (location body): package/sdks/label tam, launchable-activity MainActivity; lib/arm64-v8a 14 native + assets gövde + classes.dex 8.4 KB |
 | İçdenetim | APK gömülü native seti device-pkg ile aynı kanıt zincirinden şaşmaz; APK düğmelerinin sardığı pump koşumları iki kutupta zaten kanıtlı |
 | Yol | HANDOFF.md el-kitabı repo'da; GitHub release yayın adımı kullanıcıya ait (contributor tarafı kullanıcıda); APK zemini apkg fazı 2 ile genişleyecek |
+
+## Faz5 kapani — 2026-10-21 gece durumu
+
+- Dilim zinciri tamam: L ✔ V ✔ 1 ✔ 2 ✔ 3 ✔ 4 ✔ — karaskel hattı iki kutupta pump
+  koşumlarıyla canli; makro duman kümesi Dolaş/Stil/Çöz/Kara/Ölç/Ana harf/Form/Ekle sil
+- Desktop: gtest **345/351 + velnosub-core-smoke Ok** (6 lagi_acs Denied — proot-kök
+  ortam kısıtı; zincirle ilgisiz)
+- nm: `velnosub_abi_*` **47 sembol** sabit (dilim 4 kanal büyümesi ABI fonksiyon
+  eklemeden çözüldü)
+- Paket: device-pkg.tar.gz 87.002.454 B / 44 dosya (karaskel vendor kümesi dahil)
+- APK alpha: imzali velnosub-0.1.0-alpha.apk **12.777.457 B** (yayın forum kullanıcıda; el-kitabı HANDOFF.md)
