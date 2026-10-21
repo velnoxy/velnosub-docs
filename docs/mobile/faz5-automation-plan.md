@@ -220,3 +220,11 @@ P5.2 kalanı yerine GERÇEK boşluk kapatıldı.
 | Kanıt | Telefonunda iki pump RC=0 birebir: **Dolaş dene** toplam=51, sel=13 + 8 info/2 stil + aralık kırması; **Kara dene** 5 olay birebir — `libvelnosub_automation.so` (nativeLibraryDir exec) + `LD_LIBRARY_PATH` + `VELNOSUB_*` kancalarıyla |
 | Önemi | Bu, çekirdek zincirinin (ayrıştırıcı → sanal satır uzayı → subs.styles/script_resolution → parse_karaoke_data → karaskel vendor → text_extents) proot emülasyon şeridinden **bağımsız** ilk yerinde koşumu; bionic ikililerin gerçek Android çalışma zamanında doğrulanması |
 | Sırada | Kullanıcı tarafı: GitHub release (contributor kimliği); mimariye apkg fazı 2 (özellik + UI) genişlemesi |
+
+## APK alpha3 — telefon ölçüm hattı kanıtı ✔ [`bb6f186bd`](https://github.com/velnoxy/velnosub/commit/bb6f186bd) — 2026-10-21
+
+| Kayıt | Değer |
+|---|---|
+| Düğme | alpha3: 4. pump düğmesi «Karaskel dene» (karaskel-dene.ass, --sel 1; addView kk,3 — ScrollView öncesi, düğme ekran altında kaymaz) |
+| Kanıt | Telefonda RC=0 **birebir**: res=384×288 stil.n=2 vfaktör=1.000; `video_size → nil` ([AUSB]); kl ölçü **g=97.00 y=18.00**; konum **sol=143.5 orta=192.0 sağ=240.5 x=192.0 h=center v=bottom**; etkin marj 10,10,10,10; sibek g **0/29/25/43** (toplam = satır genişliği 97 — tutarlılık) |
+| Önemi | FreeType/libharfbuzz ölçüm hattı + collect_head + preproc_line_text/size/pos üçüncü kutupta (gerçek Android uygulama kum havuzu) ilk kez koştu — host / proot-cihaz / telefon **üç kutup birebir**; P5 karaskel fazı tamam |
