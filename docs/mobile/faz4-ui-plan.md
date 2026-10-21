@@ -41,10 +41,25 @@ Notlar:
 ## Bekleyen paketler
 
 - P4.3 video paneli ✔, P4.4 ses paneli ✔, P4.5 stil omurgası **+ tam
-  editör** ✔ aşağıda künyeli; sırada Faz 5 dialog formları (aynı widget
-  dilimi), P4.6 jestler/hotkey/düzenler ve APK bağlamı (NativeActivity +
-  imza + yükleme; eframe ikilisi orada pencere açar): plan metni master
-  plan Faz 4'te.
+  editör** ✔, P4.6 düzenler/önizleme ✔, P4.7 denetim düzeltmeleri ✔
+  aşağıda künyeli; **P4.8 asıl uygulama APK'sı ✔ (aşağıda künyeli —
+  cdylib + NativeActivity, telefona kurulabilir ilk gerçek UI)**. Sırada:
+  SAF dosya seçici (kullanıcı dosyası açma), suağırım ay'ları (ses/video
+  gerçek kanıtları), testmedia-ile panel şeritlerinin cihaz ekran yaşamı.
+
+## P4.8 — Asıl uygulama APK'sı (egui UI cdylib + NativeActivity) ✔ (2026-10-21)
+
+| Kayıt | Değer |
+|---|---|
+| Kod commit | [`baac28bde`](https://github.com/velnoxy/velnosub/commit/baac28bde) (dilim 2: cdylib + android_main) → [`a5feda404`](https://github.com/velnoxy/velnosub/commit/a5feda404) (dilim 3: apk-ui pakacı), `feature` |
+| Plan/bulgu | `docs/mobile/faz4-8-ui-apk-plan.md` (`1a9235b`): eski planın "panel kodu kayıp, yeniden kur" varsayımı **yanlıştı** — panel kodu `abi.rs`'de mevcuttu (GridApp/Sekme/video/ses/form gövdeleri, 1863 satır); plan "kurtarma" → "doğrulama"ya revize edildi |
+| Yapı | `[lib] velnosub_ui` crate-type `["cdylib","rlib"]` (bin host dev koşumunu sürer); `main.rs` tek satır (`calistir_env`); ortak `kos()` (tema `ayar_yukle`→`stil_tamir` + GridApp) host ile AYNI kapı |
+| Android girişi | `android_main`: `internal_data_path` + `asset_manager`→filesDir (karaskel-dene.ass + DejaVuSans.ttf kopyası) → `calistir(open,save)`; `options.event_loop_builder → with_android_app(app)` (winit `platform/android.rs:128`); `ANativeActivity_onCreate`'in android-activity-0.6.1 `native_activity/glue.rs:876`'dan geldiği kaynağa doğrulandı |
+| Sembol kanıtı | `llvm-nm -D libvelnosub_ui.so` → `T ANativeActivity_onCreate` + `T android_main`; boyut 8.359.432 B; NEEDED: `libvelnosub-abi.so` + platform küpü (dl/android/log/m/c) |
+| Test | host `cargo test` **2 passed** (`kontrast_tamiri_aa_uyumlu`, `ayar_dongusu`) RC=0 — dönüşüm öncesiyle birebir; ABI defteri **47 sabit**; aarch64 cdylib RC=0 (26.67 s) |
+| APK | `velnosub-ui-0.1.0-alpha.apk` **13.583.682 B**, `com.velnoxy.velnosubui` v4 (0.1.0-ui-alpha) — NativeActivity, `hasCode="false"` (dex yok), `extractNativeLibs`; kapanış küpü: ui/abi/core/freetype/fribidi/harfbuzz/uchardet/c++_shared (core 117 MB→18.4 MB strip); aapt (Debian arm64) → zip → zipalign 4 → apksigner **verify OK** (alpha keystore kimlik ailesiyle aynı); `/mnt/sdcard/Download/`'a kopyalandı |
+| Süreç dürüstüğü | Dilim 2 alt-ajanı koşum ortasında sessizleşti (süreç/flock/yazma yok 10+ dk; iki durum-sorgusu boş döndü) — **orkestratör mekanik kalanı kendisi aldı**, alt-ajanın yazdığı yapıtlar (lib.rs + Cargo.toml E0433 `["cdylib","rlib"]` düzeltmesi) desteklendi; ilk apk denemesi 570 sn timeout yedi (160 MB kopya+strip+zip+imza — telefon IO), arka planda yeniden koşum sürmedi |
+| Alpha sınırları | Dürüst: dosya seçici (SAF/JNI) **kuyrukta** — açılış yalnız paketli örnek .ass; Kayıt filesDir `kayit.ass`; depolama izni yok; libass önizleme fontu asset kopyasından |
 
 ## P4.5 — Stiller omurgası ✔ (2026-10-20, host + cihaz + paket-içi)
 
